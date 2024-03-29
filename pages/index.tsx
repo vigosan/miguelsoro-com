@@ -4,6 +4,7 @@ import { FindAllPictures } from "@/application/cases/FindAllPictures";
 import { InMemoryPictureRepository } from "@/infra/PictureRepository";
 import { pictureData } from "@/data/pictures";
 import List from "@/components/List";
+import { PictureProps } from "@/interfaces/PictureProps";
 
 export default function IndexPage() {
   const [pictures, setPictures] = useState<PictureProps[]>([]);
