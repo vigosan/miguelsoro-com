@@ -17,7 +17,7 @@ const Picture = ({ item, className }: Props) => (
       <Image
         src={`/pictures/${item.id}.jpg`}
         alt={item.title}
-        className="h-full w-full object-cover object-center lg:h-full lg:w-full border-24 lg:border-12 border-gray-900"
+        className="h-full w-full object-cover object-center border-8 border-gray-900"
         width={260}
         height={320}
       />
