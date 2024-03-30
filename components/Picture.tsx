@@ -15,7 +15,7 @@ const Picture = ({ item, className }: Props) => (
   <div className={cn("group relative", className)}>
     <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
       <Image
-        src={`/pictures/${item.id}.jpg`}
+        src={`/pictures/${item.id}.webp`}
         alt={item.title}
         className="h-full w-full object-cover object-center border-8 border-gray-900"
         width={260}
