@@ -7,6 +7,7 @@ const navigation = [
   { name: "Biografía", href: "/biography" },
   { name: "Tienda", href: "/" },
   { name: "Contacto", href: "/contact" },
+  { name: "Acerca de", href: "/terms" },
 ];
 
 export function Header() {
