@@ -1,11 +1,11 @@
 import * as React from "react";
-import { PictureProps } from "@/interfaces/PictureProps";
+import { Picture } from "@/domain/picture";
 import { cn } from "@/utils/cn";
-import Picture from "./Picture";
+import Item from "./Item";
 
 type Props = {
   className?: string;
-  items: PictureProps[];
+  items: Picture[];
 };
 
 const List = ({ items, className }: Props) => (
@@ -16,7 +16,7 @@ const List = ({ items, className }: Props) => (
     )}
   >
     {items.map((item) => (
-      <Picture item={item} key={item.id} className="group relative" />
+      <Item item={item} key={item.id} className="group relative" />
     ))}
   </div>
 );
