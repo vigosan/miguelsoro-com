@@ -6,10 +6,7 @@ export default function ContactPage() {
     <Layout>
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-3">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-            Contacto
-          </h2>
-          <p className="mt-4 leading-7 text-gray-600">
+          <p className="leading-7 text-gray-600">
             ¿Tienes preguntas sobre la obra de Miguel Soro o te gustaría más
             información sobre las futuras exposiciones? Nos encantaría
             escucharte.
