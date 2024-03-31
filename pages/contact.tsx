@@ -33,8 +33,15 @@ export default function ContactPage() {
                 </dd>
               </div>
               <div className="mt-1">
-                <dt className="sr-only">Phone number</dt>
-                <dd>+34 637 787 778</dd>
+                <dt className="sr-only">Número de telefono</dt>
+                <dd>
+                  <a
+                    className="font-semibold text-gray-600"
+                    href="tel:+34637787778"
+                  >
+                    +34 637 787 778
+                  </a>
+                </dd>
               </div>
             </dl>
           </div>
