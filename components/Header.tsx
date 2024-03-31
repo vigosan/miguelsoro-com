@@ -1,15 +1,12 @@
 import { useState } from "react";
-import {
-  Bars3Icon,
-  XMarkIcon,
-  ShoppingBagIcon,
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
 import Link from "next/link";
 
 const navigation = [
-  { name: "Obra", href: "/" },
-  { name: "Acerca de", href: "/about" },
+  { name: "Biografía", href: "/biography" },
+  { name: "Tienda", href: "/" },
+  { name: "Contacto", href: "/contact" },
 ];
 
 export function Header() {
@@ -46,10 +43,6 @@ export function Header() {
               {item.name}
             </a>
           ))}
-
-          <a href="#" className="text-sm leading-6 text-gray-900">
-            <ShoppingBagIcon className="h-6 w-6" aria-hidden="true" />
-          </a>
         </div>
       </nav>
 
