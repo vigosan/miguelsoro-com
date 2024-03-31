@@ -1,18 +1,18 @@
 import Layout from "@/components/Layout";
-import Image from "next/image";
 
 export default function ContactPage() {
   return (
     <Layout>
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-3">
         <div>
+          <h2 className="sr-only">Contacto</h2>
           <p className="leading-7 text-gray-600">
             ¿Tienes preguntas sobre la obra de Miguel Soro o te gustaría más
             información sobre las futuras exposiciones? Nos encantaría
             escucharte.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-2 lg:gap-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:col-span-2 lg:gap-8">
           <div className="rounded-2xl bg-gray-50 p-10">
             <h3 className="text-base font-semibold leading-7 text-gray-900">
               Email
