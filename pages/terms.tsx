@@ -13,7 +13,7 @@ export default function TermsPage() {
         </p>
         <p>
           Nos enorgullece asegurar envíos cuidadosos y seguros para cada obra de
-          arte comprada. Sabemos lo importante que es recibir estas piezas en
+          arte comprada. Entendemos lo importante que es recibir estas piezas en
           perfecto estado, por lo que cada envío se maneja con el máximo cuidado
           y el embalaje adecuado para proteger la obra.
         </p>
