@@ -6,7 +6,7 @@ export default function AboutPage() {
     <Layout>
       <div className="flex flex-col gap-4">
         <Image
-          src="/ms.jpg"
+          src="/biography.webp"
           alt="Miguel Soro"
           className="h-full w-full object-cover object-center"
           width={948}
