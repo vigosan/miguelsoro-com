@@ -3,7 +3,7 @@ import { InMemoryPictureRepository } from "@/infra/PictureRepository";
 import { findAllPictures } from "@/application/findAllPictures";
 import { Picture } from "@/domain/picture";
 
-export const usePictures = () => {
+export function usePictures() {
   const [pictures, setPictures] = useState<Picture[]>([]);
 
   useEffect(() => {
@@ -17,4 +17,4 @@ export const usePictures = () => {
   }, []);
 
   return pictures;
-};
+}

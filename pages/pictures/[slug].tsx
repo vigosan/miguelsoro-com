@@ -1,10 +1,9 @@
 import Image from "next/image";
-import { useRouter } from "next/router";
-import Layout from "@/components/Layout";
-import { getImgPath } from "@/domain/picture";
-
+import { Layout } from "@/components/Layout";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { getImgPath } from "@/domain/picture";
 import { usePicture } from "@/hooks/usePicture";
+import { useRouter } from "next/router";
 
 const PictureDetail = () => {
   const router = useRouter();

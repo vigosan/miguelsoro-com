@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { InMemoryPictureRepository } from "@/infra/PictureRepository";
 import { Picture } from "@/domain/picture";
 
-export const usePicture = (idOrSlug: string | undefined) => {
+export function usePicture(idOrSlug: string | undefined) {
   const [picture, setPicture] = useState<Picture | undefined>(undefined);
 
   useEffect(() => {
@@ -25,4 +25,4 @@ export const usePicture = (idOrSlug: string | undefined) => {
   }, [idOrSlug]);
 
   return picture;
-};
+}

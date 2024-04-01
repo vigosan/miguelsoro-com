@@ -9,31 +9,31 @@ type Props = {
   item: Picture;
 };
 
-const Item = ({ item, className }: Props) => (
-  <Link href={getPath(item)} className="relative">
-    <div className={cn("group relative", className)}>
-      <div className="aspect-h-1 aspect-w-1 lg:aspect-none h:96 max-h-96 w-full overflow-hidden bg-gray-200 group-hover:opacity-75 lg:h-80 lg:max-h-80">
-        <Image
-          src={getImgPath(item)}
-          alt={item.title}
-          className="h-full w-full border-18 border-gray-900 object-cover object-top p-8 group-hover:opacity-75 lg:border-14"
-          width={260}
-          height={320}
-        />
-      </div>
-      <div className="mt-4 flex flex-col gap-2">
-        <div>
-          <h3 className="text-sm text-gray-700">
-            <span aria-hidden="true" className="absolute inset-0" />
-            {item.title}
-          </h3>
+export function Item({ item, className }: Props) {
+  return (
+    <Link href={getPath(item)} className="relative">
+      <div className={cn("group relative", className)}>
+        <div className="aspect-h-1 aspect-w-1 lg:aspect-none h:96 max-h-96 w-full overflow-hidden bg-gray-200 group-hover:opacity-75 lg:h-80 lg:max-h-80">
+          <Image
+            src={getImgPath(item)}
+            alt={item.title}
+            className="h-full w-full border-18 border-gray-900 object-cover object-top p-8 group-hover:opacity-75 lg:border-14"
+            width={260}
+            height={320}
+          />
         </div>
-        <div className="flex justify-between">
-          <p className="mt-1 text-sm text-gray-500">{item.size}</p>
+        <div className="mt-4 flex flex-col gap-2">
+          <div>
+            <h3 className="text-sm text-gray-700">
+              <span aria-hidden="true" className="absolute inset-0" />
+              {item.title}
+            </h3>
+          </div>
+          <div className="flex justify-between">
+            <p className="mt-1 text-sm text-gray-500">{item.size}</p>
+          </div>
         </div>
       </div>
-    </div>
-  </Link>
-);
-
-export default Item;
+    </Link>
+  );
+}
