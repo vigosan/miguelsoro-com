@@ -1,30 +1,17 @@
 import Image from "next/image";
-import Layout from "@/components/Layout";
-import { InMemoryPictureRepository } from "@/infra/PictureRepository";
-import { Picture, getImgPath } from "@/domain/picture";
-import { findPictureBySlug } from "@/application/findPictureBySlug";
-import { pictures as pictureData } from "@/data/pictures";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Layout from "@/components/Layout";
+import { getImgPath } from "@/domain/picture";
+
 import { formatCurrency } from "@/utils/formatCurrency";
+import { usePicture } from "@/hooks/usePicture";
 
 const PictureDetail = () => {
   const router = useRouter();
-  const [picture, setPicture] = useState<Picture | undefined>(undefined);
-  const { slug } = router.query;
-
-  useEffect(() => {
-    const getPicture = async () => {
-      if (typeof slug === "string") {
-        const pictureRepository = new InMemoryPictureRepository(pictureData);
-        const picture = await findPictureBySlug(pictureRepository, slug);
-
-        setPicture(picture);
-      }
-    };
-
-    getPicture();
-  }, [slug]);
+  const slug = Array.isArray(router.query.slug)
+    ? router.query.slug[0]
+    : router.query.slug;
+  const picture = usePicture(slug);
 
   if (!picture) {
     return <div>No se encontró el picture</div>;
