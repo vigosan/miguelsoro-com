@@ -19,7 +19,7 @@ export function Header() {
         className="mx-auto flex items-center justify-between"
         aria-label="Global"
       >
-        <Link href="/" className="text-md -m-1.5 p-1.5 lg:text-2xl">
+        <Link href="/" className="text-md -m-1.5 p-1.5 lg:text-2xl text-xl">
           <span>Miguel Soro</span>
         </Link>
 
