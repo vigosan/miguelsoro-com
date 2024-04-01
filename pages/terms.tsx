@@ -6,10 +6,11 @@ export default function TermsPage() {
     <Layout>
       <div className="flex flex-col gap-4">
         <p>
-          Todas las obras de Miguel Soro son piezas únicas, y él detenta en
-          exclusiva los derechos de autor. Cada pintura es el resultado de un
-          verdadero esfuerzo de creatividad y pasión, y refleja la singular
-          visión del propio Miguel.
+          Cada obra de Miguel Soro es una interpretación original basada en
+          auténticas y vibrantes escenas del mundo del ciclismo. Aunque se
+          inspira en hechos y momentos reales de las carreras, cada pintura se
+          transforma a través de su visión y talento artístico, convirtiéndola
+          en una pieza única.
         </p>
         <p>
           Nos enorgullece asegurar envíos cuidadosos y seguros para cada obra de
