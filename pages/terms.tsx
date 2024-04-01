@@ -7,10 +7,9 @@ export default function TermsPage() {
       <div className="flex flex-col gap-4">
         <p>
           Cada obra de Miguel Soro es una interpretación original basada en
-          auténticas y vibrantes escenas del mundo del ciclismo. Aunque se
-          inspira en hechos y momentos reales de las carreras, cada pintura se
-          transforma a través de su visión y talento artístico, convirtiéndola
-          en una pieza única.
+          escenas vibrantes del mundo del ciclismo. Aunque se inspira en hechos
+          y momentos reales de las carreras, cada pintura se transforma a través
+          de su visión y talento artístico, convirtiéndola en una pieza única.
         </p>
         <p>
           Nos enorgullece asegurar envíos cuidadosos y seguros para cada obra de
