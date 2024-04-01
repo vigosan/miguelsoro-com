@@ -1,7 +1,8 @@
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-import Link from "next/link";
 
 const navigation = [
   { name: "Biografía", href: "/biography" },
@@ -19,8 +20,19 @@ export function Header() {
         className="mx-auto flex items-center justify-between"
         aria-label="Global"
       >
-        <Link href="/" className="text-md -m-1.5 p-1.5 lg:text-2xl text-xl">
-          <span>Miguel Soro</span>
+        <Link
+          href="/"
+          className="text-md -m-1.5 p-1.5 lg:text-2xl text-xl w-32 lg:w-48 h-auto"
+        >
+          <span className="sr-only">Miguel Soro</span>
+          <Image
+            src="/signature.webp"
+            alt="Firma de Miguel Soro"
+            width={200}
+            height={42}
+            priority
+            aria-hidden
+          />
         </Link>
 
         <div className="flex lg:hidden">
