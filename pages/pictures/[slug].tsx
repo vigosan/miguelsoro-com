@@ -21,12 +21,12 @@ const PictureDetail = () => {
     <Layout>
       <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
         <div className="lg:col-span-4 lg:row-end-1">
-          <div className="aspect-h-3 aspect-w-4 overflow-hidden shadow-lg border-16 border-gray-900">
+          <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden bg-gray-200 group-hover:opacity-75 max-h-max">
             <Image
               src={getImgPath(picture)}
               alt={picture.title}
-              className="object-cover object-center"
-              width={500}
+              className="h-full w-full --object-cover --object-center border-18 lg:border-14 border-gray-900"
+              width={400}
               height={500}
             />
           </div>
