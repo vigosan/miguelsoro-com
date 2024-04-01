@@ -12,11 +12,11 @@ type Props = {
 const Item = ({ item, className }: Props) => (
   <Link href={getPath(item)} className="relative">
     <div className={cn("group relative", className)}>
-      <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+      <div className="aspect-h-1 aspect-w-1 lg:aspect-none h:96 max-h-96 w-full overflow-hidden bg-gray-200 group-hover:opacity-75 lg:h-80 lg:max-h-80">
         <Image
           src={getImgPath(item)}
           alt={item.title}
-          className="h-full w-full object-cover object-center border-18 lg:border-14 border-gray-900"
+          className="h-full w-full border-18 border-gray-900 object-cover object-top p-8 group-hover:opacity-75 lg:border-14"
           width={260}
           height={320}
         />

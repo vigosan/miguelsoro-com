@@ -21,13 +21,13 @@ const PictureDetail = () => {
     <Layout>
       <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
         <div className="lg:col-span-4 lg:row-end-1">
-          <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden bg-gray-200 group-hover:opacity-75 max-h-max">
+          <div className="aspect-h-1 aspect-w-1 h-96 max-h-96 w-full overflow-hidden bg-gray-200 group-hover:opacity-75">
             <Image
               src={getImgPath(picture)}
               alt={picture.title}
-              className="h-full w-full --object-cover --object-center border-18 lg:border-14 border-gray-900"
-              width={400}
-              height={500}
+              className="h-full w-full border-18 border-gray-900 object-cover object-top p-8 lg:border-14"
+              width={384}
+              height={460}
             />
           </div>
           <div className="mt-10 border-t border-gray-200 pt-10">
@@ -93,7 +93,7 @@ const PictureDetail = () => {
           </div>
         </div>
 
-        <div className="mx-auto mt-14 max-w-2xl sm:mt-16 lg:col-span-3 lg:row-span-2 lg:row-end-2 lg:mt-0 lg:max-w-none">
+        <div className="mt-14 mx-auto max-w-2xl sm:mt-16 lg:col-span-3 lg:row-span-2 lg:row-end-2 lg:mt-0 lg:max-w-none">
           <div className="flex flex-col-reverse">
             <div className="mt-4">
               <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
@@ -110,7 +110,7 @@ const PictureDetail = () => {
           <div className="mt-10">
             <button
               type="button"
-              className="cursor-pointer flex items-center justify-center rounded-md border border-transparent bg-gray-900 px-8 py-3 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+              className="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-gray-900 py-3 px-8 text-base font-medium text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-50 focus:outline-none"
             >
               {`Comprar ${formatCurrency(picture.price)}`}
             </button>
@@ -120,7 +120,7 @@ const PictureDetail = () => {
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center">
                 <dt>
                   <svg
-                    className="mx-auto h-6 w-6 flex-shrink-0 text-gray-400"
+                    className="flex-shrink-0 mx-auto h-6 w-6 text-gray-400"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
