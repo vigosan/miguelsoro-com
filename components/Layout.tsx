@@ -9,7 +9,7 @@ type Props = {
 };
 
 const Layout = ({ children, title = "Miguel Soro" }: Props) => (
-  <div className="mx-auto min-h-screen flex flex-col max-w-5xl px-6 py-12 antialiased lg:px-24 lg:py-16 gap-6 lg:gap-12">
+  <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 py-12 px-6 antialiased lg:gap-12 lg:py-16 lg:px-24">
     <Head>
       <title>{title}</title>
       <meta charSet="utf-8" />

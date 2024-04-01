@@ -28,7 +28,7 @@ export default function TermsPage() {
         <p>
           Si tienes alguna pregunta sobre nuestras políticas de envío y
           devoluciones, o si necesitas ayuda con tu compra, no dudes en{" "}
-          <Link href="/contact" className="underline text-gray-900">
+          <Link href="/contact" className="text-gray-900 underline">
             contactar
           </Link>{" "}
           con nosotros.
