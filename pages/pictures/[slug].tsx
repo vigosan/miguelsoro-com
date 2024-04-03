@@ -20,7 +20,7 @@ const PictureDetail = () => {
     <Layout>
       <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
         <div className="lg:col-span-4 lg:row-end-1">
-          <div className="aspect-h-1 aspect-w-1 h-[36rem] lg:h-96 w-full overflow-hidden bg-gray-200 group-hover:opacity-75">
+          <div className="aspect-h-1 aspect-w-1 h-[36rem] w-full overflow-hidden bg-gray-200 group-hover:opacity-75 lg:h-96">
             <Image
               src={getImgPath(picture)}
               alt={picture.title}

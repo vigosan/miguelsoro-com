@@ -22,7 +22,7 @@ export function Header() {
       >
         <Link
           href="/"
-          className="text-md -m-1.5 p-1.5 lg:text-2xl text-xl w-32 lg:w-48 h-auto"
+          className="text-md -m-1.5 h-auto w-32 p-1.5 text-xl lg:w-48 lg:text-2xl"
         >
           <span className="sr-only">Miguel Soro</span>
           <Image

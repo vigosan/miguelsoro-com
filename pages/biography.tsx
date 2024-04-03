@@ -34,17 +34,17 @@ export default function AboutPage() {
           retratando a los grandes héroes de este deporte y evocando momentos
           célebres de la historia del ciclismo.
         </p>
-        <div>
-          <video controls className="aspect-video">
+        <div className="flex flex-col gap-2 lg:gap-1">
+          <video controls className="aspect-video h-auto w-full">
             <source src="/videos/tve1.mp4" type="video/mp4" />
             <source src="/videos/tve1.ogg" type="video/ogg" />
             Your browser does not support the video tag.
           </video>
           <a
-            className="text-xs text-center"
+            className="text-center text-xs lg:text-right"
             href="https://www.rtve.es/play/videos/telediario-1/exposicion-miguel-soro-pone-acento-espanol-homenaje-pau-vencedores-espanoles-del-tour/5377156/"
           >
-            Fuente rtve
+            fuente rtve
           </a>
         </div>
         <p>
