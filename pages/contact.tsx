@@ -29,17 +29,6 @@ export default function ContactPage() {
                   </a>
                 </dd>
               </div>
-              <div className="mt-1">
-                <dt className="sr-only">Número de telefono</dt>
-                <dd>
-                  <a
-                    className="font-semibold text-gray-600"
-                    href="tel:+34637787778"
-                  >
-                    +34 637 787 778
-                  </a>
-                </dd>
-              </div>
             </dl>
           </div>
           <div className="rounded-2xl bg-gray-50 p-10">
