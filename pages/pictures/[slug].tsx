@@ -106,7 +106,7 @@ const PictureDetail = () => {
             </div>
           </div>
           <p className="mt-6 text-gray-500">{picture.description}</p>
-          <div className="mt-10">
+          <div className="mt-10 hidden">
             <button
               type="button"
               className="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-gray-900 py-3 px-8 text-base font-medium text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-50 focus:outline-none"
@@ -114,7 +114,7 @@ const PictureDetail = () => {
               {`Comprar ${formatCurrency(picture.price)}`}
             </button>
           </div>
-          <div className="mt-8 border-t border-gray-200 pt-8">
+          <div className="mt-8 border-t border-gray-200 pt-8 hidden">
             <dl className="">
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center">
                 <dt>
