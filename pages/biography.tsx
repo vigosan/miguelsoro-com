@@ -34,19 +34,6 @@ export default function AboutPage() {
           retratando a los grandes héroes de este deporte y evocando momentos
           célebres de la historia del ciclismo.
         </p>
-        <div className="flex flex-col gap-2 lg:gap-1">
-          <video controls className="aspect-video h-auto w-full">
-            <source src="/videos/tve1.mp4" type="video/mp4" />
-            <source src="/videos/tve1.ogg" type="video/ogg" />
-            Your browser does not support the video tag.
-          </video>
-          <a
-            className="text-center text-xs lg:text-right"
-            href="https://www.rtve.es/play/videos/telediario-1/exposicion-miguel-soro-pone-acento-espanol-homenaje-pau-vencedores-espanoles-del-tour/5377156/"
-          >
-            fuente rtve
-          </a>
-        </div>
         <p>
           La pasión de Miguel por el ciclismo va más allá de las ruedas y los
           pedales y se ha convertido en su tema artístico principal. Siendo
