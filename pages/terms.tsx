@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
+import ContactPage from "./contact";
 
-export default function TermsPage() {
+function TermsPage() {
   return (
     <Layout>
       <div className="flex flex-col gap-4">
@@ -28,12 +29,28 @@ export default function TermsPage() {
         <p>
           Si tienes alguna pregunta sobre nuestras políticas de envío y
           devoluciones, o si necesitas ayuda con tu compra, no dudes en{" "}
-          <Link href="/contact" className="text-gray-900 underline">
+          <ContactPage.Link className="text-gray-900 underline">
             contactar
-          </Link>{" "}
+          </ContactPage.Link>
           con nosotros.
         </p>
       </div>
     </Layout>
   );
 }
+
+TermsPage.Link = function TermsPageLink({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link href="/terms" className={className}>
+      {children}
+    </Link>
+  );
+};
+
+export default TermsPage;

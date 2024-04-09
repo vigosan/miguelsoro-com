@@ -1,6 +1,7 @@
+import Link from "next/link";
 import { Layout } from "@/components/Layout";
 
-export default function ContactPage() {
+function ContactPage() {
   return (
     <Layout>
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-3">
@@ -79,3 +80,19 @@ export default function ContactPage() {
     </Layout>
   );
 }
+
+ContactPage.Link = function ContactPageLink({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link href="/contact" className={className}>
+      {children}
+    </Link>
+  );
+};
+
+export default ContactPage;

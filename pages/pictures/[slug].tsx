@@ -114,7 +114,7 @@ const PictureDetail = () => {
               {`Comprar ${formatCurrency(picture.price)}`}
             </button>
           </div>
-          <div className="mt-8 border-t border-gray-200 pt-8 hidden">
+          <div className="mt-8 hidden border-t border-gray-200 pt-8">
             <dl className="">
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center">
                 <dt>

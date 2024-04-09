@@ -1,7 +1,7 @@
-import Image from "next/image";
+import Link from "next/link";
 import { Layout } from "@/components/Layout";
 
-export default function NewsPage() {
+function NewsPage() {
   return (
     <Layout>
       <div className="flex flex-col gap-4">
@@ -22,3 +22,19 @@ export default function NewsPage() {
     </Layout>
   );
 }
+
+NewsPage.Link = function NewsPageLink({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link href="/news" className={className}>
+      {children}
+    </Link>
+  );
+};
+
+export default NewsPage;

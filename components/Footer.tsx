@@ -1,8 +1,10 @@
+import ContactPage from "@/pages/contact";
+import TermsPage from "@/pages/terms";
 import { cn } from "@/utils/cn";
 
 const navigation = [
-  { name: "Contacto", href: "/contact" },
-  { name: "Términos", href: "/terms" },
+  { name: "Contacto", Link: ContactPage.Link },
+  { name: "Términos", Link: TermsPage.Link },
 ];
 
 export function Footer({ className }: { className?: string }) {
@@ -11,7 +13,7 @@ export function Footer({ className }: { className?: string }) {
   return (
     <footer
       className={cn(
-        "flex items-center flex-col lg:flex-row lg:justify-between flex-col-reverse",
+        "flex flex-col flex-col-reverse items-center lg:flex-row lg:justify-between",
         className,
       )}
     >
@@ -21,14 +23,13 @@ export function Footer({ className }: { className?: string }) {
         </p>
       </div>
       <div className="flex gap-4">
-        {navigation.map((item) => (
-          <a
-            key={item.name}
-            href={item.href}
-            className="text-sm leading-6 text-gray-600 hover:text-gray-899"
+        {navigation.map(({ name, Link }) => (
+          <Link
+            key={name}
+            className="hover:text-gray-899 text-sm leading-6 text-gray-600"
           >
-            {item.name}
-          </a>
+            {name}
+          </Link>
         ))}
       </div>
     </footer>

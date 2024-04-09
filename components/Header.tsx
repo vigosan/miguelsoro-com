@@ -1,17 +1,20 @@
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-
-const navigation = [
-  { name: "Obra", href: "/" },
-  { name: "Noticias", href: "/news" },
-  { name: "Biografía", href: "/biography" },
-  { name: "Contacto", href: "/contact" },
-];
+import BiographyPage from "@/pages/biography";
+import ContactPage from "@/pages/contact";
+import IndexPage from "@/pages/index";
+import NewsPage from "@/pages/news";
 
 export function Header() {
+  const navigation = [
+    { name: "Obra", Link: IndexPage.Link },
+    { name: "Noticias", Link: NewsPage.Link },
+    { name: "Biografía", Link: BiographyPage.Link },
+    { name: "Contacto", Link: ContactPage.Link },
+  ];
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -20,10 +23,7 @@ export function Header() {
         className="mx-auto flex items-center justify-between"
         aria-label="Global"
       >
-        <Link
-          href="/"
-          className="text-md -m-1.5 h-auto w-32 p-1.5 text-xl lg:w-48 lg:text-2xl"
-        >
+        <IndexPage.Link className="text-md -m-1.5 h-auto w-32 p-1.5 text-xl lg:w-48 lg:text-2xl">
           <span className="sr-only">Miguel Soro</span>
           <Image
             src="/signature.webp"
@@ -33,7 +33,7 @@ export function Header() {
             priority
             aria-hidden
           />
-        </Link>
+        </IndexPage.Link>
 
         <div className="flex lg:hidden">
           <button
@@ -47,14 +47,10 @@ export function Header() {
         </div>
 
         <div className="hidden lg:flex lg:gap-x-8">
-          {navigation.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="text-sm leading-6 text-gray-900"
-            >
-              {item.name}
-            </a>
+          {navigation.map(({ name, Link }) => (
+            <Link key={name} className="text-sm leading-6 text-gray-900">
+              {name}
+            </Link>
           ))}
         </div>
       </nav>

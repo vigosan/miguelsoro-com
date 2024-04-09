@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
 import { usePictures } from "@/hooks/usePictures";
 
-export default function IndexPage() {
+function IndexPage() {
   const pictures = usePictures();
 
   return (
@@ -11,3 +12,19 @@ export default function IndexPage() {
     </Layout>
   );
 }
+
+IndexPage.Link = function IndexPageLink({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link href="/" className={className}>
+      {children}
+    </Link>
+  );
+};
+
+export default IndexPage;

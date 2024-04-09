@@ -1,7 +1,8 @@
+import Link from "next/link";
 import Image from "next/image";
 import { Layout } from "@/components/Layout";
 
-export default function AboutPage() {
+function BiographyPage() {
   return (
     <Layout>
       <div className="flex flex-col gap-4">
@@ -54,3 +55,19 @@ export default function AboutPage() {
     </Layout>
   );
 }
+
+BiographyPage.Link = function BiographyPageLink({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link href="/biography" className={className}>
+      {children}
+    </Link>
+  );
+};
+
+export default BiographyPage;
