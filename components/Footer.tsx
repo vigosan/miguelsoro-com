@@ -1,10 +1,10 @@
-import ContactPage from "@/pages/contact";
-import TermsPage from "@/pages/terms";
+import { ContactPageLink } from "@/pages/contact";
+import { TermsPageLink } from "@/pages/terms";
 import { cn } from "@/utils/cn";
 
 const navigation = [
-  { name: "Contacto", Link: ContactPage.Link },
-  { name: "Términos", Link: TermsPage.Link },
+  { name: "Contacto", Link: ContactPageLink },
+  { name: "Términos", Link: TermsPageLink },
 ];
 
 export function Footer({ className }: { className?: string }) {

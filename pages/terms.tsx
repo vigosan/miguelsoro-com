@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
-import ContactPage from "./contact";
+import { ContactPageLink } from "@/pages/contact";
 
-function TermsPage() {
+export default function TermsPage() {
   return (
     <Layout>
       <div className="flex flex-col gap-4">
@@ -29,9 +29,9 @@ function TermsPage() {
         <p>
           Si tienes alguna pregunta sobre nuestras políticas de envío y
           devoluciones, o si necesitas ayuda con tu compra, no dudes en{" "}
-          <ContactPage.Link className="text-gray-900 underline">
+          <ContactPageLink className="text-gray-900 underline">
             contactar
-          </ContactPage.Link>
+          </ContactPageLink>
           con nosotros.
         </p>
       </div>
@@ -39,7 +39,7 @@ function TermsPage() {
   );
 }
 
-TermsPage.Link = function TermsPageLink({
+export function TermsPageLink({
   children,
   className,
 }: {
@@ -51,6 +51,4 @@ TermsPage.Link = function TermsPageLink({
       {children}
     </Link>
   );
-};
-
-export default TermsPage;
+}

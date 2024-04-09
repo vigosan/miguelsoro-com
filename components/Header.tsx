@@ -2,17 +2,17 @@ import { useState } from "react";
 import Image from "next/image";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-import BiographyPage from "@/pages/biography";
-import ContactPage from "@/pages/contact";
-import IndexPage from "@/pages/index";
-import NewsPage from "@/pages/news";
+import { BiographyPageLink } from "@/pages/biography";
+import { ContactPageLink } from "@/pages/contact";
+import { IndexPageLink } from "@/pages/index";
+import { NewsPageLink } from "@/pages/news";
 
 export function Header() {
   const navigation = [
-    { name: "Obra", Link: IndexPage.Link },
-    { name: "Noticias", Link: NewsPage.Link },
-    { name: "Biografía", Link: BiographyPage.Link },
-    { name: "Contacto", Link: ContactPage.Link },
+    { name: "Obra", Link: IndexPageLink },
+    { name: "Noticias", Link: NewsPageLink },
+    { name: "Biografía", Link: BiographyPageLink },
+    { name: "Contacto", Link: ContactPageLink },
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,7 +23,7 @@ export function Header() {
         className="mx-auto flex items-center justify-between"
         aria-label="Global"
       >
-        <IndexPage.Link className="text-md -m-1.5 h-auto w-32 p-1.5 text-xl lg:w-48 lg:text-2xl">
+        <IndexPageLink className="text-md -m-1.5 h-auto w-32 p-1.5 text-xl lg:w-48 lg:text-2xl">
           <span className="sr-only">Miguel Soro</span>
           <Image
             src="/signature.webp"
@@ -33,7 +33,7 @@ export function Header() {
             priority
             aria-hidden
           />
-        </IndexPage.Link>
+        </IndexPageLink>
 
         <div className="flex lg:hidden">
           <button

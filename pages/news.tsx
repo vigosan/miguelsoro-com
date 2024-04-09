@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 
-function NewsPage() {
+export default function NewsPage() {
   return (
     <Layout>
       <div className="flex flex-col gap-4">
@@ -23,7 +23,7 @@ function NewsPage() {
   );
 }
 
-NewsPage.Link = function NewsPageLink({
+export function NewsPageLink({
   children,
   className,
 }: {
@@ -35,6 +35,4 @@ NewsPage.Link = function NewsPageLink({
       {children}
     </Link>
   );
-};
-
-export default NewsPage;
+}

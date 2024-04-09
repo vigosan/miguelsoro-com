@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Layout } from "@/components/Layout";
 
-function BiographyPage() {
+export default function BiographyPage() {
   return (
     <Layout>
       <div className="flex flex-col gap-4">
@@ -56,7 +56,7 @@ function BiographyPage() {
   );
 }
 
-BiographyPage.Link = function BiographyPageLink({
+export function BiographyPageLink({
   children,
   className,
 }: {
@@ -68,6 +68,4 @@ BiographyPage.Link = function BiographyPageLink({
       {children}
     </Link>
   );
-};
-
-export default BiographyPage;
+}

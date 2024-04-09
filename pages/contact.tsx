@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 
-function ContactPage() {
+export default function ContactPage() {
   return (
     <Layout>
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-3">
@@ -81,7 +81,7 @@ function ContactPage() {
   );
 }
 
-ContactPage.Link = function ContactPageLink({
+export function ContactPageLink({
   children,
   className,
 }: {
@@ -93,6 +93,4 @@ ContactPage.Link = function ContactPageLink({
       {children}
     </Link>
   );
-};
-
-export default ContactPage;
+}

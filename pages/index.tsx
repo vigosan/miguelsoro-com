@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
 import { usePictures } from "@/hooks/usePictures";
 
-function IndexPage() {
+export default function IndexPage() {
   const pictures = usePictures();
 
   return (
@@ -13,7 +13,7 @@ function IndexPage() {
   );
 }
 
-IndexPage.Link = function IndexPageLink({
+export function IndexPageLink({
   children,
   className,
 }: {
@@ -25,6 +25,4 @@ IndexPage.Link = function IndexPageLink({
       {children}
     </Link>
   );
-};
-
-export default IndexPage;
+}
