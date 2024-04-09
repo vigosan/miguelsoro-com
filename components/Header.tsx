@@ -76,14 +76,13 @@ export function Header() {
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
-                {navigation.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
+                {navigation.map(({ name, Link }) => (
+                  <Link
+                    key={name}
                     className="-mx-3 block rounded-lg py-2 px-3 text-base leading-7 text-gray-900 hover:bg-gray-50"
                   >
-                    {item.name}
-                  </a>
+                    {name}
+                  </Link>
                 ))}
               </div>
             </div>
