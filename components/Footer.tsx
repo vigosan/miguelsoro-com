@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { ContactPageLink } from "@/pages/contact";
 import { TermsPageLink } from "@/pages/terms";
 import { cn } from "@/utils/cn";
@@ -23,13 +24,13 @@ export function Footer({ className }: { className?: string }) {
         </p>
       </div>
       <div className="flex gap-4">
-        {navigation.map(({ name, Link }) => (
-          <Link
-            key={name}
-            className="hover:text-gray-899 text-sm leading-6 text-gray-600"
-          >
-            {name}
-          </Link>
+        {navigation.map(({ name, Link }, i) => (
+          <Fragment key={name}>
+            {i > 0 && <span className="text-gray-600">&bull;</span>}
+            <Link className="hover:text-gray-899 text-sm leading-6 text-gray-600">
+              {name}
+            </Link>
+          </Fragment>
         ))}
       </div>
     </footer>
