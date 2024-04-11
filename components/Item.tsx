@@ -11,27 +11,23 @@ type Props = {
 
 export function Item({ item, className }: Props) {
   return (
-    <Link href={getPath(item)} className="relative">
-      <div className={cn("group relative", className)}>
-        <div className="aspect-h-1 aspect-w-1 lg:aspect-none h:96 --lg:max-h-80 w-full overflow-hidden bg-gray-200 group-hover:opacity-75 lg:h-80">
-          <Image
-            src={getImgPath(item)}
-            alt={item.title}
-            className="h-96 w-full border-18 border-gray-900 object-cover object-top p-8 group-hover:opacity-75 lg:h-80"
-            width={260}
-            height={320}
-          />
+    <Link href={getPath(item)}>
+      <div className={cn("overflow-hidden", className)}>
+        <div className="group relative flex h-96 items-center justify-center lg:max-h-80">
+          <div className="aspect-h-1 aspect-w-1 lg:aspect-none absolute top-0 left-0 h-96 w-full bg-gray-200 lg:h-80 lg:max-h-80">
+            <Image
+              src={getImgPath(item)}
+              alt={item.title}
+              className="h-full w-full border-18 border-gray-900 object-cover object-top p-8"
+              width={260}
+              height={320}
+            />
+          </div>
+          <div className="absolute -inset-full top-0 z-1 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-40 transition-all group-hover:inset-0" />
         </div>
         <div className="mt-4 flex flex-col gap-2">
-          <div>
-            <h3 className="text-sm text-gray-700">
-              <span aria-hidden="true" className="absolute inset-0" />
-              {item.title}
-            </h3>
-          </div>
-          <div className="flex justify-between">
-            <p className="mt-1 text-sm text-gray-500">{item.size}</p>
-          </div>
+          <h3 className="text-sm text-gray-700">{item.title}</h3>
+          <p className="mt-1 text-sm text-gray-500">{item.size}</p>
         </div>
       </div>
     </Link>
