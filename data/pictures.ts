@@ -83,4 +83,31 @@ export const pictures: Picture[] = [
     size: "90x120",
     slug: slugify("Mark Cavendish - Campeón de Inglaterra"),
   },
+  {
+    id: "10",
+    title: "Eddy Merckx - Selección Belga",
+    description:
+      "Esta destacada obra de acrílico y collage de 120x120 cm, presenta a Eddy Merckx, una leyenda del ciclismo que defendió con orgullo los colores de la Selección Belga durante su carrera. Merckx, apodado 'El Canibal', está inmortalizado en esta pieza, celebrando su contribución imborrable al deporte.",
+    price: 0,
+    size: "120x120",
+    slug: slugify("Eddy Merckx - Selección Belga"),
+  },
+  {
+    id: "11",
+    title: "Alejandro Valverde - Movistar",
+    description:
+      "Esta interesante obra de acrílico y collage de 90x120 cm celebra a Alejandro Valverde, el veterano ciclista español que ha formado una parte integral del Equipo Movistar durante muchos años. Reconocido por su formidable presencia y habilidad para escalar y sprintar, la contribución y el legado de Valverde a Movistar y al deporte en general están maravillosamente encarnados en esta pieza.",
+    price: 0,
+    size: "90x120",
+    slug: slugify("Alejandro Valverde - Movistar"),
+  },
+  {
+    id: "12",
+    title: "Bernard Hinault - Champion du Monde",
+    description:
+      "Esta intrigante obra de acrílico y collage de 120x90 cm homenajea a Bernard Hinault, la leyenda del ciclismo francés que ostenta cinco victorias en el Tour de Francia y fue dos veces campeón del mundo. Conocido por su competitividad feroz y su indomable espíritu combativo, la imagen de Hinault seguira siendo recordada y respetada en el mundo del ciclismo, un legado que esta pieza celebra a la perfección. ",
+    price: 0,
+    size: "120x90",
+    slug: slugify("Bernard Hinault - Champion du Monde"),
+  },
 ];
