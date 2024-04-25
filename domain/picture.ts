@@ -1,7 +1,6 @@
 export type Picture = {
   description: string;
   id: string;
-  imgUrl: string;
   price: number;
   size: string;
   slug: string;
