@@ -19,6 +19,7 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: HomeIcon },
   { name: "Cuadros", href: "/admin/pictures", icon: PhotoIcon },
   { name: "Pedidos", href: "/admin/orders", icon: ShoppingBagIcon },
+  { name: "Tipos de Producto", href: "/admin/product-types", icon: Cog6ToothIcon },
   { name: "Configuración", href: "/admin/settings", icon: Cog6ToothIcon },
 ];
 

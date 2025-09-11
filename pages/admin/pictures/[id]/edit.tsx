@@ -19,8 +19,19 @@ type AdminPicture = {
   slug: string;
   imageUrl: string;
   status: 'AVAILABLE' | 'SOLD' | 'RESERVED';
+  productTypeId: string;
+  productTypeName: string;
+  stock: number;
   createdAt: string;
   updatedAt: string;
+};
+
+type ProductType = {
+  id: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  isActive: boolean;
 };
 
 const statusOptions = [
@@ -35,6 +46,7 @@ export default function EditPicture() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [picture, setPicture] = useState<AdminPicture | null>(null);
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -42,7 +54,25 @@ export default function EditPicture() {
     size: '',
     slug: '',
     status: 'AVAILABLE' as const,
+    productTypeId: '',
+    stock: '',
   });
+
+  useEffect(() => {
+    const fetchProductTypes = async () => {
+      try {
+        const response = await fetch('/api/admin/product-types');
+        if (response.ok) {
+          const data = await response.json();
+          setProductTypes(data.productTypes);
+        }
+      } catch (error) {
+        console.error('Error fetching product types:', error);
+      }
+    };
+
+    fetchProductTypes();
+  }, []);
 
   useEffect(() => {
     if (!id || typeof id !== 'string') return;
@@ -70,6 +100,8 @@ export default function EditPicture() {
           size: data.picture.size,
           slug: data.picture.slug,
           status: data.picture.status,
+          productTypeId: data.picture.productTypeId || '',
+          stock: data.picture.stock?.toString() || '1',
         });
       } catch (error) {
         console.error('Error fetching picture:', error);
@@ -99,6 +131,7 @@ export default function EditPicture() {
         body: JSON.stringify({
           ...formData,
           price: Math.round(parseFloat(formData.price) * 100), // Convert euros to cents
+          stock: parseInt(formData.stock) || 1,
         }),
       });
       
@@ -232,7 +265,26 @@ export default function EditPicture() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tipo de Producto *
+                </label>
+                <select
+                  value={formData.productTypeId}
+                  onChange={(e) => setFormData({ ...formData, productTypeId: e.target.value })}
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">Selecciona un tipo</option>
+                  {productTypes.map(type => (
+                    <option key={type.id} value={type.id}>
+                      {type.displayName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Precio (€) *
@@ -244,6 +296,21 @@ export default function EditPicture() {
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Stock *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    required
+                    placeholder="1"
                   />
                 </div>
 
@@ -333,17 +400,25 @@ export default function EditPicture() {
                 <div>
                   <h4 className="font-semibold text-gray-900">{formData.title || 'Sin título'}</h4>
                   <p className="text-sm text-gray-500">{formData.size || 'Sin tamaño'}</p>
+                  <p className="text-sm text-blue-600">
+                    {productTypes.find(t => t.id === formData.productTypeId)?.displayName || 'Sin tipo'}
+                  </p>
                 </div>
                 
                 <div>
                   <p className="text-lg font-bold text-gray-900">
                     {formData.price ? formatCurrency(parseFloat(formData.price) * 100) : '€0.00'}
                   </p>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    statusOptions.find(opt => opt.value === formData.status)?.color
-                  }`}>
-                    {statusOptions.find(opt => opt.value === formData.status)?.label}
-                  </span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      statusOptions.find(opt => opt.value === formData.status)?.color
+                    }`}>
+                      {statusOptions.find(opt => opt.value === formData.status)?.label}
+                    </span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Stock: {formData.stock || 0}
+                    </span>
+                  </div>
                 </div>
                 
                 {formData.description && (

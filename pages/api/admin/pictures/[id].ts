@@ -28,6 +28,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         slug: product.slug,
         imageUrl: product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || '',
         status: product.variants.length > 0 && product.variants[0].status === 'AVAILABLE' ? 'AVAILABLE' : 'SOLD',
+        productTypeId: product.productType.id,
+        productTypeName: product.productType.displayName,
+        stock: product.variants.reduce((total, variant) => total + variant.stock, 0),
         createdAt: product.createdAt,
         updatedAt: product.updatedAt
       }
@@ -41,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'PUT') {
     try {
-      const { title, description, price, size, slug, status } = req.body
+      const { title, description, price, size, slug, status, productTypeId, stock } = req.body
       const { prisma } = await import('@/lib/prisma')
 
       // Check if product exists
@@ -72,6 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ...(description !== undefined && { description }),
           ...(price && { basePrice: parseInt(price) }),
           ...(slug && { slug }),
+          ...(productTypeId && { productTypeId }),
         }
       })
 
@@ -80,6 +84,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await prisma.productVariant.updateMany({
           where: { productId: id },
           data: { price: parseInt(price) }
+        })
+      }
+
+      // Update variant stock if provided
+      if (stock !== undefined) {
+        await prisma.productVariant.updateMany({
+          where: { productId: id },
+          data: { stock: parseInt(stock) }
         })
       }
 
@@ -111,6 +123,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         slug: product.slug,
         imageUrl: product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || '',
         status: product.variants.length > 0 && product.variants[0].status === 'AVAILABLE' ? 'AVAILABLE' : 'SOLD',
+        productTypeId: product.productType.id,
+        productTypeName: product.productType.displayName,
+        stock: product.variants.reduce((total, variant) => total + variant.stock, 0),
         createdAt: product.createdAt,
         updatedAt: product.updatedAt
       }

@@ -17,6 +17,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         slug: product.slug,
         imageUrl: product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || '',
         status: product.variants.length > 0 && product.variants[0].status === 'AVAILABLE' ? 'AVAILABLE' : 'SOLD',
+        productTypeId: product.productType.id,
+        productTypeName: product.productType.displayName,
+        stock: product.variants.reduce((total, variant) => total + variant.stock, 0),
         createdAt: product.createdAt,
         updatedAt: product.updatedAt
       }))

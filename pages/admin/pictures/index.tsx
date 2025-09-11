@@ -126,13 +126,23 @@ export default function AdminPictures() {
                       </p>
                     </div>
                     <div className="flex items-center space-x-4 ml-4">
-                      {/* Status */}
-                      <span className={cn(
-                        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                        statusColors[picture.status]
-                      )}>
-                        {statusLabels[picture.status]}
-                      </span>
+                      {/* Status & Stock */}
+                      <div className="text-right">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={cn(
+                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+                            statusColors[picture.status]
+                          )}>
+                            {statusLabels[picture.status]}
+                          </span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Stock: {picture.stock || 0}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          {picture.productTypeName || 'Sin tipo'}
+                        </p>
+                      </div>
                       
                       {/* Price */}
                       <div className="text-right">
