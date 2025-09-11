@@ -1,53 +1,41 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '@/lib/prisma'
+import { DatabaseProductRepository } from '@/infra/DatabaseProductRepository'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      const pictures = await prisma.picture.findMany({
-        orderBy: { createdAt: 'desc' }
-      })
+      const productRepository = new DatabaseProductRepository()
+      const products = await productRepository.findAll()
+      
+      // Convert products to legacy format for admin compatibility
+      const pictures = products.map(product => ({
+        id: product.id,
+        title: product.title,
+        description: product.description,
+        price: product.basePrice,
+        size: product.productType.displayName,
+        slug: product.slug,
+        imageUrl: product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || '',
+        status: product.variants.length > 0 && product.variants[0].status === 'AVAILABLE' ? 'AVAILABLE' : 'SOLD',
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
+      }))
+      
       return res.status(200).json({ pictures })
     } catch (error) {
-      console.error('Error fetching pictures:', error)
-      return res.status(500).json({ error: 'Failed to fetch pictures' })
+      console.error('Error fetching products:', error)
+      return res.status(500).json({ error: 'Failed to fetch products' })
     }
   }
 
   if (req.method === 'POST') {
     try {
-      const { title, description, price, size, slug, imageUrl, status } = req.body
-
-      // Validate required fields
-      if (!title || !price || !size || !slug) {
-        return res.status(400).json({ error: 'Missing required fields' })
-      }
-
-      // Check if slug already exists
-      const existingPicture = await prisma.picture.findUnique({
-        where: { slug }
-      })
-
-      if (existingPicture) {
-        return res.status(400).json({ error: 'Slug already exists' })
-      }
-
-      const picture = await prisma.picture.create({
-        data: {
-          title,
-          description,
-          price: parseInt(price),
-          size,
-          slug,
-          imageUrl: imageUrl || '',
-          status: status || 'AVAILABLE'
-        }
-      })
-
-      return res.status(201).json({ picture })
+      // For now, creating products is not implemented through the admin API
+      // This would require more complex logic for product types, variants, etc.
+      return res.status(501).json({ error: 'Creating products not yet implemented' })
     } catch (error) {
-      console.error('Error creating picture:', error)
-      return res.status(500).json({ error: 'Failed to create picture' })
+      console.error('Error creating product:', error)
+      return res.status(500).json({ error: 'Failed to create product' })
     }
   }
 

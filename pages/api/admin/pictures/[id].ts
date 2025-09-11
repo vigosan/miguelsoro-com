@@ -1,46 +1,61 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '@/lib/prisma'
+import { DatabaseProductRepository } from '@/infra/DatabaseProductRepository'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query
 
   if (typeof id !== 'string') {
-    return res.status(400).json({ error: 'Invalid picture ID' })
+    return res.status(400).json({ error: 'Invalid product ID' })
   }
+
+  const productRepository = new DatabaseProductRepository()
 
   if (req.method === 'GET') {
     try {
-      const picture = await prisma.picture.findUnique({
-        where: { id }
-      })
+      const product = await productRepository.findById(id)
 
-      if (!picture) {
-        return res.status(404).json({ error: 'Picture not found' })
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' })
+      }
+
+      // Convert product to legacy format
+      const picture = {
+        id: product.id,
+        title: product.title,
+        description: product.description,
+        price: product.basePrice,
+        size: product.productType.displayName,
+        slug: product.slug,
+        imageUrl: product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || '',
+        status: product.variants.length > 0 && product.variants[0].status === 'AVAILABLE' ? 'AVAILABLE' : 'SOLD',
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
       }
 
       return res.status(200).json({ picture })
     } catch (error) {
-      console.error('Error fetching picture:', error)
-      return res.status(500).json({ error: 'Failed to fetch picture' })
+      console.error('Error fetching product:', error)
+      return res.status(500).json({ error: 'Failed to fetch product' })
     }
   }
 
   if (req.method === 'PUT') {
     try {
-      const { title, description, price, size, slug, imageUrl, status } = req.body
+      const { title, description, price, size, slug, status } = req.body
+      const { prisma } = await import('@/lib/prisma')
 
-      // Check if picture exists
-      const existingPicture = await prisma.picture.findUnique({
+      // Check if product exists
+      const existingProduct = await prisma.product.findUnique({
         where: { id }
       })
 
-      if (!existingPicture) {
-        return res.status(404).json({ error: 'Picture not found' })
+      if (!existingProduct) {
+        return res.status(404).json({ error: 'Product not found' })
       }
 
       // Check if slug is being changed and if new slug already exists
-      if (slug && slug !== existingPicture.slug) {
-        const slugExists = await prisma.picture.findUnique({
+      if (slug && slug !== existingProduct.slug) {
+        const slugExists = await prisma.product.findUnique({
           where: { slug }
         })
 
@@ -49,45 +64,78 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      const picture = await prisma.picture.update({
+      // Update product
+      const updatedProduct = await prisma.product.update({
         where: { id },
         data: {
           ...(title && { title }),
           ...(description !== undefined && { description }),
-          ...(price && { price: parseInt(price) }),
-          ...(size && { size }),
+          ...(price && { basePrice: parseInt(price) }),
           ...(slug && { slug }),
-          ...(imageUrl !== undefined && { imageUrl }),
-          ...(status && { status })
         }
       })
 
+      // Update variant price if provided
+      if (price) {
+        await prisma.productVariant.updateMany({
+          where: { productId: id },
+          data: { price: parseInt(price) }
+        })
+      }
+
+      // Update variant status if provided
+      if (status) {
+        const variantStatus = status === 'AVAILABLE' ? 'AVAILABLE' : 
+                            status === 'SOLD' ? 'OUT_OF_STOCK' : 'AVAILABLE'
+        
+        await prisma.productVariant.updateMany({
+          where: { productId: id },
+          data: { status: variantStatus }
+        })
+      }
+
+      // Fetch updated product with relations
+      const product = await productRepository.findById(id)
+
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found after update' })
+      }
+
+      // Convert to legacy format
+      const picture = {
+        id: product.id,
+        title: product.title,
+        description: product.description,
+        price: product.basePrice,
+        size: product.productType.displayName,
+        slug: product.slug,
+        imageUrl: product.images.find(img => img.isPrimary)?.url || product.images[0]?.url || '',
+        status: product.variants.length > 0 && product.variants[0].status === 'AVAILABLE' ? 'AVAILABLE' : 'SOLD',
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
+      }
+
       return res.status(200).json({ picture })
     } catch (error) {
-      console.error('Error updating picture:', error)
-      return res.status(500).json({ error: 'Failed to update picture' })
+      console.error('Error updating product:', error)
+      return res.status(500).json({ error: 'Failed to update product' })
     }
   }
 
   if (req.method === 'DELETE') {
     try {
-      // Check if picture exists
-      const existingPicture = await prisma.picture.findUnique({
-        where: { id }
-      })
+      const product = await productRepository.findById(id)
 
-      if (!existingPicture) {
-        return res.status(404).json({ error: 'Picture not found' })
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' })
       }
 
-      await prisma.picture.delete({
-        where: { id }
-      })
+      await productRepository.delete(id)
 
-      return res.status(200).json({ message: 'Picture deleted successfully' })
+      return res.status(200).json({ message: 'Product deleted successfully' })
     } catch (error) {
-      console.error('Error deleting picture:', error)
-      return res.status(500).json({ error: 'Failed to delete picture' })
+      console.error('Error deleting product:', error)
+      return res.status(500).json({ error: 'Failed to delete product' })
     }
   }
 
