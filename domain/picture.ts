@@ -8,7 +8,7 @@ export type Picture = {
 };
 
 export function getPath(picture: Picture): string {
-  return `/pictures/${picture.slug}`;
+  return `/products/${picture.slug}`;
 }
 
 export function getImgPath(picture: Picture): string {

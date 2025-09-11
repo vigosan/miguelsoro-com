@@ -4,16 +4,17 @@
 Transform the static Miguel Soro art gallery into a dynamic e-commerce platform with admin capabilities, database integration, Stripe payments, and enhanced SEO.
 
 ## Stage 1: Database Setup & Migration
-**Goal**: Migrate from static data to Vercel PostgreSQL database
-**Status**: [ ] Not Started
+**Goal**: Migrate from static data to PostgreSQL database (Docker for dev, Vercel for prod)
+**Status**: [X] Completed
 
 ### Tasks
-- [ ] Set up Vercel PostgreSQL database
-- [ ] Design database schema for pictures, orders, and admin users
-- [ ] Create database migrations and seed scripts
-- [ ] Install and configure Prisma ORM
+- [X] Set up Docker PostgreSQL for development
+- [X] Create Makefile for database management
+- [X] Design database schema for pictures, orders, and admin users
+- [X] Create database migrations and seed scripts
+- [X] Install and configure Prisma ORM
 - [ ] Implement database repository replacing in-memory implementation
-- [ ] Migrate existing picture data to database
+- [ ] Migrate existing picture data to database (via seed)
 - [ ] Set up image upload to Vercel Blob Storage
 - [ ] Create image migration script for existing pictures
 

@@ -8,6 +8,30 @@ Miguel Soro Art Website - A Next.js-based art portfolio website showcasing cycli
 
 ## Development Commands
 
+### Docker & Database
+```bash
+# Quick setup for new developers
+make setup           # Complete setup (install deps, start DB, migrate, seed)
+
+# Database management
+make up             # Start PostgreSQL database
+make down           # Stop all services
+make restart        # Restart services
+make logs           # Show database logs
+make clean          # Remove containers and volumes (DANGER: deletes all data)
+
+# Database operations
+make migrate        # Run Prisma migrations
+make seed           # Seed database with initial data
+make reset-db       # Reset database (migrate + seed)
+
+# Development
+make dev            # Start dev server with database
+make pgadmin        # Start pgAdmin (http://localhost:5050)
+make status         # Check services status
+```
+
+### Application Commands
 ```bash
 # Development
 npm run dev           # Start development server (localhost:3000)
@@ -22,11 +46,14 @@ npm run format       # Format code with Prettier + Tailwind plugin
 ## Technology Stack
 
 - **Framework**: Next.js 14 with Pages Router (not App Router)
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: NextAuth.js with database sessions
 - **Styling**: Tailwind CSS v4 (alpha) with PostCSS
 - **Font**: Geist Sans via `geist` package
 - **Icons**: Heroicons + Headless UI React components
 - **Analytics**: Vercel Analytics
 - **Language**: TypeScript with strict mode
+- **Development**: Docker Compose for local PostgreSQL
 
 ## Architecture
 
