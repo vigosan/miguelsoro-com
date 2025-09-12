@@ -3,7 +3,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import Link from "next/link";
 import Image from "next/image";
 import { usePictures, useDeletePicture } from "@/hooks/usePictures";
-import { PictureStatus } from "@/domain/picture";
+import { PictureStatus, getPictureStatus } from "@/domain/picture";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatEuros } from "@/domain/order";
 import { Toaster, toast } from "react-hot-toast";
@@ -19,14 +19,12 @@ import { Select } from "@/components/ui/Select";
 
 const statusColors = {
   AVAILABLE: "bg-green-100 text-green-800",
-  SOLD: "bg-gray-100 text-gray-800", 
-  RESERVED: "bg-yellow-100 text-yellow-800",
+  NOT_AVAILABLE: "bg-gray-100 text-gray-800", 
 };
 
 const statusLabels = {
   AVAILABLE: "Disponible",
-  SOLD: "Vendido",
-  RESERVED: "Reservado",
+  NOT_AVAILABLE: "No disponible",
 };
 
 export default function AdminPictures() {
@@ -155,9 +153,9 @@ export default function AdminPictures() {
                       <div className="flex flex-wrap justify-center lg:justify-start items-center gap-2">
                         <span className={cn(
                           "inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium",
-                          statusColors[picture.status]
+                          statusColors[getPictureStatus(picture)]
                         )}>
-                          {statusLabels[picture.status]}
+                          {statusLabels[getPictureStatus(picture)]}
                         </span>
                         <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                           Stock: {picture.stock || 0}

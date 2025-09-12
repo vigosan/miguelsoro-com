@@ -1,11 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Picture, PictureStatus } from '@/domain/picture';
+import { Picture, PictureStatus, getPictureStatus } from '@/domain/picture';
 
 export type PictureStats = {
   totalPictures: number;
   availablePictures: number;
-  soldPictures: number;
-  reservedPictures: number;
+  notAvailablePictures: number;
 };
 
 // Query keys
@@ -65,9 +64,8 @@ export function usePictureStats() {
       
       return {
         totalPictures: pictures.length,
-        availablePictures: pictures.filter((p: Picture) => p.status === 'AVAILABLE').length,
-        soldPictures: pictures.filter((p: Picture) => p.status === 'SOLD').length,
-        reservedPictures: pictures.filter((p: Picture) => p.status === 'RESERVED').length,
+        availablePictures: pictures.filter((p: Picture) => getPictureStatus(p) === 'AVAILABLE').length,
+        notAvailablePictures: pictures.filter((p: Picture) => getPictureStatus(p) === 'NOT_AVAILABLE').length,
       };
     },
     staleTime: 1000 * 60 * 5, // 5 minutes

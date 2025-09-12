@@ -14,11 +14,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 
-const statusOptions = [
-  { value: 'AVAILABLE', label: 'Disponible', color: 'bg-green-100 text-green-800' },
-  { value: 'SOLD', label: 'Vendido', color: 'bg-gray-100 text-gray-800' },
-  { value: 'RESERVED', label: 'Reservado', color: 'bg-yellow-100 text-yellow-800' },
-];
+// Status is now computed from stock field - this form only needs stock
 
 type ProductType = {
   id: string;
@@ -38,7 +34,6 @@ export default function NewPicture() {
     price: '',
     size: '',
     slug: '',
-    status: 'AVAILABLE' as const,
     productTypeId: '',
     stock: '1',
     imageUrl: '',
@@ -222,17 +217,7 @@ export default function NewPicture() {
                 )}
               </div>
 
-              <Select
-                label="Estado"
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              >
-                {statusOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
+              {/* Estado se calcula automáticamente basado en stock */}
 
               <ImageUpload
                 currentImageUrl={formData.imageUrl}
@@ -294,9 +279,9 @@ export default function NewPicture() {
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      statusOptions.find(opt => opt.value === formData.status)?.color
+                      parseInt(formData.stock) > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {statusOptions.find(opt => opt.value === formData.status)?.label}
+                      {parseInt(formData.stock) > 0 ? 'Disponible' : 'No disponible'}
                     </span>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                       Stock: {formData.stock || 0}

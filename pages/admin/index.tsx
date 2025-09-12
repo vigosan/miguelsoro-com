@@ -40,10 +40,10 @@ export default function AdminDashboard() {
       color: "bg-green-500"
     },
     {
-      name: "Cuadros Vendidos",
-      value: loading ? "..." : (pictureStats?.soldPictures || 0).toString(), 
+      name: "No Disponibles",
+      value: loading ? "..." : (pictureStats?.notAvailablePictures || 0).toString(), 
       icon: ShoppingBagIcon,
-      href: "/admin/pictures?status=sold",
+      href: "/admin/pictures?status=not-available",
       color: "bg-gray-500"
     },
     {

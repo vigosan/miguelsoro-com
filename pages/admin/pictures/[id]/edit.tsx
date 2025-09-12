@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { Toaster, toast } from "react-hot-toast";
+import { getPictureStatus } from "@/domain/picture";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { 
   ArrowLeftIcon,
@@ -22,7 +23,6 @@ type AdminPicture = {
   size: string;
   slug: string;
   imageUrl: string;
-  status: 'AVAILABLE' | 'SOLD' | 'RESERVED';
   productTypeId: string;
   productTypeName: string;
   stock: number;
@@ -38,11 +38,7 @@ type ProductType = {
   isActive: boolean;
 };
 
-const statusOptions = [
-  { value: 'AVAILABLE', label: 'Disponible', color: 'bg-green-100 text-green-800' },
-  { value: 'SOLD', label: 'Vendido', color: 'bg-gray-100 text-gray-800' },
-  { value: 'RESERVED', label: 'Reservado', color: 'bg-yellow-100 text-yellow-800' },
-];
+// Status is now computed from stock field - no longer needed
 
 export default function EditPicture() {
   const router = useRouter();
@@ -57,7 +53,6 @@ export default function EditPicture() {
     price: '',
     size: '',
     slug: '',
-    status: 'AVAILABLE' as const,
     productTypeId: '',
     stock: '',
     imageUrl: '',
@@ -104,7 +99,6 @@ export default function EditPicture() {
           price: data.picture.price.toString(), // Price is already in euros from API
           size: data.picture.size,
           slug: data.picture.slug,
-          status: data.picture.status,
           productTypeId: data.picture.productTypeId || '',
           stock: data.picture.stock?.toString() || '1',
           imageUrl: data.picture.imageUrl || '',
@@ -317,17 +311,6 @@ export default function EditPicture() {
                 </p>
               </div>
 
-              <Select
-                label="Estado"
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              >
-                {statusOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
 
               <ImageUpload
                 currentImageUrl={formData.imageUrl}
@@ -385,9 +368,9 @@ export default function EditPicture() {
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      statusOptions.find(opt => opt.value === formData.status)?.color
+                      parseInt(formData.stock) > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {statusOptions.find(opt => opt.value === formData.status)?.label}
+                      {parseInt(formData.stock) > 0 ? 'Disponible' : 'No disponible'}
                     </span>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                       Stock: {formData.stock || 0}
