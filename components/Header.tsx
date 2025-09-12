@@ -20,7 +20,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-1 bg-gradient-to-b from-white to-transparent pt-4">
+    <header className="pt-4">
       <nav
         className="mx-auto flex items-center justify-between"
         aria-label="Global"
