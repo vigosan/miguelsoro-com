@@ -101,7 +101,7 @@ export default function EditPicture() {
         setFormData({
           title: data.picture.title,
           description: data.picture.description || '',
-          price: (data.picture.price / 100).toString(), // Convert cents to euros
+          price: data.picture.price.toString(), // Price is already in euros from API
           size: data.picture.size,
           slug: data.picture.slug,
           status: data.picture.status,
@@ -136,7 +136,7 @@ export default function EditPicture() {
         },
         body: JSON.stringify({
           ...formData,
-          price: Math.round(parseFloat(formData.price) * 100), // Convert euros to cents
+          price: parseFloat(formData.price), // Send price in euros, repository will handle conversion
           stock: parseInt(formData.stock) || 1,
         }),
       });
@@ -381,7 +381,7 @@ export default function EditPicture() {
                 
                 <div>
                   <p className="text-lg font-bold text-gray-900">
-                    {formData.price ? formatCurrency(parseFloat(formData.price) * 100) : '€0.00'}
+                    {formData.price ? formatCurrency(Math.round(parseFloat(formData.price) * 100)) : '€0.00'}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

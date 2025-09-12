@@ -98,7 +98,7 @@ export default function NewPicture() {
         },
         body: JSON.stringify({
           ...formData,
-          price: Math.round(parseFloat(formData.price) * 100), // Convert euros to cents
+          price: parseFloat(formData.price), // Send price in euros, repository will handle conversion
           stock: parseInt(formData.stock) || 1,
         }),
       });
@@ -290,7 +290,7 @@ export default function NewPicture() {
                 
                 <div>
                   <p className="text-lg font-bold text-gray-900">
-                    {formData.price ? formatCurrency(parseFloat(formData.price) * 100) : '€0.00'}
+                    {formData.price ? formatCurrency(Math.round(parseFloat(formData.price) * 100)) : '€0.00'}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
