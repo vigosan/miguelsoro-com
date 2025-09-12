@@ -22,7 +22,7 @@ export default function NewsPage() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                    'L'Art del Ciclocross' en Benidorm
+                    &lsquo;L&rsquo;Art del Ciclocross&rsquo; en Benidorm
                   </h2>
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-3">
                     Enero 2025
@@ -30,7 +30,7 @@ export default function NewsPage() {
                 </div>
               </div>
               <p className="text-gray-600 mb-4">
-                Del 8 al 17 de enero de 2025, Miguel Soro expone en el Espai d'Art del Ayuntamiento de Benidorm 
+                Del 8 al 17 de enero de 2025, Miguel Soro expone en el Espai d&rsquo;Art del Ayuntamiento de Benidorm 
                 con motivo de la Copa del Mundo de Ciclocross UCI-Benidorm Costa Blanca 2025. Una muestra 
                 que combina el arte y el deporte en una de las competiciones más importantes del calendario internacional.
               </p>
@@ -59,8 +59,8 @@ export default function NewsPage() {
               </div>
               <p className="text-gray-600 mb-4">
                 Durante las etapas pirenaicas del Tour de Francia 2024, Miguel Soro presentó una exposición 
-                en Bagnères de Luchon con obras que recorren "desde el ciclismo clásico más épico de los años 
-                30, 40 ó 50, al actual", capturando la esencia histórica del ciclismo.
+                en Bagnères de Luchon con obras que recorren &ldquo;desde el ciclismo clásico más épico de los años 
+                30, 40 ó 50, al actual&rdquo;, capturando la esencia histórica del ciclismo.
               </p>
               <div className="flex items-center text-sm text-gray-500">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +106,7 @@ export default function NewsPage() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                    "El Arte del Ciclismo" en Canals
+                    &ldquo;El Arte del Ciclismo&rdquo; en Canals
                   </h2>
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 mb-3">
                     Enero 2024
@@ -114,7 +114,7 @@ export default function NewsPage() {
                 </div>
               </div>
               <p className="text-gray-600 mb-4">
-                Miguel Soro inauguró su exposición "El Arte del Ciclismo" en la Casa de la Cultura Ca Don José 
+                Miguel Soro inauguró su exposición &ldquo;El Arte del Ciclismo&rdquo; en la Casa de la Cultura Ca Don José 
                 en Canals, con motivo de la Volta Ciclista a la Comunitat Valenciana. Un lugar especial donde 
                 hace 10 años lanzó una de sus primeras exposiciones dedicadas al ciclismo.
               </p>
