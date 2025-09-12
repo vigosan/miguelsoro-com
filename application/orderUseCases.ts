@@ -75,7 +75,7 @@ export class CreateOrder {
     private variantRepository: ProductVariantRepository
   ) {}
   
-  async execute(orderData: Omit<CreateOrderData, 'paypalOrderId' | 'status'> & { 
+  async execute(orderData: Omit<CreateOrderData, 'paypalOrderId' | 'status' | 'items'> & { 
     paypalOrderId: string,
     items: Array<{ variantId: string, quantity: number }>
   }) {

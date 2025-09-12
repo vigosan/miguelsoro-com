@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { DatabasePictureRepository } from '@/infra/DatabasePictureRepository';
+import { SupabasePictureRepository } from '@/infra/SupabasePictureRepository';
 import { Picture } from '@/domain/picture';
 
 type SiteMapPage = {
@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   ];
 
   // Get pictures from database
-  const pictureRepository = new DatabasePictureRepository();
+  const pictureRepository = new SupabasePictureRepository();
   const pictures = await pictureRepository.findAll();
   
   // Dynamic picture pages - high priority for e-commerce

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ordersController } from '../../../lib/paypal';
 import { Order, OrderRequest, CheckoutPaymentIntent } from '@paypal/paypal-server-sdk';
-import { productVariantRepository } from '../../../infra/dependencies';
+import { productVariantRepository, createOrder } from '../../../infra/dependencies';
 import { CreateOrderRequest, calculateOrderTotal } from '../../../domain/order';
 
 export default async function handler(
@@ -95,48 +95,26 @@ export default async function handler(
     const paypalOrder = paypalOrderResponse as Order;
 
     // Create order in database
-    const order = await prisma.order.create({
-      data: {
-        customerEmail,
-        customerName,
-        customerPhone,
-        shippingAddress,
-        paypalOrderId: paypalOrder.id,
-        status: 'PENDING',
-        subtotal,
-        tax,
-        shipping,
-        total,
-        items: {
-          create: orderItems.map(item => ({
-            variantId: item.variantId,
-            quantity: item.quantity,
-            price: item.price,
-            total: item.total
-          }))
-        }
-      },
-      include: {
-        items: {
-          include: {
-            variant: {
-              include: {
-                product: {
-                  include: {
-                    images: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+    const order = await createOrder.execute({
+      customerEmail,
+      customerName,
+      customerPhone,
+      shippingAddress,
+      paypalOrderId: paypalOrder.id!,
+      subtotal,
+      tax,
+      shipping,
+      total,
+      items: items.map(item => ({
+        variantId: item.variantId,
+        quantity: item.quantity
+      }))
     });
 
     res.status(200).json({
       paypalOrderId: paypalOrder.id,
       orderId: order.id,
-      total: total,
+      total: order.total,
       approvalUrl: paypalOrder.links?.find(link => link.rel === 'approve')?.href
     });
 

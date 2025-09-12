@@ -30,7 +30,7 @@ export default async function handler(
     }
 
     // Use the capture PayPal order use case
-    const order = await capturePayPalOrder.execute({ paypalOrderId });
+    const order = await capturePayPalOrder.execute(paypalOrderId);
 
     // Send confirmation emails
     try {
