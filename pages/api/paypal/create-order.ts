@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { paypalClient } from '../../../lib/paypal';
+import { ordersController } from '../../../lib/paypal';
+import { Order, OrderRequest, CheckoutPaymentIntent } from '@paypal/paypal-server-sdk';
 import { prisma } from '../../../lib/prisma';
 import { CreateOrderRequest, calculateOrderTotal } from '../../../domain/order';
 
@@ -68,24 +69,24 @@ export default async function handler(
     );
 
     // Create PayPal order
-    const paypalOrderRequest = {
-      intent: 'CAPTURE',
-      purchase_units: [
+    const paypalOrderRequest: OrderRequest = {
+      intent: CheckoutPaymentIntent.Capture,
+      purchaseUnits: [
         {
           amount: {
-            currency_code: 'EUR',
+            currencyCode: 'EUR',
             value: (total / 100).toFixed(2),
             breakdown: {
-              item_total: {
-                currency_code: 'EUR',
+              itemTotal: {
+                currencyCode: 'EUR',
                 value: (subtotal / 100).toFixed(2)
               },
-              tax_total: {
-                currency_code: 'EUR',
+              taxTotal: {
+                currencyCode: 'EUR',
                 value: (tax / 100).toFixed(2)
               },
               shipping: {
-                currency_code: 'EUR',
+                currencyCode: 'EUR',
                 value: (shipping / 100).toFixed(2)
               }
             }
@@ -93,8 +94,8 @@ export default async function handler(
           items: orderItems.map(item => ({
             name: item.variant.product.title,
             quantity: item.quantity.toString(),
-            unit_amount: {
-              currency_code: 'EUR',
+            unitAmount: {
+              currencyCode: 'EUR',
               value: (item.price / 100).toFixed(2)
             }
           }))
@@ -102,9 +103,11 @@ export default async function handler(
       ]
     };
 
-    const { body: paypalOrder } = await paypalClient.orders.ordersCreate({
+    const { body: paypalOrderResponse } = await ordersController.createOrder({
       body: paypalOrderRequest
     });
+
+    const paypalOrder = paypalOrderResponse as Order;
 
     // Create order in database
     const order = await prisma.order.create({

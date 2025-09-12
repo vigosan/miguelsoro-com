@@ -47,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         tax: order.tax,
         shipping: order.shipping,
         total: order.total,
-        stripePaymentIntentId: order.stripePaymentIntentId,
+        paypalOrderId: order.paypalOrderId,
         createdAt: order.createdAt.toISOString(),
         updatedAt: order.updatedAt.toISOString(),
         items: order.items.map(item => ({

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { paypalClient } from '../../../lib/paypal';
+import { ordersController } from '../../../lib/paypal';
+import { Order } from '@paypal/paypal-server-sdk';
 import { prisma } from '../../../lib/prisma';
 import { sendOrderConfirmationEmail, sendAdminNotificationEmail } from '../../../lib/email';
 
@@ -19,11 +20,12 @@ export default async function handler(
     }
 
     // Capture the PayPal payment
-    const { body: captureResponse } = await paypalClient.orders.ordersCapture({
+    const { body: captureResponse } = await ordersController.captureOrder({
       id: paypalOrderId
     });
 
-    if (captureResponse.status !== 'COMPLETED') {
+    const paypalOrder = captureResponse as Order;
+    if (paypalOrder.status !== 'COMPLETED') {
       return res.status(400).json({ error: 'Payment not completed' });
     }
 
@@ -101,7 +103,7 @@ export default async function handler(
       success: true,
       orderId: order.id,
       status: 'PAID',
-      captureId: captureResponse.id
+      captureId: paypalOrder.id
     });
 
   } catch (error) {
