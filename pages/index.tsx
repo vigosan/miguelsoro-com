@@ -1,40 +1,40 @@
 import { useState } from "react";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
 import { Filters } from "@/components/Filters";
-import { usePicturesPublic } from "@/hooks/usePicturesPublic";
-import { useProductTypesPublic } from "@/hooks/useProductTypes";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
+import { SupabasePictureRepository } from "@/infra/SupabasePictureRepository";
+import { SupabaseProductTypeRepository } from "@/infra/SupabaseProductRepository";
+import { Picture } from "@/domain/picture";
+import { ProductType } from "@/domain/product";
 
-export default function IndexPage() {
+interface IndexPageProps {
+  initialPictures: Picture[];
+  availableTypes: ProductType[];
+}
+
+export default function IndexPage({ initialPictures, availableTypes }: IndexPageProps) {
+  const [pictures, setPictures] = useState<Picture[]>(initialPictures);
   const [filters, setFilters] = useState({
     productType: '',
     status: ''
   });
 
-  // Build filters for API call
-  const apiFilters: any = {};
-  if (filters.productType) apiFilters.productType = filters.productType;
-  if (filters.status) apiFilters.status = filters.status as 'AVAILABLE' | 'NOT_AVAILABLE';
-
-  const { data: pictures = [], isLoading } = usePicturesPublic(
-    Object.keys(apiFilters).length > 0 ? apiFilters : undefined
-  );
-  const { data: availableTypes = [] } = useProductTypesPublic();
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando obras...</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+  // Client-side filtering (we could also implement server-side filtering via URL params if needed)
+  const filteredPictures = pictures.filter((picture) => {
+    if (filters.productType && !picture.productTypeName.toLowerCase().includes(filters.productType.toLowerCase())) {
+      return false;
+    }
+    if (filters.status === 'AVAILABLE' && picture.stock <= 0) {
+      return false;
+    }
+    if (filters.status === 'NOT_AVAILABLE' && picture.stock > 0) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <>
@@ -58,13 +58,43 @@ export default function IndexPage() {
         <Filters 
           filters={filters} 
           onFiltersChange={setFilters}
-          availableTypes={availableTypes}
-          resultCount={pictures.length}
+          availableTypes={availableTypes.map(type => type.displayName)}
+          resultCount={filteredPictures.length}
         />
         
-        <List items={pictures} />
+        <List items={filteredPictures} />
       </div>
       </Layout>
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<IndexPageProps> = async () => {
+  try {
+    const pictureRepository = new SupabasePictureRepository();
+    const productTypeRepository = new SupabaseProductTypeRepository();
+
+    // Fetch pictures and product types in parallel
+    const [pictures, productTypes] = await Promise.all([
+      pictureRepository.findAll(),
+      productTypeRepository.findAll()
+    ]);
+
+    return {
+      props: {
+        initialPictures: pictures,
+        availableTypes: productTypes,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching data for homepage:', error);
+    
+    // Return empty arrays as fallback
+    return {
+      props: {
+        initialPictures: [],
+        availableTypes: [],
+      },
+    };
+  }
+};

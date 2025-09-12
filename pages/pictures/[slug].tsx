@@ -1,34 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
+import { GetServerSideProps } from "next";
 import { Layout } from "@/components/Layout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatEuros } from "@/domain/order";
-import { usePicturePublic } from "@/hooks/usePicturesPublic";
-import { getPictureStatus } from "@/domain/picture";
-import { useRouter } from "next/router";
+import { getPictureStatus, Picture } from "@/domain/picture";
 import { ArtworkStructuredData, BreadcrumbStructuredData } from "@/components/seo/StructuredData";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { useCart } from "../../contexts/CartContext";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { SupabasePictureRepository } from "@/infra/SupabasePictureRepository";
 
-const PictureDetail = () => {
-  const router = useRouter();
-  const slug = Array.isArray(router.query.slug)
-    ? router.query.slug[0]
-    : router.query.slug;
-  const { data: picture, isLoading } = usePicturePublic(slug);
+interface PictureDetailProps {
+  picture: Picture | null;
+  slug: string;
+}
+
+const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
   const { addItem, toggleCart } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div>Loading...</div>
-      </Layout>
-    );
-  }
 
   if (!picture) {
     return (
@@ -283,6 +275,41 @@ const PictureDetail = () => {
       </Layout>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<PictureDetailProps> = async (context) => {
+  try {
+    const slug = Array.isArray(context.params?.slug)
+      ? context.params.slug[0]
+      : context.params?.slug;
+
+    if (!slug) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const pictureRepository = new SupabasePictureRepository();
+    const picture = await pictureRepository.getPictureBySlug(slug);
+
+    if (!picture) {
+      return {
+        notFound: true,
+      };
+    }
+
+    return {
+      props: {
+        picture,
+        slug,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching picture:', error);
+    return {
+      notFound: true,
+    };
+  }
 };
 
 export default PictureDetail;
