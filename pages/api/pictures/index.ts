@@ -7,8 +7,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
+    const { productType, inStock, status } = req.query;
+    
+    const filters: any = {};
+    
+    if (productType && typeof productType === 'string') {
+      filters.productType = productType;
+    }
+    
+    if (inStock !== undefined && typeof inStock === 'string') {
+      filters.inStock = inStock === 'true';
+    }
+    
+    if (status && typeof status === 'string' && (status === 'AVAILABLE' || status === 'SOLD')) {
+      filters.status = status;
+    }
+
     const pictureRepository = new DatabasePictureRepository()
-    const pictures = await pictureRepository.findAll()
+    const pictures = await pictureRepository.findAll(Object.keys(filters).length > 0 ? filters : undefined)
     
     return res.status(200).json({ pictures })
   } catch (error) {

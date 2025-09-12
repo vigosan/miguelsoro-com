@@ -3,16 +3,36 @@ import { Picture } from '@/domain/picture';
 
 export const publicPictureKeys = {
   all: ['public-pictures'] as const,
-  lists: () => [...publicPictureKeys.all, 'list'] as const,
+  lists: (filters?: any) => [...publicPictureKeys.all, 'list', filters] as const,
   details: () => [...publicPictureKeys.all, 'detail'] as const,
   detail: (slug: string) => [...publicPictureKeys.details(), slug] as const,
 };
 
-export function usePicturesPublic() {
+export function usePicturesPublic(filters?: {
+  productType?: string;
+  inStock?: boolean;
+  status?: 'AVAILABLE' | 'SOLD';
+}) {
   return useQuery({
-    queryKey: publicPictureKeys.lists(),
+    queryKey: publicPictureKeys.lists(filters),
     queryFn: async (): Promise<Picture[]> => {
-      const response = await fetch('/api/pictures');
+      const searchParams = new URLSearchParams();
+      
+      if (filters?.productType) {
+        searchParams.append('productType', filters.productType);
+      }
+      
+      if (filters?.inStock !== undefined) {
+        searchParams.append('inStock', filters.inStock.toString());
+      }
+      
+      if (filters?.status) {
+        searchParams.append('status', filters.status);
+      }
+
+      const url = `/api/pictures${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+      const response = await fetch(url);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch pictures');
       }

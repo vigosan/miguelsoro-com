@@ -10,11 +10,24 @@ type ProductWithRelations = Product & {
 };
 
 export class DatabasePictureRepository implements PictureRepository {
-  async findAll(): Promise<Picture[]> {
+  async findAll(filters?: {
+    productType?: string;
+    inStock?: boolean;
+    status?: 'AVAILABLE' | 'SOLD';
+  }): Promise<Picture[]> {
+    const where: any = {
+      isActive: true
+    };
+
+    // Filter by product type
+    if (filters?.productType) {
+      where.productType = {
+        name: filters.productType
+      };
+    }
+
     const products = await prisma.product.findMany({
-      where: {
-        isActive: true
-      },
+      where,
       orderBy: { createdAt: 'desc' },
       include: {
         images: {
@@ -29,7 +42,25 @@ export class DatabasePictureRepository implements PictureRepository {
       }
     });
 
-    return products.map(product => this.mapToDomainPicture(product));
+    let results = products.map(product => this.mapToDomainPicture(product));
+
+    // Filter by stock availability
+    if (filters?.inStock !== undefined) {
+      results = results.filter(picture => {
+        if (filters.inStock) {
+          return picture.stock > 0 && picture.status === 'AVAILABLE';
+        } else {
+          return picture.stock === 0 || picture.status !== 'AVAILABLE';
+        }
+      });
+    }
+
+    // Filter by status
+    if (filters?.status) {
+      results = results.filter(picture => picture.status === filters.status);
+    }
+
+    return results;
   }
 
   async getPictureBySlug(slug: string): Promise<Picture | undefined> {

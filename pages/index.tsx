@@ -1,11 +1,29 @@
+import { useState } from "react";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
+import { Filters } from "@/components/Filters";
 import { usePicturesPublic } from "@/hooks/usePicturesPublic";
+import { useProductTypesPublic } from "@/hooks/useProductTypes";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 
 export default function IndexPage() {
-  const { data: pictures = [], isLoading } = usePicturesPublic();
+  const [filters, setFilters] = useState({
+    productType: '',
+    inStock: null as boolean | null,
+    status: ''
+  });
+
+  // Build filters for API call
+  const apiFilters: any = {};
+  if (filters.productType) apiFilters.productType = filters.productType;
+  if (filters.inStock !== null) apiFilters.inStock = filters.inStock;
+  if (filters.status) apiFilters.status = filters.status as 'AVAILABLE' | 'SOLD';
+
+  const { data: pictures = [], isLoading } = usePicturesPublic(
+    Object.keys(apiFilters).length > 0 ? apiFilters : undefined
+  );
+  const { data: availableTypes = [] } = useProductTypesPublic();
 
   if (isLoading) {
     return (
@@ -38,6 +56,19 @@ export default function IndexPage() {
             Cada pieza captura la emoción y la pasión del deporte sobre ruedas.
           </p>
         </div>
+        
+        <Filters 
+          filters={filters} 
+          onFiltersChange={setFilters}
+          availableTypes={availableTypes}
+        />
+        
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            {pictures.length} obra{pictures.length !== 1 ? 's' : ''} encontrada{pictures.length !== 1 ? 's' : ''}
+          </p>
+        </div>
+        
         <List items={pictures} />
       </div>
       </Layout>

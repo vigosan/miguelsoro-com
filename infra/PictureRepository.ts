@@ -2,7 +2,11 @@ import { Picture } from "@/domain/picture";
 import { pictures as pictureData } from "@/data/pictures";
 
 export interface PictureRepository {
-  findAll(): Promise<Picture[]>;
+  findAll(filters?: {
+    productType?: string;
+    inStock?: boolean;
+    status?: 'AVAILABLE' | 'SOLD';
+  }): Promise<Picture[]>;
   getPictureBySlug(slug: string): Promise<Picture | undefined>;
   getPictureById(id: string): Promise<Picture | undefined>;
   create(pictureData: Omit<Picture, 'id' | 'createdAt' | 'updatedAt'>): Promise<Picture>;
@@ -17,8 +21,37 @@ export class InMemoryPictureRepository implements PictureRepository {
     this.pictures = [...pictureData];
   }
 
-  async findAll(): Promise<Picture[]> {
-    return [...this.pictures];
+  async findAll(filters?: {
+    productType?: string;
+    inStock?: boolean;
+    status?: 'AVAILABLE' | 'SOLD';
+  }): Promise<Picture[]> {
+    let results = [...this.pictures];
+
+    // Filter by product type
+    if (filters?.productType) {
+      results = results.filter(picture => 
+        picture.productTypeName.toLowerCase().includes(filters.productType!.toLowerCase())
+      );
+    }
+
+    // Filter by stock availability
+    if (filters?.inStock !== undefined) {
+      results = results.filter(picture => {
+        if (filters.inStock) {
+          return picture.stock > 0 && picture.status === 'AVAILABLE';
+        } else {
+          return picture.stock === 0 || picture.status !== 'AVAILABLE';
+        }
+      });
+    }
+
+    // Filter by status
+    if (filters?.status) {
+      results = results.filter(picture => picture.status === filters.status);
+    }
+
+    return results;
   }
 
   async getPictureBySlug(slug: string): Promise<Picture | undefined> {
