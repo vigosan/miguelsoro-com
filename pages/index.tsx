@@ -10,15 +10,13 @@ import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 export default function IndexPage() {
   const [filters, setFilters] = useState({
     productType: '',
-    inStock: null as boolean | null,
     status: ''
   });
 
   // Build filters for API call
   const apiFilters: any = {};
   if (filters.productType) apiFilters.productType = filters.productType;
-  if (filters.inStock !== null) apiFilters.inStock = filters.inStock;
-  if (filters.status) apiFilters.status = filters.status as 'AVAILABLE' | 'SOLD';
+  if (filters.status) apiFilters.status = filters.status as 'AVAILABLE' | 'NOT_AVAILABLE';
 
   const { data: pictures = [], isLoading } = usePicturesPublic(
     Object.keys(apiFilters).length > 0 ? apiFilters : undefined
@@ -61,13 +59,8 @@ export default function IndexPage() {
           filters={filters} 
           onFiltersChange={setFilters}
           availableTypes={availableTypes}
+          resultCount={pictures.length}
         />
-        
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">
-            {pictures.length} obra{pictures.length !== 1 ? 's' : ''} encontrada{pictures.length !== 1 ? 's' : ''}
-          </p>
-        </div>
         
         <List items={pictures} />
       </div>
