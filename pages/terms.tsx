@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
-import { ContactPageLink } from "@/pages/contact";
+import { ContactPageLink } from "@/components/navigation/PageLinks";
 
 export default function TermsPage() {
   return (
@@ -36,19 +36,5 @@ export default function TermsPage() {
         </p>
       </div>
     </Layout>
-  );
-}
-
-export function TermsPageLink({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <Link href="/terms" className={className}>
-      {children}
-    </Link>
   );
 }

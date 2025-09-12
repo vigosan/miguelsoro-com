@@ -174,17 +174,3 @@ export default function BiographyPage() {
     </>
   );
 }
-
-export function BiographyPageLink({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <Link href="/biography" className={className}>
-      {children}
-    </Link>
-  );
-}

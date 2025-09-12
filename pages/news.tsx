@@ -63,17 +63,3 @@ export default function NewsPage() {
     </Layout>
   );
 }
-
-export function NewsPageLink({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <Link href="/news" className={className}>
-      {children}
-    </Link>
-  );
-}

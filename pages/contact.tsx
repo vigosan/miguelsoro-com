@@ -126,17 +126,3 @@ export default function ContactPage() {
     </>
   );
 }
-
-export function ContactPageLink({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <Link href="/contact" className={className}>
-      {children}
-    </Link>
-  );
-}

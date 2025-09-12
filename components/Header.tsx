@@ -2,10 +2,12 @@ import { useState } from "react";
 import Image from "next/image";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-import { BiographyPageLink } from "@/pages/biography";
-import { ContactPageLink } from "@/pages/contact";
-import { IndexPageLink } from "@/pages/index";
-import { NewsPageLink } from "@/pages/news";
+import { 
+  BiographyPageLink, 
+  ContactPageLink, 
+  IndexPageLink, 
+  NewsPageLink 
+} from "@/components/navigation/PageLinks";
 
 export function Header() {
   const navigation = [

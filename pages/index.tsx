@@ -44,17 +44,3 @@ export default function IndexPage() {
     </>
   );
 }
-
-export function IndexPageLink({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <Link href="/" className={className}>
-      {children}
-    </Link>
-  );
-}
