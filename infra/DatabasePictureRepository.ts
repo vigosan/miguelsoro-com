@@ -91,6 +91,63 @@ export class DatabasePictureRepository implements PictureRepository {
     };
   }
 
+  async create(pictureData: Omit<Picture, 'id' | 'createdAt' | 'updatedAt'>): Promise<Picture> {
+    throw new Error('Picture creation not implemented yet - requires complex Product/Variant creation');
+  }
+
+  async update(id: string, pictureData: Partial<Picture>): Promise<Picture> {
+    const { title, description, price, slug, status, stock } = pictureData;
+    
+    // Update product
+    if (title || description || slug || price) {
+      await prisma.product.update({
+        where: { id },
+        data: {
+          ...(title && { title }),
+          ...(description !== undefined && { description }),
+          ...(price && { basePrice: price }),
+          ...(slug && { slug }),
+        }
+      });
+    }
+
+    // Update variant price and stock
+    if (price || stock !== undefined) {
+      await prisma.productVariant.updateMany({
+        where: { productId: id },
+        data: {
+          ...(price && { price }),
+          ...(stock !== undefined && { stock }),
+        }
+      });
+    }
+
+    // Update variant status
+    if (status) {
+      const variantStatus = status === 'AVAILABLE' ? 'AVAILABLE' : 
+                          status === 'SOLD' ? 'OUT_OF_STOCK' : 'AVAILABLE';
+      
+      await prisma.productVariant.updateMany({
+        where: { productId: id },
+        data: { status: variantStatus }
+      });
+    }
+
+    // Return updated picture
+    const updatedPicture = await this.getPictureById(id);
+    if (!updatedPicture) {
+      throw new Error('Picture not found after update');
+    }
+    
+    return updatedPicture;
+  }
+
+  async delete(id: string): Promise<void> {
+    await prisma.product.delete({
+      where: { id },
+    });
+  }
+
   // Helper method to extract size from title (e.g., "Obra 120x90" -> "120x90")
   private extractSizeFromTitle(title: string): string | null {
     const sizeMatch = title.match(/(\d+)x(\d+)/);

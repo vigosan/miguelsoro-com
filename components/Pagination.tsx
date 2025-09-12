@@ -7,7 +7,7 @@ function Previous({
   children: ReactNode;
   className?: string;
 }) {
-  return <button className={className}>{children}</button>;
+  return <button className={className} data-testid="pagination-previous">{children}</button>;
 }
 
 function Next({
@@ -17,7 +17,7 @@ function Next({
   children?: ReactNode;
   className?: string;
 }) {
-  return <button className={className}>{children}</button>;
+  return <button className={className} data-testid="pagination-next">{children}</button>;
 }
 
 function Pagination({
@@ -27,7 +27,7 @@ function Pagination({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={className}>{children}</div>;
+  return <div className={className} data-testid="pagination-container">{children}</div>;
 }
 
 Pagination.Previous = Previous;
