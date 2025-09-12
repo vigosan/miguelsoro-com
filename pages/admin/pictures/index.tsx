@@ -112,85 +112,89 @@ export default function AdminPictures() {
           />
         </div>
 
-        {/* Pictures Grid */}
+        {/* Pictures Grid - Minimalist Design */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 p-4 sm:p-6">
+          <div className="grid grid-cols-1 gap-1 divide-y divide-gray-100">
             {pictures.map((picture) => (
               <div
                 key={picture.id}
-                className="flex flex-col space-y-4 lg:flex-row lg:items-start lg:space-y-0 lg:space-x-8 p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
               >
-                {/* Image */}
-                <div className="flex-shrink-0 mx-auto lg:mx-0 lg:mr-2">
-                  <Image
-                    src={picture.imageUrl || `/pictures/${picture.id}.webp`}
-                    alt={picture.title}
-                    width={120}
-                    height={90}
-                    className="w-20 h-15 sm:w-24 sm:h-18 lg:w-32 lg:h-24 rounded-lg object-cover border"
-                  />
-                </div>
+                {/* Left side - Image and basic info */}
+                <div className="flex items-center space-x-4 min-w-0 flex-1">
+                  {/* Image */}
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={picture.imageUrl || `/pictures/${picture.id}.webp`}
+                      alt={picture.title}
+                      width={64}
+                      height={48}
+                      className="w-16 h-12 rounded-md object-cover border"
+                    />
+                  </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0 space-y-3">
-                  {/* Title and basic info */}
-                  <div className="text-center lg:text-left">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                  {/* Title and size */}
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-medium text-gray-900 truncate">
                       {picture.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-0.5">
                       {picture.size}
                     </p>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-2 line-clamp-2">
-                      {picture.description}
-                    </p>
+                  </div>
+                </div>
+
+                {/* Center - Status */}
+                <div className="hidden md:flex items-center min-w-0">
+                  <span className={cn(
+                    "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap",
+                    statusColors[getPictureStatus(picture)]
+                  )}>
+                    {statusLabels[getPictureStatus(picture)]}
+                  </span>
+                </div>
+
+                {/* Mobile - Status below title */}
+                <div className="md:hidden">
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className={cn(
+                      "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
+                      statusColors[getPictureStatus(picture)]
+                    )}>
+                      {statusLabels[getPictureStatus(picture)]}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      Stock: {picture.stock || 0}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right side - Stock, Price and Actions */}
+                <div className="flex items-center space-x-6">
+                  <div className="hidden md:block text-xs text-gray-500 whitespace-nowrap">
+                    Stock: {picture.stock || 0}
                   </div>
                   
-                  {/* Status, Stock, Price - Mobile stacked, Desktop inline */}
-                  <div className="flex flex-col space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-                    {/* Status & Stock */}
-                    <div className="flex flex-col items-center lg:items-start space-y-2">
-                      <div className="flex flex-wrap justify-center lg:justify-start items-center gap-2">
-                        <span className={cn(
-                          "inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium",
-                          statusColors[getPictureStatus(picture)]
-                        )}>
-                          {statusLabels[getPictureStatus(picture)]}
-                        </span>
-                        <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          Stock: {picture.stock || 0}
-                        </span>
-                      </div>
-                      <p className="text-xs sm:text-sm text-gray-500">
-                        {picture.productTypeName || 'Sin tipo'}
-                      </p>
-                    </div>
-                    
-                    {/* Price */}
-                    <div className="text-center lg:text-right">
-                      <p className="text-base sm:text-lg font-bold text-gray-900">
-                        {formatEuros(picture.price)}
-                      </p>
+                  <div className="text-right min-w-0">
+                    <div className="text-sm font-semibold text-gray-900">
+                      {formatEuros(picture.price)}
                     </div>
                   </div>
-
-                  {/* Actions - Always at bottom on mobile, right side on desktop */}
-                  <div className="flex items-center justify-center lg:justify-end space-x-3 pt-2 border-t border-gray-100 lg:border-t-0 lg:pt-0">
+                  
+                  <div className="flex items-center space-x-1">
                     <Link
                       href={`/pictures/${picture.slug}`}
-                      className="flex items-center space-x-1 px-3 py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
+                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
                       title="Ver en el sitio"
                     >
                       <EyeIcon className="h-4 w-4" />
-                      <span className="hidden sm:inline">Ver</span>
                     </Link>
                     <Link
                       href={`/admin/pictures/${picture.id}/edit`}
-                      className="flex items-center space-x-1 px-3 py-2 text-xs sm:text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
+                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
                       title="Editar"
                     >
                       <PencilIcon className="h-4 w-4" />
-                      <span className="hidden sm:inline">Editar</span>
                     </Link>
                   </div>
                 </div>
