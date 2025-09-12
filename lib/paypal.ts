@@ -1,6 +1,6 @@
 import { Client, Environment } from '@paypal/paypal-server-sdk';
 
-const environment = process.env.PAYPAL_ENVIRONMENT === 'production' ? Environment.Live : Environment.Sandbox;
+const environment = process.env.PAYPAL_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox;
 
 export const paypalClient = new Client({
   clientCredentialsAuthCredentials: {
@@ -15,5 +15,5 @@ export const getPayPalClientConfig = () => ({
   currency: 'EUR',
   intent: 'capture',
   'data-client-token': undefined,
-  environment: environment === Environment.Live ? 'production' : 'sandbox',
+  environment: environment === Environment.Production ? 'production' : 'sandbox',
 });
