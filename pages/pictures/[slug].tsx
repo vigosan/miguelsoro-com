@@ -4,6 +4,8 @@ import { Layout } from "@/components/Layout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { usePicturePublic } from "@/hooks/usePicturesPublic";
 import { useRouter } from "next/router";
+import { ArtworkStructuredData, BreadcrumbStructuredData } from "@/components/seo/StructuredData";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 
 const PictureDetail = () => {
   const router = useRouter();
@@ -32,19 +34,32 @@ const PictureDetail = () => {
   const shareTitle = `${picture.title} - Miguel Soro`;
   const shareText = picture.description;
 
+  const pictureUrl = `https://www.miguelsoro.com/pictures/${slug}`;
+  const pictureImageUrl = picture.imageUrl;
+
+  const breadcrumbItems = [
+    { name: "Inicio", href: "/", current: false },
+    { name: "Obra", href: "/", current: false },
+    { name: picture.title, href: `/pictures/${slug}`, current: true }
+  ];
+
+  const structuredBreadcrumbItems = [
+    { name: "Inicio", url: "https://www.miguelsoro.com" },
+    { name: "Obra", url: "https://www.miguelsoro.com" },
+    { name: picture.title, url: pictureUrl }
+  ];
+
   return (
-    <Layout>
-      <nav className="mb-8">
-        <ol className="flex items-center space-x-2 text-sm">
-          <li>
-            <Link href="/" className="text-gray-500 hover:text-gray-700 transition-colors">
-              Inicio
-            </Link>
-          </li>
-          <li className="text-gray-500">/</li>
-          <li className="text-gray-900 font-medium truncate">{picture.title}</li>
-        </ol>
-      </nav>
+    <>
+      <ArtworkStructuredData artwork={picture} url={pictureUrl} />
+      <BreadcrumbStructuredData items={structuredBreadcrumbItems} />
+      <Layout
+        title={`${picture.title} - Miguel Soro | Arte Ciclístico Original`}
+        description={`${picture.description} Obra original de Miguel Soro, ex-ciclista profesional. Acrílico y collage ${picture.size}cm. ${picture.price > 0 ? `Precio: ${formatCurrency(picture.price)}` : 'Consultar precio'}.`}
+        image={pictureImageUrl}
+        url={pictureUrl}
+      >
+        <Breadcrumbs items={breadcrumbItems} />
 
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
         {/* Imagen Principal */}
@@ -53,7 +68,7 @@ const PictureDetail = () => {
             <div className="aspect-square relative bg-gray-900 p-6">
               <Image
                 src={picture.imageUrl}
-                alt={picture.title}
+                alt={`${picture.title} - Arte ciclístico original de Miguel Soro. Obra única ${picture.size}cm, acrílico y collage sobre lienzo${picture.status === 'SOLD' ? ' [VENDIDA]' : picture.status === 'AVAILABLE' ? ' disponible para compra' : ''}`}
                 className="h-full w-full object-cover"
                 width={600}
                 height={600}
@@ -192,7 +207,8 @@ const PictureDetail = () => {
           </div>
         </div>
       </div>
-    </Layout>
+      </Layout>
+    </>
   );
 };
 

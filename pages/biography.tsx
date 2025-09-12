@@ -1,10 +1,73 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Layout } from "@/components/Layout";
+import Head from "next/head";
 
 export default function BiographyPage() {
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": "https://www.miguelsoro.com#artist",
+    name: "Miguel Soro",
+    birthDate: "1976-02-27",
+    birthPlace: {
+      "@type": "Place",
+      name: "Xàtiva, Valencia, España"
+    },
+    nationality: "Spanish",
+    jobTitle: ["Artista Visual", "Ex-Ciclista Profesional"],
+    description: "Ex-ciclista profesional español reconvertido en artista contemporáneo especializado en arte ciclístico. Ha expuesto en España, Italia, Francia, Estados Unidos, Canadá y Australia.",
+    url: "https://www.miguelsoro.com",
+    image: "https://www.miguelsoro.com/biography.webp",
+    sameAs: [
+      "https://www.miguelsoro.com"
+    ],
+    hasOccupation: [
+      {
+        "@type": "Occupation",
+        name: "Visual Artist",
+        description: "Contemporary artist specializing in cycling-themed artwork using acrylic and collage techniques"
+      },
+      {
+        "@type": "Occupation",
+        name: "Professional Cyclist", 
+        description: "Former professional cyclist who competed in Portugal and Italy"
+      }
+    ],
+    knowsAbout: [
+      "Ciclismo profesional",
+      "Arte contemporáneo",
+      "Pintura acrílica",
+      "Técnicas de collage",
+      "Arte deportivo"
+    ],
+    award: [
+      "Reconocimiento de Forbes",
+      "Apoyo de Giant Bicycles",
+      "Exposiciones internacionales"
+    ],
+    workLocation: {
+      "@type": "Place",
+      name: "Valencia, España"
+    },
+    alumni: "Ciclismo profesional"
+  };
+
   return (
-    <Layout>
+    <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(personSchema)
+          }}
+        />
+      </Head>
+      <Layout
+        title="Biografía Miguel Soro - Ex-Ciclista Profesional y Artista | Del Pedal al Pincel"
+        description="Conoce la historia de Miguel Soro (Xàtiva, 1976), ex-ciclista profesional convertido en artista reconocido internacionalmente. Exposiciones en España, Italia, Francia, EEUU, Canadá y Australia. Reconocido por Forbes y Giant Bicycles."
+        url="https://www.miguelsoro.com/biography"
+      >
       <div className="space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -107,7 +170,8 @@ export default function BiographyPage() {
           </div>
         </div>
       </div>
-    </Layout>
+      </Layout>
+    </>
   );
 }
 

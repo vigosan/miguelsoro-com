@@ -1,9 +1,17 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
+import { LocalBusinessStructuredData } from "@/components/seo/StructuredData";
+import Head from "next/head";
 
 export default function ContactPage() {
   return (
-    <Layout>
+    <>
+      <LocalBusinessStructuredData />
+      <Layout
+        title="Contacto - Miguel Soro Art | Consultas y Adquisiciones"
+        description="Contacta con Miguel Soro para consultas sobre adquisición de obras, exposiciones y colaboraciones. Galería de arte ciclístico con presencia internacional. Respuesta en menos de 24 horas."
+        url="https://www.miguelsoro.com/contact"
+      >
       <div className="space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -114,7 +122,8 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-    </Layout>
+      </Layout>
+    </>
   );
 }
 

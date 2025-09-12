@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
 import { usePicturesPublic } from "@/hooks/usePicturesPublic";
+import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 
 export default function IndexPage() {
   const { data: pictures = [], isLoading } = usePicturesPublic();
@@ -20,7 +21,13 @@ export default function IndexPage() {
   }
 
   return (
-    <Layout>
+    <>
+      <WebsiteStructuredData />
+      <Layout
+        title="Miguel Soro - Arte Ciclístico Original | Ex-Ciclista Profesional"
+        description="Descubre la colección única de arte ciclístico de Miguel Soro, ex-ciclista profesional español. Obras originales en acrílico y collage inspiradas en el mundo del ciclismo. Compra arte deportivo contemporáneo."
+        url="https://www.miguelsoro.com"
+      >
       <div className="space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -33,7 +40,8 @@ export default function IndexPage() {
         </div>
         <List items={pictures} />
       </div>
-    </Layout>
+      </Layout>
+    </>
   );
 }
 
