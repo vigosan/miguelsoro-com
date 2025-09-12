@@ -119,16 +119,16 @@ export default function AdminPictures() {
             {pictures.map((picture) => (
               <div
                 key={picture.id}
-                className="flex flex-col space-y-4 lg:flex-row lg:items-start lg:space-y-0 lg:space-x-6 p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex flex-col space-y-4 lg:flex-row lg:items-start lg:space-y-0 lg:space-x-8 p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 {/* Image */}
-                <div className="flex-shrink-0 mx-auto lg:mx-0">
+                <div className="flex-shrink-0 mx-auto lg:mx-0 lg:mr-2">
                   <Image
                     src={picture.imageUrl || `/pictures/${picture.id}.webp`}
                     alt={picture.title}
                     width={120}
                     height={90}
-                    className="w-20 h-15 sm:w-24 sm:h-18 lg:w-30 lg:h-auto rounded-lg object-cover border"
+                    className="w-20 h-15 sm:w-24 sm:h-18 lg:w-32 lg:h-24 rounded-lg object-cover border"
                   />
                 </div>
 
