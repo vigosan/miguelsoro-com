@@ -104,7 +104,7 @@ export function useUpdatePicture() {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Picture> }) => {
       const response = await fetch(`/api/admin/pictures/${id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -112,7 +112,8 @@ export function useUpdatePicture() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update picture');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update picture');
       }
 
       return response.json();

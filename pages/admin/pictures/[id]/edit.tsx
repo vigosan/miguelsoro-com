@@ -5,6 +5,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { Toaster, toast } from "react-hot-toast";
 import { getPictureStatus } from "@/domain/picture";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { usePicture, useUpdatePicture } from "@/hooks/usePictures";
 import { 
   ArrowLeftIcon,
   PhotoIcon,
@@ -43,9 +44,6 @@ type ProductType = {
 export default function EditPicture() {
   const router = useRouter();
   const { id } = router.query;
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [picture, setPicture] = useState<AdminPicture | null>(null);
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [formData, setFormData] = useState({
     title: '',
@@ -57,6 +55,10 @@ export default function EditPicture() {
     stock: '',
     imageUrl: '',
   });
+
+  // Use React Query hooks
+  const { data: picture, isLoading: loading, error } = usePicture(typeof id === 'string' ? id : '');
+  const updatePictureMutation = useUpdatePicture();
 
   useEffect(() => {
     const fetchProductTypes = async () => {
@@ -74,80 +76,50 @@ export default function EditPicture() {
     fetchProductTypes();
   }, []);
 
+  // Update form data when picture is loaded
   useEffect(() => {
-    if (!id || typeof id !== 'string') return;
+    if (picture) {
+      setFormData({
+        title: picture.title,
+        description: picture.description || '',
+        price: picture.price.toString(),
+        size: picture.size,
+        slug: picture.slug,
+        productTypeId: picture.productTypeId || '',
+        stock: picture.stock?.toString() || '1',
+        imageUrl: picture.imageUrl || '',
+      });
+    }
+  }, [picture]);
 
-    const fetchPicture = async () => {
-      try {
-        const response = await fetch(`/api/admin/pictures/${id}`);
-        
-        if (response.status === 404) {
-          toast.error('Cuadro no encontrado');
-          router.push('/admin/pictures');
-          return;
-        }
-        
-        if (!response.ok) {
-          throw new Error('Error al cargar el cuadro');
-        }
-        
-        const data = await response.json();
-        setPicture(data.picture);
-        setFormData({
-          title: data.picture.title,
-          description: data.picture.description || '',
-          price: data.picture.price.toString(), // Price is already in euros from API
-          size: data.picture.size,
-          slug: data.picture.slug,
-          productTypeId: data.picture.productTypeId || '',
-          stock: data.picture.stock?.toString() || '1',
-          imageUrl: data.picture.imageUrl || '',
-        });
-      } catch (error) {
-        console.error('Error fetching picture:', error);
-        toast.error('Error al cargar el cuadro');
-        router.push('/admin/pictures');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPicture();
-  }, [id, router]);
+  // Handle error state
+  useEffect(() => {
+    if (error) {
+      toast.error('Error al cargar el cuadro');
+      router.push('/admin/pictures');
+    }
+  }, [error, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!picture) return;
     
-    setSaving(true);
-    
     try {
-      const response = await fetch(`/api/admin/pictures/${picture.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      await updatePictureMutation.mutateAsync({
+        id: picture.id,
+        data: {
           ...formData,
-          price: parseFloat(formData.price), // Send price in euros, repository will handle conversion
+          price: parseFloat(formData.price),
           stock: parseInt(formData.stock) || 1,
-        }),
+        }
       });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al actualizar el cuadro');
-      }
       
       toast.success('Cuadro actualizado correctamente');
       router.push('/admin/pictures');
     } catch (error) {
       console.error('Error updating picture:', error);
       toast.error(error instanceof Error ? error.message : 'Error al actualizar el cuadro');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -327,10 +299,10 @@ export default function EditPicture() {
                 </Link>
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={updatePictureMutation.isPending}
                   className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                 >
-                  {saving ? 'Guardando...' : 'Guardar Cambios'}
+                  {updatePictureMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
               </div>
             </form>
