@@ -111,7 +111,7 @@ export default function EditPicture() {
         data: {
           ...formData,
           price: parseFloat(formData.price),
-          stock: parseInt(formData.stock) || 1,
+          stock: formData.stock === '' ? 0 : parseInt(formData.stock),
         }
       });
       
