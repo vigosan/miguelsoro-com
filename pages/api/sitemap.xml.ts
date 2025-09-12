@@ -1,7 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { pictures } from '@/data/pictures';
+import { DatabasePictureRepository } from '@/infra/DatabasePictureRepository';
+import { Picture } from '@/domain/picture';
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+type SiteMapPage = {
+  url: string;
+  changefreq: string;
+  priority: string;
+  lastmod: string;
+  picture?: Picture;
+};
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -9,7 +18,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const baseUrl = 'https://www.miguelsoro.com';
   
   // Static pages with high priority
-  const staticPages = [
+  const staticPages: SiteMapPage[] = [
     {
       url: baseUrl,
       changefreq: 'weekly',
@@ -36,12 +45,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
   ];
 
+  // Get pictures from database
+  const pictureRepository = new DatabasePictureRepository();
+  const pictures = await pictureRepository.findAll();
+  
   // Dynamic picture pages - high priority for e-commerce
-  const picturePages = pictures.map(picture => ({
+  const picturePages: SiteMapPage[] = pictures.map(picture => ({
     url: `${baseUrl}/pictures/${picture.slug}`,
     changefreq: 'monthly',
     priority: '0.9', // High priority for product pages
-    lastmod: new Date().toISOString()
+    lastmod: picture.updatedAt,
+    picture: picture // Add picture data for image sitemap
   }));
 
   const allPages = [...staticPages, ...picturePages];
@@ -55,11 +69,11 @@ ${allPages.map(page => `  <url>
     <loc>${page.url}</loc>
     <lastmod>${page.lastmod}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority}</priority>${page.url.includes('/pictures/') ? `
+    <priority>${page.priority}</priority>${page.picture ? `
     <image:image>
-      <image:loc>${baseUrl}${pictures.find(p => page.url.includes(p.slug))?.imageUrl || '/pictures/1.webp'}</image:loc>
-      <image:title>${pictures.find(p => page.url.includes(p.slug))?.title || 'Arte Ciclístico'}</image:title>
-      <image:caption>${pictures.find(p => page.url.includes(p.slug))?.description || 'Obra de arte original de Miguel Soro'}</image:caption>
+      <image:loc>${page.picture.imageUrl}</image:loc>
+      <image:title>${page.picture.title}</image:title>
+      <image:caption>${page.picture.description}</image:caption>
       <image:license>${baseUrl}</image:license>
     </image:image>` : ''}
   </url>`).join('\n')}

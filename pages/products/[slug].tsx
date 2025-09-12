@@ -15,10 +15,20 @@ import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 export default function ProductPage() {
   const router = useRouter();
   const { slug } = router.query;
-  const { product, loading, error } = useProduct(typeof slug === "string" ? slug : undefined);
+  const { data: product, isLoading, error } = useProduct(typeof slug === "string" ? slug : undefined);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  if (!product) {
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-16">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !product) {
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center py-16">

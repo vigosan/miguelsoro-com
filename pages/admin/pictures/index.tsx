@@ -2,7 +2,8 @@ import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Link from "next/link";
 import Image from "next/image";
-import { usePictures, useDeletePicture, PictureStatus } from "@/hooks/usePictures";
+import { usePictures, useDeletePicture } from "@/hooks/usePictures";
+import { PictureStatus } from "@/domain/picture";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { Toaster, toast } from "react-hot-toast";
 import { 

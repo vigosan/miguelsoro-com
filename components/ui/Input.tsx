@@ -4,11 +4,13 @@ import { cn } from '@/utils/cn';
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  'data-testid'?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, id, ...props }, ref) => {
+  ({ className, label, error, id, 'data-testid': testId, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
+    const defaultTestId = testId || (inputId ? `input-${inputId}` : undefined);
 
     return (
       <div>
@@ -16,6 +18,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <label 
             htmlFor={inputId} 
             className="block text-sm/6 font-medium text-gray-900 mb-2"
+            data-testid={defaultTestId ? `${defaultTestId}-label` : undefined}
           >
             {label}
           </label>
@@ -27,11 +30,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             error && "outline-red-300 focus:outline-red-600",
             className
           )}
+          data-testid={defaultTestId}
           ref={ref}
           {...props}
         />
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+          <p className="mt-1 text-sm text-red-600" data-testid={defaultTestId ? `${defaultTestId}-error` : undefined}>{error}</p>
         )}
       </div>
     );

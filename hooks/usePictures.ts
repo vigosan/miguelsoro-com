@@ -1,23 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-// Types
-export type PictureStatus = 'AVAILABLE' | 'SOLD' | 'RESERVED';
-
-export type Picture = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  size: string;
-  slug: string;
-  imageUrl: string;
-  status: PictureStatus;
-  productTypeId: string;
-  productTypeName: string;
-  stock: number;
-  createdAt: string;
-  updatedAt: string;
-};
+import { Picture, PictureStatus } from '@/domain/picture';
 
 export type PictureStats = {
   totalPictures: number;

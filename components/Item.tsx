@@ -13,11 +13,12 @@ export function Item({ item, className }: Props) {
   const altText = `${item.title} - Arte ciclístico de Miguel Soro, obra original ${item.size}cm en acrílico y collage${item.status === 'SOLD' ? ' [VENDIDA]' : item.status === 'AVAILABLE' ? ' disponible para compra' : ''}`;
   
   return (
-    <Link href={`/pictures/${item.slug}`}>
+    <Link href={`/pictures/${item.slug}`} data-testid={`picture-link-${item.slug}`}>
       <article 
         className={cn("h-full overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 hover:shadow-lg transition-shadow duration-200 flex flex-col", className)}
         itemScope 
         itemType="https://schema.org/VisualArtwork"
+        data-testid={`picture-card-${item.slug}`}
       >
         <div className="group relative h-80 w-full bg-gray-50">
           <Image
@@ -35,16 +36,18 @@ export function Item({ item, className }: Props) {
           <h3 
             className="font-medium text-gray-900 group-hover:text-gray-700 transition-colors duration-200 line-clamp-2 min-h-[2.5rem]"
             itemProp="name"
+            data-testid={`picture-title-${item.slug}`}
           >
             {item.title}
           </h3>
           <div className="mt-2 flex items-center justify-between">
-            <p className="text-sm text-gray-500" itemProp="size">{item.size}cm</p>
+            <p className="text-sm text-gray-500" itemProp="size" data-testid={`picture-size-${item.slug}`}>{item.size}cm</p>
             {item.status === 'AVAILABLE' && (
               <span 
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
                 itemProp="availability"
                 itemType="https://schema.org/InStock"
+                data-testid={`picture-status-available-${item.slug}`}
               >
                 Disponible
               </span>
@@ -54,6 +57,7 @@ export function Item({ item, className }: Props) {
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
                 itemProp="availability"
                 itemType="https://schema.org/OutOfStock"
+                data-testid={`picture-status-sold-${item.slug}`}
               >
                 Vendido
               </span>

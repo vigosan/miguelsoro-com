@@ -29,7 +29,7 @@ export class DatabasePictureRepository implements PictureRepository {
       }
     });
 
-    return products.map(this.mapToDomainPicture);
+    return products.map(product => this.mapToDomainPicture(product));
   }
 
   async getPictureBySlug(slug: string): Promise<Picture | undefined> {

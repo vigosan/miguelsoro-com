@@ -1,45 +1,24 @@
-import { useState, useEffect } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { Product } from "@/domain/product";
 
 export function useProduct(slug: string | undefined) {
-  const [product, setProduct] = useState<Product | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      if (!slug) {
-        setLoading(false);
-        return;
+  return useQuery({
+    queryKey: ['product', slug],
+    queryFn: async (): Promise<Product> => {
+      const response = await fetch(`/api/products/${encodeURIComponent(slug!)}`);
+      
+      if (response.status === 404) {
+        throw new Error('Product not found');
       }
-
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/products/${encodeURIComponent(slug)}`);
-        
-        if (response.status === 404) {
-          setProduct(undefined);
-          setError(null);
-          return;
-        }
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch product');
-        }
-        
-        const data = await response.json();
-        setProduct(data.product);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        setProduct(undefined);
-      } finally {
-        setLoading(false);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch product');
       }
-    };
-
-    fetchProduct();
-  }, [slug]);
-
-  return { product, loading, error };
+      
+      const data = await response.json();
+      return data.product;
+    },
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 }
