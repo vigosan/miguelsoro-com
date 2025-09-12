@@ -2,6 +2,7 @@ import type { AppProps } from "next/app";
 import { GeistSans } from "geist/font/sans";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import { CartProvider } from "../contexts/CartContext";
 
 import "./globals.css";
 
@@ -18,9 +19,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className={GeistSans.className}>
-        <Component {...pageProps} />
-      </div>
+      <CartProvider>
+        <div className={GeistSans.className}>
+          <Component {...pageProps} />
+        </div>
+      </CartProvider>
     </QueryClientProvider>
   );
 }

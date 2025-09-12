@@ -8,6 +8,7 @@ import {
   IndexPageLink, 
   NewsPageLink 
 } from "@/components/navigation/PageLinks";
+import CartButton from "./cart/CartButton";
 
 export function Header() {
   const navigation = [
@@ -39,7 +40,8 @@ export function Header() {
           />
         </IndexPageLink>
 
-        <div className="flex lg:hidden">
+        <div className="flex items-center gap-4 lg:hidden">
+          <CartButton />
           <button
             type="button"
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
@@ -51,12 +53,13 @@ export function Header() {
           </button>
         </div>
 
-        <div className="hidden lg:flex lg:gap-x-8" data-testid="desktop-navigation">
+        <div className="hidden lg:flex lg:items-center lg:gap-x-8" data-testid="desktop-navigation">
           {navigation.map(({ name, Link }) => (
             <Link key={name} className="text-sm leading-6 text-gray-900" data-testid={`nav-link-${name.toLowerCase().replace(/\s+/g, '-')}`}>
               {name}
             </Link>
           ))}
+          <CartButton />
         </div>
       </nav>
 

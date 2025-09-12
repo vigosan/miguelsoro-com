@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ error: 'Picture not found' })
       }
 
-      return res.status(200).json(picture)
+      return res.status(200).json({ picture })
     } catch (error) {
       console.error('Error fetching picture:', error)
       return res.status(500).json({ error: 'Failed to fetch picture' })

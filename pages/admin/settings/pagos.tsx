@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { Toaster, toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
@@ -8,29 +8,81 @@ type PaymentSettings = {
   currency: string;
   taxRate: number;
   shippingCost: number;
+  freeShippingThreshold: number;
 };
 
 const defaultSettings: PaymentSettings = {
   currency: "EUR",
   taxRate: 21,
   shippingCost: 0,
+  freeShippingThreshold: 0,
 };
 
 export default function PaymentSettings() {
   const [settings, setSettings] = useState<PaymentSettings>(defaultSettings);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Load shipping settings on component mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/admin/shipping-settings');
+        if (response.ok) {
+          const data = await response.json();
+          setSettings(prev => ({
+            ...prev,
+            shippingCost: data.standardRate / 100, // Convert cents to euros
+            freeShippingThreshold: data.freeShippingThreshold / 100 // Convert cents to euros
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading shipping settings:', error);
+        toast.error('Error al cargar la configuración');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/admin/shipping-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          standardRate: settings.shippingCost,
+          freeShippingThreshold: settings.freeShippingThreshold,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save settings');
+      }
+
       toast.success('Configuración guardada correctamente');
     } catch (error) {
+      console.error('Error saving settings:', error);
       toast.error('Error al guardar la configuración');
     } finally {
       setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <SettingsLayout title="Configuración de Pagos - Admin">
+        <div className="p-4 sm:p-6 flex justify-center items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      </SettingsLayout>
+    );
+  }
 
   return (
     <SettingsLayout title="Configuración de Pagos - Admin">
@@ -65,9 +117,24 @@ export default function PaymentSettings() {
               step="0.01"
               value={settings.shippingCost}
               onChange={(e) => setSettings({ ...settings, shippingCost: parseFloat(e.target.value) || 0 })}
+              disabled={loading}
             />
             <p className="text-xs text-gray-500 mt-1">
-              0 para envío gratuito
+              Coste del envío estándar
+            </p>
+          </div>
+          <div>
+            <Input
+              label="Umbral para envío gratuito (€)"
+              type="number"
+              min="0"
+              step="0.01"
+              value={settings.freeShippingThreshold}
+              onChange={(e) => setSettings({ ...settings, freeShippingThreshold: parseFloat(e.target.value) || 0 })}
+              disabled={loading}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Pedidos superiores a esta cantidad tendrán envío gratuito. 0 para desactivar envío gratuito.
             </p>
           </div>
         </div>
