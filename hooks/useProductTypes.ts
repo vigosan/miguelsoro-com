@@ -18,10 +18,14 @@ export function useProductTypesPublic() {
       const pictures = data.pictures || [];
       
       // Extract unique product type names
-      const uniqueTypes = [...new Set(
-        pictures.map((picture: any) => picture.productTypeName).filter(Boolean)
-      )];
+      const productTypeNames: string[] = [];
+      pictures.forEach((picture: any) => {
+        if (picture.productTypeName && typeof picture.productTypeName === 'string') {
+          productTypeNames.push(picture.productTypeName);
+        }
+      });
       
+      const uniqueTypes = Array.from(new Set(productTypeNames));
       return uniqueTypes.sort();
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
