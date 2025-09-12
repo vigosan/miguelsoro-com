@@ -2,10 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { formatEuros } from "@/domain/order";
 import { usePicturePublic } from "@/hooks/usePicturesPublic";
 import { useRouter } from "next/router";
 import { ArtworkStructuredData, BreadcrumbStructuredData } from "@/components/seo/StructuredData";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { useCart } from "../../contexts/CartContext";
+import { toast } from "react-hot-toast";
+import { useState } from "react";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 
 const PictureDetail = () => {
   const router = useRouter();
@@ -13,6 +18,8 @@ const PictureDetail = () => {
     ? router.query.slug[0]
     : router.query.slug;
   const { data: picture, isLoading } = usePicturePublic(slug);
+  const { addItem, toggleCart } = useCart();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   if (isLoading) {
     return (
@@ -49,13 +56,52 @@ const PictureDetail = () => {
     { name: picture.title, url: pictureUrl }
   ];
 
+  const handleAddToCart = async () => {
+    if (!picture || picture.status !== 'AVAILABLE' || picture.price <= 0) {
+      return;
+    }
+
+    setIsAddingToCart(true);
+    
+    try {
+      // Para trabajar con nuestro sistema actual, vamos a crear un item compatible
+      // Más adelante cuando tengas ProductVariants, podrás usar el variantId real
+      const cartItem = {
+        variantId: `picture_${picture.id}`, // ID temporal para el sistema actual
+        productId: picture.id,
+        title: picture.title,
+        price: picture.price, // El precio ya está en euros en la DB
+        slug: picture.slug,
+        imageUrl: picture.imageUrl,
+        stock: picture.stock || 1, // Include stock information
+      };
+
+      addItem(cartItem);
+      
+      toast.success(`"${picture.title}" añadido al carrito`, {
+        duration: 3000,
+      });
+      
+      // Abrir el carrito después de añadir
+      setTimeout(() => {
+        toggleCart();
+      }, 500);
+      
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error('Error al añadir al carrito');
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
   return (
     <>
       <ArtworkStructuredData artwork={picture} url={pictureUrl} />
       <BreadcrumbStructuredData items={structuredBreadcrumbItems} />
       <Layout
         title={`${picture.title} - Miguel Soro | Arte Ciclístico Original`}
-        description={`${picture.description} Obra original de Miguel Soro, ex-ciclista profesional. Acrílico y collage ${picture.size}cm. ${picture.price > 0 ? `Precio: ${formatCurrency(picture.price)}` : 'Consultar precio'}.`}
+        description={`${picture.description} Obra original de Miguel Soro, ex-ciclista profesional. Acrílico y collage ${picture.size}cm. ${picture.price > 0 ? `Precio: ${formatEuros(picture.price)}` : 'Consultar precio'}.`}
         image={pictureImageUrl}
         url={pictureUrl}
       >
@@ -169,7 +215,7 @@ const PictureDetail = () => {
           <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
             <div className="mb-6">
               <div className="text-3xl font-bold text-gray-900 mb-2">
-                {picture.price > 0 ? formatCurrency(picture.price) : "Consultar precio"}
+                {picture.price > 0 ? formatEuros(picture.price) : "Consultar precio"}
               </div>
               {picture.price === 0 && (
                 <p className="text-sm text-gray-600">
@@ -179,12 +225,38 @@ const PictureDetail = () => {
             </div>
             
             <div className="space-y-3">
-              <button
-                type="button"
-                className="w-full flex items-center justify-center rounded-lg bg-gray-900 py-3 px-6 text-base font-medium text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-              >
-                {picture.price > 0 ? "Añadir al carrito" : "Consultar disponibilidad"}
-              </button>
+              {picture.status === 'AVAILABLE' && picture.price > 0 ? (
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart}
+                  className="w-full flex items-center justify-center rounded-lg bg-gray-900 py-3 px-6 text-base font-medium text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="add-to-cart-button"
+                >
+                  {isAddingToCart ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Añadiendo...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCartIcon className="w-5 h-5 mr-2" />
+                      Añadir al carrito
+                    </>
+                  )}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-center rounded-lg bg-gray-400 py-3 px-6 text-base font-medium text-white cursor-not-allowed"
+                  disabled
+                >
+                  {picture.status === 'SOLD' ? 'Obra vendida' : 'Consultar disponibilidad'}
+                </button>
+              )}
               
               <a
                 href={`mailto:info@miguelsoro.com?subject=Consulta sobre la obra: ${encodeURIComponent(picture.title)}`}

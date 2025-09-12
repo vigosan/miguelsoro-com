@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePictures, useDeletePicture } from "@/hooks/usePictures";
 import { PictureStatus } from "@/domain/picture";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { formatEuros } from "@/domain/order";
 import { Toaster, toast } from "react-hot-toast";
 import { 
   PlusIcon,
@@ -170,7 +171,7 @@ export default function AdminPictures() {
                     {/* Price */}
                     <div className="text-center lg:text-right">
                       <p className="text-base sm:text-lg font-bold text-gray-900">
-                        {formatCurrency(picture.price)}
+                        {formatEuros(picture.price)}
                       </p>
                     </div>
                   </div>
