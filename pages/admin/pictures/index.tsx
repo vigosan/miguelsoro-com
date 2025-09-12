@@ -118,10 +118,10 @@ export default function AdminPictures() {
             {pictures.map((picture) => (
               <div
                 key={picture.id}
-                className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 transition-colors gap-3 sm:gap-0"
               >
-                {/* Left side - Image and basic info */}
-                <div className="flex items-center space-x-4 min-w-0 flex-1">
+                {/* Left side - Image and info */}
+                <div className="flex items-start space-x-4 min-w-0 flex-1">
                   {/* Image */}
                   <div className="flex-shrink-0">
                     <Image
@@ -133,70 +133,46 @@ export default function AdminPictures() {
                     />
                   </div>
 
-                  {/* Title and size */}
+                  {/* Title, size, status, stock, price */}
                   <div className="min-w-0 flex-1">
                     <h3 className="text-sm font-medium text-gray-900 truncate">
                       {picture.title}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {picture.size}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Center - Status */}
-                <div className="hidden md:flex items-center min-w-0">
-                  <span className={cn(
-                    "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap",
-                    statusColors[getPictureStatus(picture)]
-                  )}>
-                    {statusLabels[getPictureStatus(picture)]}
-                  </span>
-                </div>
-
-                {/* Mobile - Status below title */}
-                <div className="md:hidden">
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className={cn(
-                      "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                      statusColors[getPictureStatus(picture)]
-                    )}>
-                      {statusLabels[getPictureStatus(picture)]}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      Stock: {picture.stock || 0}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Right side - Stock, Price and Actions */}
-                <div className="flex items-center space-x-6">
-                  <div className="hidden md:block text-xs text-gray-500 whitespace-nowrap">
-                    Stock: {picture.stock || 0}
-                  </div>
-                  
-                  <div className="text-right min-w-0">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {formatEuros(picture.price)}
+                    <div className="flex items-center space-x-2 mt-1 text-xs text-gray-500">
+                      <span>{picture.size}</span>
+                      <span>·</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {formatEuros(picture.price)}
+                      </span>
+                      <span>·</span>
+                      <span className={cn(
+                        "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
+                        statusColors[getPictureStatus(picture)]
+                      )}>
+                        {statusLabels[getPictureStatus(picture)]}
+                      </span>
+                      <span>·</span>
+                      <span>Stock: {picture.stock || 0}</span>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center space-x-1">
-                    <Link
-                      href={`/pictures/${picture.slug}`}
-                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
-                      title="Ver en el sitio"
-                    >
-                      <EyeIcon className="h-4 w-4" />
-                    </Link>
-                    <Link
-                      href={`/admin/pictures/${picture.id}/edit`}
-                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
-                      title="Editar"
-                    >
-                      <PencilIcon className="h-4 w-4" />
-                    </Link>
-                  </div>
+                </div>
+
+                {/* Right side - Actions only */}
+                <div className="flex items-center space-x-1 flex-shrink-0 self-start sm:self-center">
+                  <Link
+                    href={`/pictures/${picture.slug}`}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
+                    title="Ver en el sitio"
+                  >
+                    <EyeIcon className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    href={`/admin/pictures/${picture.id}/edit`}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
+                    title="Editar"
+                  >
+                    <PencilIcon className="h-4 w-4" />
+                  </Link>
                 </div>
               </div>
             ))}
