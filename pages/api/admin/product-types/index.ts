@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { DatabaseProductTypeRepository } from '@/infra/DatabaseProductRepository'
+import { SupabaseProductTypeRepository } from '@/infra/SupabaseProductRepository'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      const productTypeRepository = new DatabaseProductTypeRepository()
+      const productTypeRepository = new SupabaseProductTypeRepository()
       const productTypes = await productTypeRepository.findAll()
       
       return res.status(200).json({ productTypes })
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Name and displayName are required' })
       }
 
-      const productTypeRepository = new DatabaseProductTypeRepository()
+      const productTypeRepository = new SupabaseProductTypeRepository()
       const productType = await productTypeRepository.create({
         name: name.toLowerCase().replace(/\s+/g, '-'),
         displayName,

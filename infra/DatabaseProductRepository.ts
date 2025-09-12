@@ -1,7 +1,6 @@
 import { Product, ProductType, ProductAttribute } from "@/domain/product";
 import { ProductRepository, ProductTypeRepository } from "./ProductRepository";
 import { prisma } from "@/lib/prisma";
-import { withRetry } from "@/lib/db-retry";
 
 export class DatabaseProductRepository implements ProductRepository {
   async findAll(): Promise<Product[]> {
@@ -166,20 +165,18 @@ export class DatabaseProductRepository implements ProductRepository {
 
 export class DatabaseProductTypeRepository implements ProductTypeRepository {
   async findAll(): Promise<ProductType[]> {
-    return await withRetry(async () => {
-      const productTypes = await prisma.productType.findMany({
-        where: { isActive: true },
-        orderBy: { displayName: 'asc' },
-      });
-
-      return productTypes.map(pt => ({
-        id: pt.id,
-        name: pt.name,
-        displayName: pt.displayName,
-        description: pt.description ?? undefined,
-        isActive: pt.isActive,
-      }));
+    const productTypes = await prisma.productType.findMany({
+      where: { isActive: true },
+      orderBy: { displayName: 'asc' },
     });
+
+    return productTypes.map(pt => ({
+      id: pt.id,
+      name: pt.name,
+      displayName: pt.displayName,
+      description: pt.description ?? undefined,
+      isActive: pt.isActive,
+    }));
   }
 
   async findById(id: string): Promise<ProductType | undefined> {
