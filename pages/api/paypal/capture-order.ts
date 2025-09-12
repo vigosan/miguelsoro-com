@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ordersController } from '../../../lib/paypal';
 import { Order } from '@paypal/paypal-server-sdk';
-import { prisma } from '../../../lib/prisma';
+import { capturePayPalOrder } from '../../../infra/dependencies';
 import { sendOrderConfirmationEmail, sendAdminNotificationEmail } from '../../../lib/email';
 
 export default async function handler(
@@ -29,56 +29,8 @@ export default async function handler(
       return res.status(400).json({ error: 'Payment not completed' });
     }
 
-    // Update order status in database
-    const order = await prisma.order.update({
-      where: { paypalOrderId },
-      data: { 
-        status: 'PAID',
-        updatedAt: new Date()
-      },
-      include: {
-        items: {
-          include: {
-            variant: {
-              include: {
-                product: {
-                  include: {
-                    images: {
-                      where: { isPrimary: true },
-                      take: 1
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-
-    // Update variant stock for each item
-    for (const item of order.items) {
-      await prisma.productVariant.update({
-        where: { id: item.variantId },
-        data: {
-          stock: {
-            decrement: item.quantity
-          }
-        }
-      });
-
-      // Mark as out of stock if needed
-      const updatedVariant = await prisma.productVariant.findUnique({
-        where: { id: item.variantId }
-      });
-
-      if (updatedVariant && updatedVariant.stock <= 0) {
-        await prisma.productVariant.update({
-          where: { id: item.variantId },
-          data: { status: 'OUT_OF_STOCK' }
-        });
-      }
-    }
+    // Use the capture PayPal order use case
+    const order = await capturePayPalOrder.execute({ paypalOrderId });
 
     // Send confirmation emails
     try {
@@ -102,7 +54,7 @@ export default async function handler(
     res.status(200).json({
       success: true,
       orderId: order.id,
-      status: 'PAID',
+      status: order.status,
       captureId: paypalOrder.id
     });
 

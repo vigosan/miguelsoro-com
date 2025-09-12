@@ -394,41 +394,102 @@ CREATE TABLE admin_users (
 
 ## Current Focus & Immediate Actions
 
-### 🚨 **CRITICAL PRIORITY: Stage 2.1 - Technical Debt**
-**Status**: Must complete before any new features
+### 🎯 **CURRENT PRIORITY: Database Migration to Supabase Client**
+**Status**: In Progress - ProductTypes migrated successfully ✅
 
-The code review revealed **critical architectural issues** that must be fixed immediately:
+#### **Problem Solved**:
+The project was experiencing frequent database connection issues with Supabase using Prisma:
+- `GET /api/admin/product-types 500 in 5094ms`
+- `Can't reach database server at aws-1-eu-west-2.pooler.supabase.com:5432`
+- Frequent connection timeouts and instability
 
-#### **Immediate Actions Required** (Next 1-2 days):
-1. **Fix Type System Inconsistencies** - Currently blocking clean compilation
-2. **Resolve Database Schema Mismatches** - Repository layer is broken
-3. **Set up Testing Infrastructure** - Required by CLAUDE.md, currently zero coverage
+#### **Solution: Complete Migration to Supabase Client SSR**
+Following the stable architecture pattern from adj-xativa project, which has never had connection issues.
 
-#### **Why This is Critical**:
-- **Type conflicts** prevent reliable development and deployment
-- **Database mismatches** cause runtime errors in production
-- **Missing tests** violate code quality standards and prevent safe refactoring
-- **Mixed data patterns** create inconsistent user experience
+### **Migration Strategy & Progress**:
 
-### **Recommended Implementation Order**:
+#### **✅ COMPLETED - Phase 0: Infrastructure Setup**
+- [X] Install @supabase/ssr and @supabase/supabase-js packages
+- [X] Create Supabase client configuration for Pages Router
+- [X] Implement SupabaseProductTypeRepository
+- [X] Migrate ProductTypes endpoints - **STABLE & FAST** (86-154ms response times)
+- [X] Clean up obsolete db-retry.ts and unused middleware
 
-**Phase 1** (Days 1-2): Foundation Fixes
-- [ ] Consolidate Picture types in domain layer
-- [ ] Fix DatabasePictureRepository schema references  
-- [ ] Install and configure Vitest + React Testing Library
+#### **🚀 NEXT: Phase 1 - Non-Critical Entities** (Days 1-3):
+- [ ] **Pictures Repository** → Supabase Client
+  - [ ] Create SupabasePictureRepository implementing PictureRepository
+  - [ ] Migrate `/api/pictures/*` endpoints 
+  - [ ] Update admin pictures CRUD operations
+  
+- [ ] **Products Repository** → Supabase Client  
+  - [ ] Extend SupabaseProductRepository for full Product entity
+  - [ ] Migrate `/api/products/*` endpoints
+  - [ ] Test product catalog functionality
 
-**Phase 2** (Days 3-4): Quality & Standards  
-- [ ] Add data-testid attributes to all components
-- [ ] Complete React Query migration
-- [ ] Set up ESLint + Prettier + Tailwind configuration
+- [ ] **ShippingSettings** → Supabase Client
+  - [ ] Create SupabaseShippingRepository
+  - [ ] Migrate shipping configuration endpoints
+  - [ ] Update shipping calculation logic
 
-**Phase 3** (Days 5-7): Polish & Performance
-- [ ] Write tests for critical admin functions
-- [ ] Add proper error handling with Zod validation
-- [ ] Implement accessibility improvements
+#### **🎯 Phase 2 - Critical Systems** (Days 4-7):
+- [ ] **Orders Repository** → Supabase Client ⚠️ CRITICAL
+  - [ ] Create SupabaseOrderRepository implementing OrderRepository
+  - [ ] Migrate order management endpoints carefully
+  - [ ] **Extensive testing** - orders handle payments & customer data
+  
+- [ ] **PayPal Integration** → Supabase Client ⚠️ CRITICAL  
+  - [ ] Update PayPal webhook handlers to use Supabase
+  - [ ] Migrate payment confirmation logic
+  - [ ] Update order creation in create-order.ts
+  - [ ] **Thorough testing** - handles real money transactions
 
-### **After Stage 2.1 Completion**:
-Proceed with **Stage 3: E-commerce Integration** with PayPal implementation on a solid, tested foundation.
+#### **🧹 Phase 3 - Cleanup** (Days 8-10):
+- [ ] **Remove Prisma Dependencies**
+  - [ ] Remove @prisma/client and prisma packages
+  - [ ] Delete lib/prisma.ts
+  - [ ] Remove all DatabaseXXXRepository classes
+  - [ ] Clean up Prisma schema and migrations
+  - [ ] Update dependency injection in infra/dependencies.ts
+  
+- [ ] **Environment Cleanup**
+  - [ ] Remove POSTGRES_PRISMA_URL and POSTGRES_URL_NON_POOLING
+  - [ ] Simplify to only Supabase environment variables
+  - [ ] Update Makefile to remove Prisma commands
+
+#### **🔄 Architecture Comparison**:
+
+**Before (Problematic)**:
+```
+Prisma Client → PostgreSQL Connection → Supabase
+- Manual connection pooling
+- Custom retry logic needed  
+- Frequent timeouts
+- 5094ms response times
+```
+
+**After (Stable)**:
+```
+Supabase Client SSR → Supabase Infrastructure
+- Automatic connection management
+- Built-in retry & resilience  
+- Consistent performance
+- 86-154ms response times
+```
+
+#### **Benefits of Complete Migration**:
+- ✅ **Stability**: Same architecture as adj-xativa (zero connection issues)
+- ✅ **Performance**: Consistent fast response times
+- ✅ **Maintenance**: Single data access technology
+- ✅ **Reliability**: Supabase handles connection pooling automatically
+- ✅ **Simplicity**: Remove complex retry logic and timeout configurations
+
+#### **Risk Mitigation**:
+- **Phase 1**: Low risk (Pictures, Products, Shipping)
+- **Phase 2**: High risk but high reward (Orders, Payments) - extensive testing required
+- **Rollback plan**: Keep Prisma implementations until Supabase versions are fully tested
+
+### **After Migration Completion**:
+Continue with existing roadmap (Stage 5: Performance & Advanced Features) on a stable, single-technology foundation.
 
 ---
 

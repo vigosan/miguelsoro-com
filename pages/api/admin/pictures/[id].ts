@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { DatabasePictureRepository } from '@/infra/DatabasePictureRepository'
+import { SupabasePictureRepository } from '@/infra/SupabasePictureRepository'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query
@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Invalid picture ID' })
   }
 
-  const pictureRepository = new DatabasePictureRepository()
+  const pictureRepository = new SupabasePictureRepository()
 
   if (req.method === 'GET') {
     try {

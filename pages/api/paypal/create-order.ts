@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ordersController } from '../../../lib/paypal';
 import { Order, OrderRequest, CheckoutPaymentIntent } from '@paypal/paypal-server-sdk';
-import { prisma } from '../../../lib/prisma';
+import { productVariantRepository } from '../../../infra/dependencies';
 import { CreateOrderRequest, calculateOrderTotal } from '../../../domain/order';
 
 export default async function handler(
@@ -21,22 +21,7 @@ export default async function handler(
 
     // Fetch product variants to calculate pricing
     const variantIds = items.map(item => item.variantId);
-    const variants = await prisma.productVariant.findMany({
-      where: {
-        id: { in: variantIds },
-        status: 'AVAILABLE'
-      },
-      include: {
-        product: {
-          include: {
-            images: {
-              where: { isPrimary: true },
-              take: 1
-            }
-          }
-        }
-      }
-    });
+    const variants = await productVariantRepository.findAvailableByIds(variantIds);
 
     if (variants.length !== variantIds.length) {
       return res.status(400).json({ error: 'Some products are not available' });

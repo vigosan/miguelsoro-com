@@ -1,15 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-// Create a simple mock for prisma
-const mockPrisma = {
-  order: {
-    findUnique: vi.fn(),
-  }
+// Create a simple mock for Supabase repositories
+const mockOrderRepository = {
+  findById: vi.fn(),
+  findAll: vi.fn(),
 }
 
-// Mock the prisma module
-vi.mock('@/lib/prisma', () => ({
-  prisma: mockPrisma
+// Mock the dependencies module
+vi.mock('@/infra/dependencies', () => ({
+  orderRepository: mockOrderRepository
 }))
 
 describe('Simple API Test', () => {
@@ -18,8 +17,8 @@ describe('Simple API Test', () => {
   })
 
   it('should work with basic mocking', () => {
-    expect(mockPrisma.order.findUnique).toBeDefined()
-    mockPrisma.order.findUnique.mockResolvedValue({ id: 'test' })
-    expect(mockPrisma.order.findUnique).toHaveBeenCalledTimes(0)
+    expect(mockOrderRepository.findById).toBeDefined()
+    mockOrderRepository.findById.mockResolvedValue({ id: 'test' })
+    expect(mockOrderRepository.findById).toHaveBeenCalledTimes(0)
   })
 })

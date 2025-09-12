@@ -1,5 +1,5 @@
-import { ProductType, ProductAttribute } from "@/domain/product";
-import { ProductTypeRepository } from "./ProductRepository";
+import { Product, ProductType, ProductAttribute } from "@/domain/product";
+import { ProductRepository, ProductTypeRepository } from "./ProductRepository";
 import { createAdminClient } from "@/utils/supabase/server";
 
 export class SupabaseProductTypeRepository implements ProductTypeRepository {
@@ -196,5 +196,272 @@ export class SupabaseProductTypeRepository implements ProductTypeRepository {
           sortOrder: option.sortOrder,
         })),
     })) || [];
+  }
+}
+
+export class SupabaseProductRepository implements ProductRepository {
+  private getClient() {
+    return createAdminClient();
+  }
+
+  async findAll(): Promise<Product[]> {
+    const supabase = this.getClient();
+    
+    const { data: products, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        product_types(
+          id,
+          name,
+          displayName,
+          description,
+          isActive
+        ),
+        product_variants(
+          id,
+          sku,
+          price,
+          stock,
+          status,
+          product_variant_attribute_values(
+            attributeId,
+            optionId,
+            textValue,
+            numberValue
+          )
+        ),
+        product_images(
+          id,
+          url,
+          altText,
+          sortOrder,
+          isPrimary
+        )
+      `)
+      .eq('isActive', true)
+      .order('createdAt', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching products:', error);
+      throw new Error(`Failed to fetch products: ${error.message}`);
+    }
+
+    return (products || []).map(this.mapToDomainProduct);
+  }
+
+  async findById(id: string): Promise<Product | undefined> {
+    const supabase = this.getClient();
+    
+    const { data: product, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        product_types(
+          id,
+          name,
+          displayName,
+          description,
+          isActive
+        ),
+        product_variants(
+          id,
+          sku,
+          price,
+          stock,
+          status,
+          product_variant_attribute_values(
+            attributeId,
+            optionId,
+            textValue,
+            numberValue
+          )
+        ),
+        product_images(
+          id,
+          url,
+          altText,
+          sortOrder,
+          isPrimary
+        )
+      `)
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned
+        return undefined;
+      }
+      console.error('Error fetching product by id:', error);
+      throw new Error(`Failed to fetch product: ${error.message}`);
+    }
+
+    return product ? this.mapToDomainProduct(product) : undefined;
+  }
+
+  async findBySlug(slug: string): Promise<Product | undefined> {
+    const supabase = this.getClient();
+    
+    const { data: product, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        product_types(
+          id,
+          name,
+          displayName,
+          description,
+          isActive
+        ),
+        product_variants(
+          id,
+          sku,
+          price,
+          stock,
+          status,
+          product_variant_attribute_values(
+            attributeId,
+            optionId,
+            textValue,
+            numberValue
+          )
+        ),
+        product_images(
+          id,
+          url,
+          altText,
+          sortOrder,
+          isPrimary
+        )
+      `)
+      .eq('slug', slug)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned
+        return undefined;
+      }
+      console.error('Error fetching product by slug:', error);
+      throw new Error(`Failed to fetch product: ${error.message}`);
+    }
+
+    return product ? this.mapToDomainProduct(product) : undefined;
+  }
+
+  async findByProductType(productTypeId: string): Promise<Product[]> {
+    const supabase = this.getClient();
+    
+    const { data: products, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        product_types(
+          id,
+          name,
+          displayName,
+          description,
+          isActive
+        ),
+        product_variants(
+          id,
+          sku,
+          price,
+          stock,
+          status,
+          product_variant_attribute_values(
+            attributeId,
+            optionId,
+            textValue,
+            numberValue
+          )
+        ),
+        product_images(
+          id,
+          url,
+          altText,
+          sortOrder,
+          isPrimary
+        )
+      `)
+      .eq('productTypeId', productTypeId)
+      .eq('isActive', true)
+      .order('createdAt', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching products by type:', error);
+      throw new Error(`Failed to fetch products: ${error.message}`);
+    }
+
+    return (products || []).map(this.mapToDomainProduct);
+  }
+
+  async create(productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> {
+    // This would be a complex implementation for creating products with variants
+    // For now, we'll throw an error as this needs to be implemented based on specific needs
+    throw new Error('Product creation not implemented yet');
+  }
+
+  async update(id: string, productData: Partial<Product>): Promise<Product> {
+    // This would be a complex implementation for updating products with variants
+    // For now, we'll throw an error as this needs to be implemented based on specific needs
+    throw new Error('Product update not implemented yet');
+  }
+
+  async delete(id: string): Promise<void> {
+    const supabase = this.getClient();
+    
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting product:', error);
+      throw new Error(`Failed to delete product: ${error.message}`);
+    }
+  }
+
+  private mapToDomainProduct(dbProduct: any): Product {
+    return {
+      id: dbProduct.id,
+      title: dbProduct.title,
+      description: dbProduct.description,
+      slug: dbProduct.slug,
+      basePrice: dbProduct.basePrice,
+      isActive: dbProduct.isActive,
+      productType: {
+        id: dbProduct.product_types.id,
+        name: dbProduct.product_types.name,
+        displayName: dbProduct.product_types.displayName,
+        description: dbProduct.product_types.description,
+        isActive: dbProduct.product_types.isActive,
+      },
+      variants: (dbProduct.product_variants || []).map((variant: any) => ({
+        id: variant.id,
+        sku: variant.sku,
+        price: variant.price,
+        stock: variant.stock,
+        status: variant.status,
+        attributeValues: (variant.product_variant_attribute_values || []).map((value: any) => ({
+          attributeId: value.attributeId,
+          optionId: value.optionId,
+          textValue: value.textValue,
+          numberValue: value.numberValue,
+        })),
+      })),
+      images: (dbProduct.product_images || [])
+        .sort((a: any, b: any) => a.sortOrder - b.sortOrder)
+        .map((image: any) => ({
+          id: image.id,
+          url: image.url,
+          altText: image.altText,
+          sortOrder: image.sortOrder,
+          isPrimary: image.isPrimary,
+        })),
+      createdAt: dbProduct.createdAt,
+      updatedAt: dbProduct.updatedAt,
+    };
   }
 }

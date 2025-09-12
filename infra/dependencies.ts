@@ -1,5 +1,4 @@
-import { prisma } from '../lib/prisma'
-import { PrismaOrderRepository, PrismaProductVariantRepository } from './PrismaOrderRepository'
+import { SupabaseOrderRepository, SupabaseProductVariantRepository } from './SupabaseOrderRepository'
 import { 
   FindOrderById,
   GetAllOrders,
@@ -14,8 +13,8 @@ import {
 } from '../application/orderUseCases'
 
 // Repository instances
-export const orderRepository = new PrismaOrderRepository(prisma)
-export const productVariantRepository = new PrismaProductVariantRepository(prisma)
+export const orderRepository = new SupabaseOrderRepository()
+export const productVariantRepository = new SupabaseProductVariantRepository()
 
 // Use case instances
 export const findOrderById = new FindOrderById(orderRepository)

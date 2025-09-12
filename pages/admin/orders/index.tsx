@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next';
 import { isAuthenticated } from '../../../lib/auth';
 import { AdminLayout } from '../../../components/admin/AdminLayout';
 import { formatPrice } from '../../../domain/order';
-import { prisma } from '../../../lib/prisma';
+import { orderRepository } from '../../../infra/dependencies';
 import Link from 'next/link';
 
 interface Order {
@@ -233,32 +233,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   try {
-    const orders = await prisma.order.findMany({
-      select: {
-        id: true,
-        customerEmail: true,
-        customerName: true,
-        customerPhone: true,
-        paypalOrderId: true,
-        status: true,
-        total: true,
-        createdAt: true,
-        _count: {
-          select: {
-            items: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const orders = await orderRepository.findAll();
 
     return {
       props: {
         orders: orders.map(order => ({
-          ...order,
-          createdAt: order.createdAt.toISOString(),
+          id: order.id,
+          customerEmail: order.customerEmail,
+          customerName: order.customerName,
+          customerPhone: null, // OrderSummary doesn't include phone
+          paypalOrderId: null, // OrderSummary doesn't include paypalOrderId
+          status: order.status,
+          total: order.totalAmount,
+          createdAt: order.createdAt,
+          _count: {
+            items: order.items.length,
+          },
         })),
       },
     };

@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { DatabasePictureRepository } from '@/infra/DatabasePictureRepository'
+import { SupabasePictureRepository } from '@/infra/SupabasePictureRepository'
 import { requireAuth } from '@/lib/auth'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
     try {
-      const pictureRepository = new DatabasePictureRepository()
+      const pictureRepository = new SupabasePictureRepository()
       const pictures = await pictureRepository.findAll()
       
       return res.status(200).json({ pictures })
