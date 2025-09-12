@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatEuros } from "@/domain/order";
 import { usePicturePublic } from "@/hooks/usePicturesPublic";
+import { getPictureStatus } from "@/domain/picture";
 import { useRouter } from "next/router";
 import { ArtworkStructuredData, BreadcrumbStructuredData } from "@/components/seo/StructuredData";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
@@ -57,7 +58,7 @@ const PictureDetail = () => {
   ];
 
   const handleAddToCart = async () => {
-    if (!picture || picture.status !== 'AVAILABLE' || picture.price <= 0) {
+    if (!picture || getPictureStatus(picture) !== 'AVAILABLE' || picture.price <= 0) {
       return;
     }
 
@@ -114,7 +115,7 @@ const PictureDetail = () => {
             <div className="aspect-square relative bg-gray-900 p-6">
               <Image
                 src={picture.imageUrl}
-                alt={`${picture.title} - Arte ciclístico original de Miguel Soro. Obra única ${picture.size}cm, acrílico y collage sobre lienzo${picture.status === 'SOLD' ? ' [VENDIDA]' : picture.status === 'AVAILABLE' ? ' disponible para compra' : ''}`}
+                alt={`${picture.title} - Arte ciclístico original de Miguel Soro. Obra única ${picture.size}cm, acrílico y collage sobre lienzo${getPictureStatus(picture) === 'NOT_AVAILABLE' ? ' [NO DISPONIBLE]' : getPictureStatus(picture) === 'AVAILABLE' ? ' disponible para compra' : ''}`}
                 className="h-full w-full object-cover"
                 width={600}
                 height={600}
@@ -122,14 +123,14 @@ const PictureDetail = () => {
                 sizes="(min-width: 1024px) 50vw, 100vw"
               />
               <div className="absolute top-2 right-2">
-                {picture.status === 'AVAILABLE' && (
+                {getPictureStatus(picture) === 'AVAILABLE' && (
                   <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-500 text-white">
                     Disponible
                   </span>
                 )}
-                {picture.status === 'SOLD' && (
+                {getPictureStatus(picture) === 'NOT_AVAILABLE' && (
                   <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-500 text-white">
-                    Vendido
+                    No disponible
                   </span>
                 )}
               </div>
@@ -225,7 +226,7 @@ const PictureDetail = () => {
             </div>
             
             <div className="space-y-3">
-              {picture.status === 'AVAILABLE' && picture.price > 0 ? (
+              {getPictureStatus(picture) === 'AVAILABLE' && picture.price > 0 ? (
                 <button
                   type="button"
                   onClick={handleAddToCart}
@@ -254,7 +255,7 @@ const PictureDetail = () => {
                   className="w-full flex items-center justify-center rounded-lg bg-gray-400 py-3 px-6 text-base font-medium text-white cursor-not-allowed"
                   disabled
                 >
-                  {picture.status === 'SOLD' ? 'Obra vendida' : 'Consultar disponibilidad'}
+                  {getPictureStatus(picture) === 'NOT_AVAILABLE' ? 'Obra no disponible' : 'Consultar disponibilidad'}
                 </button>
               )}
               

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Picture } from "@/domain/picture";
+import { Picture, getPictureStatus } from "@/domain/picture";
 import { cn } from "@/utils/cn";
 
 type Props = {
@@ -9,8 +9,10 @@ type Props = {
 };
 
 export function Item({ item, className }: Props) {
+  const status = getPictureStatus(item);
+  
   // SEO-optimized alt text for images
-  const altText = `${item.title} - Arte ciclístico de Miguel Soro, obra original ${item.size}cm en acrílico y collage${item.status === 'SOLD' ? ' [VENDIDA]' : item.status === 'AVAILABLE' ? ' disponible para compra' : ''}`;
+  const altText = `${item.title} - Arte ciclístico de Miguel Soro, obra original ${item.size}cm en acrílico y collage${status === 'NOT_AVAILABLE' ? ' [NO DISPONIBLE]' : status === 'AVAILABLE' ? ' disponible para compra' : ''}`;
   
   return (
     <Link href={`/pictures/${item.slug}`} data-testid={`picture-link-${item.slug}`}>
@@ -42,7 +44,7 @@ export function Item({ item, className }: Props) {
           </h3>
           <div className="mt-2 flex items-center justify-between">
             <p className="text-sm text-gray-500" itemProp="size" data-testid={`picture-size-${item.slug}`}>{item.size}cm</p>
-            {item.status === 'AVAILABLE' && (
+            {status === 'AVAILABLE' && (
               <span 
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
                 itemProp="availability"
@@ -52,14 +54,14 @@ export function Item({ item, className }: Props) {
                 Disponible
               </span>
             )}
-            {item.status === 'SOLD' && (
+            {status === 'NOT_AVAILABLE' && (
               <span 
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
                 itemProp="availability"
                 itemType="https://schema.org/OutOfStock"
-                data-testid={`picture-status-sold-${item.slug}`}
+                data-testid={`picture-status-not-available-${item.slug}`}
               >
-                Vendido
+                No disponible
               </span>
             )}
           </div>

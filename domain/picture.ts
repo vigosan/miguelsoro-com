@@ -7,11 +7,10 @@ export interface Picture {
   size: string; // e.g., "120x90"
   slug: string;
   imageUrl: string;
-  status: PictureStatus;
   // Database fields for complete data
   productTypeId: string;
   productTypeName: string;
-  stock: number;
+  stock: number; // stock > 0 = available, stock = 0 = not available
   createdAt: string;
   updatedAt: string;
 }
@@ -26,7 +25,12 @@ export interface BasicPicture {
   slug: string;
 }
 
-export type PictureStatus = 'AVAILABLE' | 'SOLD' | 'RESERVED';
+export type PictureStatus = 'AVAILABLE' | 'NOT_AVAILABLE';
+
+// Computed property - status is derived from stock
+export function getPictureStatus(picture: Picture): PictureStatus {
+  return picture.stock > 0 ? 'AVAILABLE' : 'NOT_AVAILABLE';
+}
 
 // Product variant status from Prisma - for mapping
 export type VariantStatus = 'AVAILABLE' | 'OUT_OF_STOCK' | 'DISCONTINUED';
@@ -47,7 +51,7 @@ export function mapVariantStatusToPictureStatus(status: VariantStatus): PictureS
       return 'AVAILABLE';
     case 'OUT_OF_STOCK':
     case 'DISCONTINUED':
-      return 'SOLD'; // Treat both as sold for UI purposes
+      return 'NOT_AVAILABLE'; // Treat both as not available for UI purposes
     default:
       return 'AVAILABLE';
   }
@@ -58,7 +62,6 @@ export function enrichPicture(basic: BasicPicture): Picture {
   return {
     ...basic,
     imageUrl: getImgPath(basic),
-    status: 'AVAILABLE' as PictureStatus,
     productTypeId: 'default',
     productTypeName: 'Cuadros Originales', 
     stock: 1,
