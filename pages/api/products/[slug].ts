@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { SupabaseProductRepository } from '@/infra/SupabaseProductRepository'
+import { DatabaseProductRepository } from '@/infra/DatabaseProductRepository'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { slug } = req.query
@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
-      const productRepository = new SupabaseProductRepository()
+      const productRepository = new DatabaseProductRepository()
       const product = await productRepository.findBySlug(slug)
 
       if (!product) {

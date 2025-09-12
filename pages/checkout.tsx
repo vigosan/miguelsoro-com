@@ -6,7 +6,7 @@ import { calculateOrderTotal, formatPrice, formatEuros } from '../domain/order';
 import { Layout } from '../components/Layout';
 import Image from 'next/image';
 import { getPayPalClientConfig } from '../lib/paypal';
-import type { ShippingSettings } from '@/services/supabaseShippingSettings';
+import type { ShippingSettings } from '@/services/databaseShippingSettings';
 
 interface CheckoutFormData {
   customerEmail: string;

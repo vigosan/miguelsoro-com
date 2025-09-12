@@ -9,7 +9,7 @@ import {
   ProductVariant
 } from './OrderRepository';
 
-export class SupabaseOrderRepository implements OrderRepository {
+export class DatabaseOrderRepository implements OrderRepository {
   private getClient() {
     return createAdminClient();
   }
@@ -346,7 +346,7 @@ export class SupabaseOrderRepository implements OrderRepository {
   }
 }
 
-export class SupabaseProductVariantRepository implements ProductVariantRepository {
+export class DatabaseProductVariantRepository implements ProductVariantRepository {
   private getClient() {
     return createAdminClient();
   }

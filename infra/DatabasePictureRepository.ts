@@ -2,7 +2,7 @@ import { Picture, getPictureStatus } from "@/domain/picture";
 import { PictureRepository } from "./PictureRepository";
 import { createAdminClient } from "@/utils/supabase/server";
 
-export class SupabasePictureRepository implements PictureRepository {
+export class DatabasePictureRepository implements PictureRepository {
   private getClient() {
     return createAdminClient();
   }

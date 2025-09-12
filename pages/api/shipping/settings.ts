@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getShippingSettings } from '@/services/supabaseShippingSettings';
+import { getShippingSettings } from '@/services/databaseShippingSettings';
 
 export default async function handler(
   req: NextApiRequest,

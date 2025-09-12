@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { SupabasePictureRepository } from '@/infra/SupabasePictureRepository'
+import { DatabasePictureRepository } from '@/infra/DatabasePictureRepository'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
@@ -13,7 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const pictureRepository = new SupabasePictureRepository()
+    const pictureRepository = new DatabasePictureRepository()
     const picture = await pictureRepository.getPictureBySlug(slug)
     
     if (!picture) {

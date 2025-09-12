@@ -5,8 +5,8 @@ import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
 import { Filters } from "@/components/Filters";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
-import { SupabasePictureRepository } from "@/infra/SupabasePictureRepository";
-import { SupabaseProductTypeRepository } from "@/infra/SupabaseProductRepository";
+import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
+import { DatabaseProductTypeRepository } from "@/infra/DatabaseProductRepository";
 import { Picture } from "@/domain/picture";
 import { ProductType } from "@/domain/product";
 
@@ -71,8 +71,8 @@ export default function IndexPage({ initialPictures, availableTypes }: IndexPage
 
 export const getServerSideProps: GetServerSideProps<IndexPageProps> = async () => {
   try {
-    const pictureRepository = new SupabasePictureRepository();
-    const productTypeRepository = new SupabaseProductTypeRepository();
+    const pictureRepository = new DatabasePictureRepository();
+    const productTypeRepository = new DatabaseProductTypeRepository();
 
     // Fetch pictures and product types in parallel
     const [pictures, productTypes] = await Promise.all([

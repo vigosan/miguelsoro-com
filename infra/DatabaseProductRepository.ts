@@ -2,7 +2,7 @@ import { Product, ProductType, ProductAttribute } from "@/domain/product";
 import { ProductRepository, ProductTypeRepository } from "./ProductRepository";
 import { createAdminClient } from "@/utils/supabase/server";
 
-export class SupabaseProductTypeRepository implements ProductTypeRepository {
+export class DatabaseProductTypeRepository implements ProductTypeRepository {
   private getClient() {
     return createAdminClient();
   }
@@ -199,7 +199,7 @@ export class SupabaseProductTypeRepository implements ProductTypeRepository {
   }
 }
 
-export class SupabaseProductRepository implements ProductRepository {
+export class DatabaseProductRepository implements ProductRepository {
   private getClient() {
     return createAdminClient();
   }

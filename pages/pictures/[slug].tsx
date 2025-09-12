@@ -11,7 +11,7 @@ import { useCart } from "../../contexts/CartContext";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
-import { SupabasePictureRepository } from "@/infra/SupabasePictureRepository";
+import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
 
 interface PictureDetailProps {
   picture: Picture | null;
@@ -289,7 +289,7 @@ export const getServerSideProps: GetServerSideProps<PictureDetailProps> = async 
       };
     }
 
-    const pictureRepository = new SupabasePictureRepository();
+    const pictureRepository = new DatabasePictureRepository();
     const picture = await pictureRepository.getPictureBySlug(slug);
 
     if (!picture) {

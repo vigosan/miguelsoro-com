@@ -1,4 +1,4 @@
-import { SupabaseOrderRepository, SupabaseProductVariantRepository } from './SupabaseOrderRepository'
+import { DatabaseOrderRepository, DatabaseProductVariantRepository } from './DatabaseOrderRepository'
 import { 
   FindOrderById,
   GetAllOrders,
@@ -13,8 +13,8 @@ import {
 } from '../application/orderUseCases'
 
 // Repository instances
-export const orderRepository = new SupabaseOrderRepository()
-export const productVariantRepository = new SupabaseProductVariantRepository()
+export const orderRepository = new DatabaseOrderRepository()
+export const productVariantRepository = new DatabaseProductVariantRepository()
 
 // Use case instances
 export const findOrderById = new FindOrderById(orderRepository)
