@@ -4,7 +4,15 @@ import { List } from "@/components/List";
 import { usePictures } from "@/hooks/usePictures";
 
 export default function IndexPage() {
-  const pictures = usePictures();
+  const { data: pictures = [], isLoading } = usePictures();
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div>Loading...</div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
