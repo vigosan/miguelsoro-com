@@ -34,11 +34,11 @@ describe('Item Component', () => {
     expect(screen.getByText('Disponible')).toBeInTheDocument()
   })
 
-  it('shows sold status when picture is sold', () => {
-    const soldPicture = { ...mockPicture, status: 'SOLD' as const }
+  it('shows not available status when picture has no stock', () => {
+    const soldPicture = { ...mockPicture, stock: 0 }
     render(<Item item={soldPicture} />)
     
-    expect(screen.getByText('Vendido')).toBeInTheDocument()
+    expect(screen.getByText('No disponible')).toBeInTheDocument()
   })
 
   it('renders image with correct alt text', () => {

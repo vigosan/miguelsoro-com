@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../../lib/prisma';
+import { findOrderById } from '../../../infra/dependencies';
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,40 +12,21 @@ export default async function handler(
   try {
     const { orderId } = req.query;
 
-    if (!orderId || typeof orderId !== 'string') {
-      return res.status(400).json({ error: 'Order ID is required' });
-    }
-
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        items: {
-          include: {
-            variant: {
-              include: {
-                product: {
-                  include: {
-                    images: {
-                      where: { isPrimary: true },
-                      take: 1
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
-
+    const order = await findOrderById.execute(orderId as string);
     res.status(200).json(order);
 
   } catch (error) {
     console.error('Error fetching order:', error);
+    
+    if (error instanceof Error) {
+      if (error.message === 'Order ID is required') {
+        return res.status(400).json({ error: 'Order ID is required' });
+      }
+      if (error.message === 'Order not found') {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+    }
+    
     res.status(500).json({ error: 'Failed to fetch order' });
   }
 }

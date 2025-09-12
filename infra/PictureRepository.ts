@@ -1,5 +1,6 @@
 import { Picture, getPictureStatus } from "@/domain/picture";
-import { pictures as pictureData } from "@/data/pictures";
+// TODO: Fix this import after data migration is complete
+// import { pictures as pictureData } from "@/data/pictures";
 
 export interface PictureRepository {
   findAll(filters?: {
@@ -18,7 +19,8 @@ export class InMemoryPictureRepository implements PictureRepository {
   private pictures: Picture[];
 
   constructor() {
-    this.pictures = [...pictureData];
+    // TODO: Fix this after data migration is complete
+    this.pictures = []; // [...pictureData];
   }
 
   async findAll(filters?: {

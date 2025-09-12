@@ -1,49 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { getOrderStats } from '../../../../infra/dependencies'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      // Get total orders count
-      const totalOrders = await prisma.order.count()
-
-      // Get completed orders count
-      const completedOrders = await prisma.order.count({
-        where: {
-          status: 'DELIVERED'
-        }
-      })
-
-      // Get pending orders count (PENDING, PAID, SHIPPED)
-      const pendingOrders = await prisma.order.count({
-        where: {
-          status: {
-            in: ['PENDING', 'PAID', 'SHIPPED']
-          }
-        }
-      })
-
-      // Get total revenue from delivered orders
-      const revenueResult = await prisma.order.aggregate({
-        where: {
-          status: 'DELIVERED'
-        },
-        _sum: {
-          total: true
-        }
-      })
-
-      const totalRevenue = revenueResult._sum.total || 0
-
-      const stats = {
-        totalOrders,
-        completedOrders,
-        pendingOrders,
-        totalRevenue
-      }
-      
+      const stats = await getOrderStats.execute()
       return res.status(200).json(stats)
     } catch (error) {
       console.error('Error fetching order stats:', error)
