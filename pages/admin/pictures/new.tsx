@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { Toaster, toast } from "react-hot-toast";
 import { slugify } from "@/utils/slug";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { 
   ArrowLeftIcon,
   PhotoIcon
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Select } from "@/components/ui/Select";
 
 const statusOptions = [
   { value: 'AVAILABLE', label: 'Disponible', color: 'bg-green-100 text-green-800' },
@@ -16,9 +20,18 @@ const statusOptions = [
   { value: 'RESERVED', label: 'Reservado', color: 'bg-yellow-100 text-yellow-800' },
 ];
 
+type ProductType = {
+  id: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  isActive: boolean;
+};
+
 export default function NewPicture() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -26,25 +39,78 @@ export default function NewPicture() {
     size: '',
     slug: '',
     status: 'AVAILABLE' as const,
+    productTypeId: '',
+    stock: '1',
+    imageUrl: '',
   });
+
+  useEffect(() => {
+    const fetchProductTypes = async () => {
+      try {
+        const response = await fetch('/api/admin/product-types');
+        if (response.ok) {
+          const data = await response.json();
+          setProductTypes(data.productTypes);
+        }
+      } catch (error) {
+        console.error('Error fetching product types:', error);
+      }
+    };
+
+    fetchProductTypes();
+  }, []);
+
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
   const handleTitleChange = (title: string) => {
     setFormData(prev => ({
       ...prev,
       title,
-      slug: prev.slug === '' ? slugify(title) : prev.slug // Auto-generate slug only if empty
+      slug: !slugManuallyEdited ? slugify(title) : prev.slug // Auto-generate slug unless manually modified
     }));
+  };
+
+  const handleSlugChange = (slug: string) => {
+    setSlugManuallyEdited(true);
+    setFormData(prev => ({ ...prev, slug }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.imageUrl) {
+      toast.error('Por favor sube una imagen para el cuadro');
+      return;
+    }
+
+    if (!formData.productTypeId) {
+      toast.error('Por favor selecciona un tipo de producto');
+      return;
+    }
+    
     setSaving(true);
     
     try {
-      // For now, we'll show a not implemented message
-      // This would require creating the full product creation flow
-      toast.error('La creación de cuadros no está implementada aún. Use el seed para datos de prueba.');
+      const response = await fetch('/api/admin/pictures', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          price: Math.round(parseFloat(formData.price) * 100), // Convert euros to cents
+          stock: parseInt(formData.stock) || 1,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear el cuadro');
+      }
+      
+      toast.success('Cuadro creado correctamente');
+      router.push('/admin/pictures');
     } catch (error) {
       console.error('Error creating picture:', error);
       toast.error(error instanceof Error ? error.message : 'Error al crear el cuadro');
@@ -61,7 +127,7 @@ export default function NewPicture() {
           <div>
             <Link
               href="/admin/pictures"
-              className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-2"
+              className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-2 cursor-pointer"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-1" />
               Volver a Cuadros
@@ -76,124 +142,115 @@ export default function NewPicture() {
           {/* Form */}
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Título *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              <Input
+                label="Título *"
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                required
+                placeholder="Ej: Eddy Merckx - El Canibal"
+              />
+
+              <Textarea
+                label="Descripción"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+                placeholder="Descripción del cuadro..."
+              />
+
+              <Select
+                label="Tipo de Producto *"
+                value={formData.productTypeId}
+                onChange={(e) => setFormData({ ...formData, productTypeId: e.target.value })}
+                required
+              >
+                <option value="">Selecciona un tipo</option>
+                {productTypes.map(type => (
+                  <option key={type.id} value={type.id}>
+                    {type.displayName}
+                  </option>
+                ))}
+              </Select>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Input
+                  label="Precio (€) *"
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
-                  placeholder="Ej: Eddy Merckx - El Canibal"
+                  placeholder="450.00"
+                />
+
+                <Input
+                  label="Stock *"
+                  type="number"
+                  min="0"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  required
+                  placeholder="1"
+                />
+
+                <Input
+                  label="Tamaño"
+                  type="text"
+                  value={formData.size}
+                  onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                  placeholder="120x90 cm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Descripción
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Descripción del cuadro..."
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Precio (€) *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    required
-                    placeholder="450.00"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tamaño
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.size}
-                    onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="120x90 cm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  URL slug *
-                </label>
-                <input
+                <Input
+                  label="URL slug *"
                   type="text"
                   value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  onChange={(e) => handleSlugChange(e.target.value)}
                   required
                   placeholder="eddy-merckx-el-canibal"
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  URL: /products/{formData.slug || 'url-del-cuadro'}
+                  URL: /pictures/{formData.slug || 'url-del-cuadro'}
                 </p>
+                {!slugManuallyEdited && (
+                  <p className="text-xs text-gray-700 mt-1">
+                    Se genera automáticamente desde el título
+                  </p>
+                )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Estado
-                </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  {statusOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="Estado"
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+              >
+                {statusOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
 
-              {/* Image Upload Placeholder */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Imagen
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-2 text-sm text-gray-500">
-                    La subida de imágenes no está implementada aún
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Por ahora, las imágenes deben añadirse manualmente a /public/pictures/
-                  </p>
-                </div>
-              </div>
+              <ImageUpload
+                currentImageUrl={formData.imageUrl}
+                onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
+                onImageRemoved={() => setFormData({ ...formData, imageUrl: '' })}
+              />
 
               <div className="flex justify-end space-x-3 pt-6 border-t">
                 <Link
                   href="/admin/pictures"
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                   Cancelar
                 </Link>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                 >
                   {saving ? 'Creando...' : 'Crear Cuadro'}
                 </button>
@@ -208,25 +265,43 @@ export default function NewPicture() {
                 Vista Previa
               </h3>
               
-              <div className="mb-4 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                <PhotoIcon className="h-12 w-12 text-gray-400" />
-              </div>
+              {formData.imageUrl ? (
+                <div className="mb-4">
+                  <img
+                    src={formData.imageUrl}
+                    alt={formData.title}
+                    className="w-full h-48 object-cover rounded-lg border"
+                  />
+                </div>
+              ) : (
+                <div className="mb-4 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <PhotoIcon className="h-12 w-12 text-gray-400" />
+                </div>
+              )}
 
               <div className="space-y-3">
                 <div>
                   <h4 className="font-semibold text-gray-900">{formData.title || 'Sin título'}</h4>
                   <p className="text-sm text-gray-500">{formData.size || 'Sin tamaño'}</p>
+                  <p className="text-sm text-gray-700">
+                    {productTypes.find(t => t.id === formData.productTypeId)?.displayName || 'Sin tipo'}
+                  </p>
                 </div>
                 
                 <div>
                   <p className="text-lg font-bold text-gray-900">
                     {formData.price ? formatCurrency(parseFloat(formData.price) * 100) : '€0.00'}
                   </p>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    statusOptions.find(opt => opt.value === formData.status)?.color
-                  }`}>
-                    {statusOptions.find(opt => opt.value === formData.status)?.label}
-                  </span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      statusOptions.find(opt => opt.value === formData.status)?.color
+                    }`}>
+                      {statusOptions.find(opt => opt.value === formData.status)?.label}
+                    </span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      Stock: {formData.stock || 0}
+                    </span>
+                  </div>
                 </div>
                 
                 {formData.description && (
@@ -237,15 +312,6 @@ export default function NewPicture() {
               </div>
             </div>
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h3 className="text-sm font-medium text-yellow-800 mb-2">
-                🚧 En Desarrollo
-              </h3>
-              <p className="text-sm text-yellow-700">
-                La creación de cuadros requiere implementar el sistema completo de productos, variantes e imágenes. 
-                Por ahora, usa el comando <code className="bg-yellow-100 px-1 rounded">make seed</code> para datos de prueba.
-              </p>
-            </div>
           </div>
         </div>
 

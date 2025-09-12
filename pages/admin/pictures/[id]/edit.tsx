@@ -3,12 +3,16 @@ import { useRouter } from "next/router";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { Toaster, toast } from "react-hot-toast";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { 
   ArrowLeftIcon,
   PhotoIcon,
   XMarkIcon
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Select } from "@/components/ui/Select";
 
 type AdminPicture = {
   id: string;
@@ -56,6 +60,7 @@ export default function EditPicture() {
     status: 'AVAILABLE' as const,
     productTypeId: '',
     stock: '',
+    imageUrl: '',
   });
 
   useEffect(() => {
@@ -102,6 +107,7 @@ export default function EditPicture() {
           status: data.picture.status,
           productTypeId: data.picture.productTypeId || '',
           stock: data.picture.stock?.toString() || '1',
+          imageUrl: data.picture.imageUrl || '',
         });
       } catch (error) {
         console.error('Error fetching picture:', error);
@@ -180,7 +186,7 @@ export default function EditPicture() {
     return (
       <AdminLayout title="Cargando... - Admin">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
         </div>
       </AdminLayout>
     );
@@ -200,7 +206,7 @@ export default function EditPicture() {
           <div className="mt-6">
             <Link
               href="/admin/pictures"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+              className="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-900 cursor-pointer"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
               Volver a Cuadros
@@ -219,7 +225,7 @@ export default function EditPicture() {
           <div>
             <Link
               href="/admin/pictures"
-              className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-2"
+              className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-2 cursor-pointer"
             >
               <ArrowLeftIcon className="h-4 w-4 mr-1" />
               Volver a Cuadros
@@ -240,103 +246,70 @@ export default function EditPicture() {
           {/* Form */}
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Título *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  required
-                />
-              </div>
+              <Input
+                label="Título *"
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Descripción
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
+              <Textarea
+                label="Descripción"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tipo de Producto *
-                </label>
-                <select
-                  value={formData.productTypeId}
-                  onChange={(e) => setFormData({ ...formData, productTypeId: e.target.value })}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Selecciona un tipo</option>
-                  {productTypes.map(type => (
-                    <option key={type.id} value={type.id}>
-                      {type.displayName}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="Tipo de Producto *"
+                value={formData.productTypeId}
+                onChange={(e) => setFormData({ ...formData, productTypeId: e.target.value })}
+                required
+              >
+                <option value="">Selecciona un tipo</option>
+                {productTypes.map(type => (
+                  <option key={type.id} value={type.id}>
+                    {type.displayName}
+                  </option>
+                ))}
+              </Select>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Precio (€) *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
+                <Input
+                  label="Precio (€) *"
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  required
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock *
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.stock}
-                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    required
-                    placeholder="1"
-                  />
-                </div>
+                <Input
+                  label="Stock *"
+                  type="number"
+                  min="0"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  required
+                  placeholder="1"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tamaño
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.size}
-                    onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="120x90 cm"
-                  />
-                </div>
+                <Input
+                  label="Tamaño"
+                  type="text"
+                  value={formData.size}
+                  onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                  placeholder="120x90 cm"
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  URL slug *
-                </label>
-                <input
+                <Input
+                  label="URL slug *"
                   type="text"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   required
                 />
                 <p className="text-sm text-gray-500 mt-1">
@@ -344,34 +317,35 @@ export default function EditPicture() {
                 </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Estado
-                </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  {statusOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label="Estado"
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+              >
+                {statusOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+
+              <ImageUpload
+                currentImageUrl={formData.imageUrl}
+                onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
+                onImageRemoved={() => setFormData({ ...formData, imageUrl: '' })}
+              />
 
               <div className="flex justify-end space-x-3 pt-6 border-t">
                 <Link
                   href="/admin/pictures"
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                   Cancelar
                 </Link>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                 >
                   {saving ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
@@ -386,11 +360,11 @@ export default function EditPicture() {
                 Vista Previa
               </h3>
               
-              {picture.imageUrl && (
+              {formData.imageUrl && (
                 <div className="mb-4">
                   <img
-                    src={picture.imageUrl}
-                    alt={picture.title}
+                    src={formData.imageUrl}
+                    alt={formData.title}
                     className="w-full h-48 object-cover rounded-lg border"
                   />
                 </div>
@@ -400,7 +374,7 @@ export default function EditPicture() {
                 <div>
                   <h4 className="font-semibold text-gray-900">{formData.title || 'Sin título'}</h4>
                   <p className="text-sm text-gray-500">{formData.size || 'Sin tamaño'}</p>
-                  <p className="text-sm text-blue-600">
+                  <p className="text-sm text-gray-900">
                     {productTypes.find(t => t.id === formData.productTypeId)?.displayName || 'Sin tipo'}
                   </p>
                 </div>
@@ -415,7 +389,7 @@ export default function EditPicture() {
                     }`}>
                       {statusOptions.find(opt => opt.value === formData.status)?.label}
                     </span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                       Stock: {formData.stock || 0}
                     </span>
                   </div>
