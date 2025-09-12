@@ -1,51 +1,111 @@
 # IMPLEMENTATION_PLAN.md
 
 ## Project Overview
-Transform the static Miguel Soro art gallery into a dynamic e-commerce platform with admin capabilities, database integration, Stripe payments, and enhanced SEO.
+Transform the static Miguel Soro art gallery into a dynamic e-commerce platform with admin capabilities, database integration, PayPal payments, and enhanced SEO.
 
 ## Stage 1: Database Setup & Migration
-**Goal**: Migrate from static data to PostgreSQL database (Docker for dev, Vercel for prod)
+**Goal**: Migrate from static data to PostgreSQL database (Supabase for prod)
 **Status**: [X] Completed
 
 ### Tasks
-- [X] Set up Docker PostgreSQL for development
+- [X] Set up PostgreSQL for development and production (Supabase)
 - [X] Create Makefile for database management
 - [X] Design database schema for pictures, orders, and admin users
 - [X] Create database migrations and seed scripts
 - [X] Install and configure Prisma ORM
-- [ ] Implement database repository replacing in-memory implementation
-- [ ] Migrate existing picture data to database (via seed)
-- [ ] Set up image upload to Vercel Blob Storage
-- [ ] Create image migration script for existing pictures
+- [X] Implement database repository replacing in-memory implementation
+- [X] Migrate existing picture data to database (via seed)
+- [X] Set up image upload to Vercel Blob Storage
+- [X] Create image migration script for existing pictures
 
 ## Stage 2: Admin Panel Foundation
 **Goal**: Create secure admin interface for picture management
-**Status**: [ ] Not Started
+**Status**: [X] Completed
 
 ### Tasks
-- [ ] Implement authentication system (NextAuth.js)
-- [ ] Create admin user seeding
-- [ ] Build admin layout and navigation
-- [ ] Create protected admin routes
-- [ ] Implement picture CRUD operations (Create, Read, Update, Delete)
-- [ ] Build image upload interface with drag & drop
-- [ ] Add picture availability status (available/sold)
-- [ ] Create admin dashboard with analytics
+- [X] Implement authentication system (NextAuth.js)
+- [X] Create admin user seeding
+- [X] Build admin layout and navigation
+- [X] Create protected admin routes
+- [X] Implement picture CRUD operations (Create, Read, Update, Delete)
+- [X] Build image upload interface with drag & drop
+- [X] Add picture availability status (available/sold/reserved)
+- [X] Create admin dashboard with analytics
+- [X] Implement React Query for efficient data caching
+- [X] Create modern UI components with Tailwind CSS
+- [X] Add responsive design for mobile admin interface
+- [X] Implement route-based settings navigation
+
+## Stage 2.1: Technical Debt & Code Quality (CRITICAL)
+**Goal**: Fix critical architecture issues and establish proper testing infrastructure
+**Status**: [ ] Not Started - **HIGH PRIORITY**
+
+### Critical Issues Found in Code Review
+- [🔥] **Type System Inconsistencies**: Multiple conflicting Picture types across codebase
+- [🔥] **Database-Code Mismatch**: Repository references non-existent tables
+- [🔥] **Missing Testing Infrastructure**: Zero test coverage, no testing framework
+- [🔥] **Incomplete React Query Migration**: Mixed data fetching patterns
+- [🔥] **API Design Issues**: Inconsistent error handling and response formats
+
+### Tasks
+- [ ] **Fix Type System** (CRITICAL):
+  - [ ] Consolidate all Picture types into single domain source
+  - [ ] Remove conflicting type definitions in hooks/usePictures.ts
+  - [ ] Create proper type exports and barrel files (following CLAUDE.md)
+  - [ ] Update all imports to use domain types
+  
+- [ ] **Implement Testing Infrastructure** (CRITICAL):
+  - [ ] Install and configure Vitest (per CLAUDE.md requirements)
+  - [ ] Add React Testing Library and @testing-library/jest-dom
+  - [ ] Create renderWithProviders() test utility with QueryClient
+  - [ ] Add data-testid attributes to all interactive elements
+  - [ ] Write tests for critical admin components
+  - [ ] Add API endpoint testing
+  
+- [ ] **Fix Database Layer** (HIGH PRIORITY):
+  - [ ] Resolve DatabasePictureRepository schema mismatch
+  - [ ] Standardize on Product→Picture mapping or separate entities
+  - [ ] Fix API endpoints to use correct database queries
+  - [ ] Add proper error handling with contextual messages
+  
+- [ ] **Complete React Query Migration**:
+  - [ ] Update deprecated cacheTime to gcTime for v5 compatibility  
+  - [ ] Migrate remaining useState/useEffect patterns to React Query
+  - [ ] Add optimistic updates for better UX
+  - [ ] Implement proper query invalidation strategies
+  
+- [ ] **Improve Error Handling & API Design**:
+  - [ ] Create standard error response format
+  - [ ] Add try-catch blocks with contextual error messages
+  - [ ] Implement proper HTTP status codes
+  - [ ] Add request validation with Zod schemas
+  
+- [ ] **Accessibility & Performance**:
+  - [ ] Add data-testid attributes throughout (CLAUDE.md requirement)
+  - [ ] Implement proper ARIA labels and keyboard navigation
+  - [ ] Add image optimization for admin interface
+  - [ ] Fix unnecessary re-renders with useCallback/useMemo
+  
+- [ ] **Code Quality Improvements**:
+  - [ ] Complete Tailwind configuration
+  - [ ] Add ESLint and Prettier configuration
+  - [ ] Implement proper dependency injection in API routes
+  - [ ] Add comprehensive TypeScript strict mode compliance
 
 ## Stage 3: E-commerce Integration
-**Goal**: Enable picture sales with Stripe integration
+**Goal**: Enable picture sales with PayPal integration
 **Status**: [ ] Not Started
 
 ### Tasks
-- [ ] Install and configure Stripe
-- [ ] Create Stripe product sync system
+- [ ] Install and configure PayPal SDK
+- [ ] Create PayPal product sync system
 - [ ] Build shopping cart functionality
-- [ ] Implement checkout process
+- [ ] Implement checkout process with PayPal
 - [ ] Add order management system
 - [ ] Create customer notification emails
 - [ ] Build order history for customers
 - [ ] Add inventory management (mark as sold)
-- [ ] Implement payment confirmation webhooks
+- [ ] Implement PayPal webhook handlers for payment confirmation
 
 ## Stage 4: Enhanced User Experience
 **Goal**: Improve social sharing, SEO, and user interface
@@ -104,7 +164,7 @@ CREATE TABLE orders (
   picture_id UUID REFERENCES pictures(id),
   customer_email VARCHAR NOT NULL,
   customer_name VARCHAR NOT NULL,
-  stripe_payment_intent_id VARCHAR,
+  paypal_order_id VARCHAR,
   status VARCHAR DEFAULT 'pending', -- pending, paid, shipped, delivered
   total_amount INTEGER NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
@@ -120,26 +180,54 @@ CREATE TABLE admin_users (
 );
 ```
 
-### New Dependencies
+### Dependencies by Stage
+
+#### Stage 1 & 2 (Completed)
 ```json
 {
   "prisma": "^5.0.0",
-  "@prisma/client": "^5.0.0",
+  "@prisma/client": "^5.0.0", 
   "next-auth": "^4.24.0",
   "@next-auth/prisma-adapter": "^1.0.0",
-  "stripe": "^14.0.0",
   "@vercel/blob": "^0.15.0",
   "bcryptjs": "^2.4.3",
-  "nodemailer": "^6.9.0",
   "react-hook-form": "^7.47.0",
   "react-dropzone": "^14.2.0",
   "sharp": "^0.32.0",
-  "@headlessui/react": "^1.7.19", // already installed
-  "react-hot-toast": "^2.4.0"
+  "@headlessui/react": "^1.7.19",
+  "react-hot-toast": "^2.4.0",
+  "@tanstack/react-query": "^5.0.0",
+  "@heroicons/react": "^2.0.0"
 }
 ```
 
-### New File Structure
+#### Stage 2.1 - Testing & Code Quality (CRITICAL)
+```json
+{
+  "vitest": "^1.6.0",
+  "@testing-library/react": "^14.0.0",
+  "@testing-library/jest-dom": "^6.4.0",
+  "@testing-library/user-event": "^14.5.0",
+  "jsdom": "^24.0.0",
+  "zod": "^3.22.0",
+  "eslint": "^8.57.0",
+  "@typescript-eslint/eslint-plugin": "^6.21.0",
+  "@typescript-eslint/parser": "^6.21.0",
+  "prettier": "^3.2.0",
+  "prettier-plugin-tailwindcss": "^0.5.0"
+}
+```
+
+#### Stage 3 - E-commerce & PayPal
+```json
+{
+  "@paypal/react-paypal-js": "^8.1.0",
+  "@paypal/paypal-server-sdk": "^0.5.0",
+  "nodemailer": "^6.9.0"
+}
+```
+
+### Updated File Structure (Post Code Review)
 ```
 ├── prisma/
 │   ├── schema.prisma
@@ -152,15 +240,24 @@ CREATE TABLE admin_users (
 │   │   │   ├── index.tsx      # Pictures management
 │   │   │   ├── new.tsx        # Add new picture
 │   │   │   └── [id]/edit.tsx  # Edit picture
-│   │   └── orders/
-│   │       └── index.tsx      # Order management
+│   │   ├── orders/
+│   │   │   └── index.tsx      # Order management
+│   │   └── settings/
+│   │       ├── index.tsx      # Settings redirect
+│   │       ├── general.tsx    # General settings
+│   │       ├── tienda.tsx     # Store settings
+│   │       ├── pagos.tsx      # Payment settings
+│   │       ├── inventario.tsx # Inventory settings
+│   │       └── admin.tsx      # Admin settings
 │   ├── api/
 │   │   ├── auth/[...nextauth].ts
 │   │   ├── admin/
-│   │   │   ├── pictures.ts
+│   │   │   ├── pictures/
+│   │   │   │   ├── index.ts   # GET/POST pictures
+│   │   │   │   └── [id].ts    # GET/PATCH/DELETE by ID
 │   │   │   └── orders.ts
-│   │   ├── stripe/
-│   │   │   ├── checkout.ts
+│   │   ├── paypal/
+│   │   │   ├── create-order.ts
 │   │   │   └── webhook.ts
 │   │   └── upload/
 │   │       └── image.ts
@@ -169,44 +266,171 @@ CREATE TABLE admin_users (
 │   └── order-confirmation.tsx # Order success page
 ├── lib/
 │   ├── prisma.ts             # Prisma client
-│   ├── stripe.ts             # Stripe configuration
+│   ├── paypal.ts             # PayPal configuration
 │   ├── auth.ts               # NextAuth configuration
 │   └── email.ts              # Email utilities
 ├── components/
-│   ├── admin/                # Admin-specific components
+│   ├── admin/
+│   │   ├── AdminLayout.tsx    # Main admin layout
+│   │   └── SettingsLayout.tsx # Settings layout
+│   ├── ui/                   # Reusable UI components
+│   │   ├── Input.tsx
+│   │   ├── Select.tsx
+│   │   ├── Textarea.tsx
+│   │   ├── Toggle.tsx
+│   │   └── Checkbox.tsx
 │   ├── cart/                 # Cart components
 │   └── seo/                  # SEO components
-└── middleware.ts             # Route protection
+├── hooks/
+│   ├── usePictures.ts        # Picture data fetching
+│   ├── useOrders.ts          # Order data fetching
+│   └── useProducts.ts        # Product data fetching
+├── domain/                   # Domain types (CONSOLIDATE TYPES HERE)
+│   ├── picture.ts            # Single source of truth for Picture type
+│   ├── product.ts            # Product domain types
+│   └── order.ts              # Order domain types
+├── infra/                    # Infrastructure layer
+│   ├── repositories/
+│   │   ├── PictureRepository.ts
+│   │   ├── DatabasePictureRepository.ts
+│   │   ├── ProductRepository.ts
+│   │   └── DatabaseProductRepository.ts
+├── test/                     # Testing infrastructure (NEW)
+│   ├── setup.ts              # Test setup and utilities
+│   ├── renderWithProviders.tsx # Test utility wrapper
+│   └── __mocks__/            # Mock implementations
+├── __tests__/                # Test files (NEW)
+│   ├── components/
+│   ├── hooks/
+│   ├── pages/
+│   └── api/
+├── middleware.ts             # Route protection
+├── vitest.config.ts          # Vitest configuration (NEW)
+├── .eslintrc.json           # ESLint configuration (NEW)
+├── .prettierrc              # Prettier configuration (NEW)
+└── tailwind.config.js       # Complete Tailwind config (FIX)
 ```
 
 ### Key Implementation Notes
 
-1. **Database Migration Strategy**:
-   - Create migration script to transfer existing static data
-   - Implement dual-read system during transition
-   - Upload existing images to Vercel Blob Storage
+#### 1. **Critical Issues Identified in Code Review**
 
-2. **Authentication**:
-   - Use NextAuth.js with database adapter
-   - Secure admin routes with middleware
-   - Implement role-based access control
+**Type System Problems**:
+- Multiple conflicting `Picture` types in `domain/picture.ts` vs `hooks/usePictures.ts`
+- Breaking changes needed to consolidate all domain types
+- Repository layer expects different schema than what exists
 
-3. **Stripe Integration**:
-   - Sync pictures as Stripe products
-   - Handle webhook events for payment confirmation
-   - Implement automatic inventory updates
+**Testing Infrastructure Gap**:
+- Zero test coverage across entire codebase
+- No testing framework or utilities configured
+- Components not designed for testability (missing data-testid attributes)
+- Critical violation of CLAUDE.md testing requirements
 
-4. **SEO Enhancements**:
-   - Dynamic meta tags per picture
-   - Structured data for better search visibility
-   - Social media preview optimization
+**Database-Code Misalignment**:
+- `DatabasePictureRepository` references non-existent `pictures` table
+- API endpoints mixing Product and Picture concepts incorrectly
+- Incomplete repository implementation with placeholder errors
 
-5. **Image Management**:
-   - Move from static files to Vercel Blob Storage
-   - Implement automatic image optimization
-   - Add multiple image support per picture
+#### 2. **Architectural Decisions**
+
+**Domain Layer Strategy**:
+- Consolidate all types in `/domain` folder as single source of truth
+- Implement proper dependency inversion with repository interfaces
+- Use React Query as the primary data fetching pattern (eliminate useState/useEffect)
+
+**Testing Strategy (Per CLAUDE.md)**:
+- **Vitest** as test runner (not Jest) - modern, fast, native TypeScript
+- **React Testing Library** for component testing
+- **data-testid attributes** for element selection (never CSS classes)
+- Custom `renderWithProviders()` utility with QueryClient and contexts
+
+**Code Quality Standards**:
+- TypeScript strict mode compliance
+- ESLint + Prettier with Tailwind plugin
+- Comprehensive error handling with Zod schemas
+- Performance optimization with proper React patterns
+
+#### 3. **Migration Priorities**
+
+**CRITICAL (Must fix before Stage 3)**:
+1. Fix type system inconsistencies - breaks compilation
+2. Resolve database schema mismatches - breaks functionality  
+3. Add testing infrastructure - required by CLAUDE.md
+4. Complete React Query migration - performance and consistency
+
+**Important (Should fix soon)**:
+1. Add proper error handling and API validation
+2. Implement accessibility features (data-testid, ARIA)
+3. Complete Tailwind configuration
+4. Add proper dependency injection
+
+#### 4. **Previous Implementation Notes**
+
+**Database Migration Strategy** ✅ COMPLETED:
+- Migration scripts successfully transfer existing static data
+- Dual-read system implemented during transition
+- Images uploaded to Vercel Blob Storage
+
+**Authentication** ✅ COMPLETED:
+- NextAuth.js with database adapter configured
+- Admin routes secured with middleware
+- Role-based access control implemented
+
+**PayPal Integration** 📋 PLANNED:
+- Create PayPal orders for picture purchases
+- Handle webhook events for payment confirmation
+- Implement automatic inventory updates
+
+**SEO Enhancements** 📋 PLANNED:
+- Dynamic meta tags per picture
+- Structured data for better search visibility
+- Social media preview optimization
 
 ---
 
-## Current Focus
-Starting with **Stage 1: Database Setup & Migration** to establish the foundation for dynamic data management.
+## Current Focus & Immediate Actions
+
+### 🚨 **CRITICAL PRIORITY: Stage 2.1 - Technical Debt**
+**Status**: Must complete before any new features
+
+The code review revealed **critical architectural issues** that must be fixed immediately:
+
+#### **Immediate Actions Required** (Next 1-2 days):
+1. **Fix Type System Inconsistencies** - Currently blocking clean compilation
+2. **Resolve Database Schema Mismatches** - Repository layer is broken
+3. **Set up Testing Infrastructure** - Required by CLAUDE.md, currently zero coverage
+
+#### **Why This is Critical**:
+- **Type conflicts** prevent reliable development and deployment
+- **Database mismatches** cause runtime errors in production
+- **Missing tests** violate code quality standards and prevent safe refactoring
+- **Mixed data patterns** create inconsistent user experience
+
+### **Recommended Implementation Order**:
+
+**Phase 1** (Days 1-2): Foundation Fixes
+- [ ] Consolidate Picture types in domain layer
+- [ ] Fix DatabasePictureRepository schema references  
+- [ ] Install and configure Vitest + React Testing Library
+
+**Phase 2** (Days 3-4): Quality & Standards  
+- [ ] Add data-testid attributes to all components
+- [ ] Complete React Query migration
+- [ ] Set up ESLint + Prettier + Tailwind configuration
+
+**Phase 3** (Days 5-7): Polish & Performance
+- [ ] Write tests for critical admin functions
+- [ ] Add proper error handling with Zod validation
+- [ ] Implement accessibility improvements
+
+### **After Stage 2.1 Completion**:
+Proceed with **Stage 3: E-commerce Integration** with PayPal implementation on a solid, tested foundation.
+
+---
+
+## Development Workflow Reminder
+Following CLAUDE.md guidelines:
+- **Tracer bullets**: Implement end-to-end minimal features first
+- **Testing required**: Every component must have data-testid and tests
+- **Single responsibility**: Break down complex components
+- **Repository pattern**: Maintain dependency inversion principles
