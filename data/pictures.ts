@@ -1,7 +1,7 @@
 import { slugify } from "@/utils/slug";
-import { Picture } from "@/domain/picture";
+import { BasicPicture, Picture, enrichPicture } from "@/domain/picture";
 
-export const pictures: Picture[] = [
+const basicPictures: BasicPicture[] = [
   {
     id: "1",
     title: "Abraham Olano - Equipo ONCE",
@@ -111,3 +111,6 @@ export const pictures: Picture[] = [
     slug: slugify("Bernard Hinault - Champion du Monde"),
   },
 ];
+
+// Export enriched pictures with full Picture interface
+export const pictures: Picture[] = basicPictures.map(basic => enrichPicture(basic));

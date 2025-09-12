@@ -1,20 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-
-export type Picture = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  size: string;
-  slug: string;
-  imageUrl: string;
-  status: 'AVAILABLE' | 'SOLD' | 'RESERVED';
-  productTypeId: string;
-  productTypeName: string;
-  stock: number;
-  createdAt: string;
-  updatedAt: string;
-};
+import { Picture } from '@/domain/picture';
 
 export const publicPictureKeys = {
   all: ['public-pictures'] as const,

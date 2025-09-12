@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Picture } from "@/hooks/usePicturesPublic";
+import { Picture } from "@/domain/picture";
 import { cn } from "@/utils/cn";
 
 type Props = {

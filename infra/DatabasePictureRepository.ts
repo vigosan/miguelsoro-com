@@ -1,6 +1,13 @@
-import { Picture } from "@/domain/picture";
+import { Picture, mapVariantStatusToPictureStatus, VariantStatus } from "@/domain/picture";
 import { PictureRepository } from "./PictureRepository";
 import { prisma } from "@/lib/prisma";
+import { Product, ProductImage, ProductType, ProductVariant } from "@prisma/client";
+
+type ProductWithRelations = Product & {
+  images: ProductImage[];
+  productType: ProductType;
+  variants: (ProductVariant & { stock?: number })[];
+};
 
 export class DatabasePictureRepository implements PictureRepository {
   async findAll(): Promise<Picture[]> {
@@ -13,11 +20,16 @@ export class DatabasePictureRepository implements PictureRepository {
         images: {
           where: { isPrimary: true },
           take: 1
+        },
+        productType: true,
+        variants: {
+          take: 1,
+          orderBy: { createdAt: 'desc' }
         }
       }
     });
 
-    return products.map(this.mapTodomainPicture);
+    return products.map(this.mapToDomainPicture);
   }
 
   async getPictureBySlug(slug: string): Promise<Picture | undefined> {
@@ -27,11 +39,16 @@ export class DatabasePictureRepository implements PictureRepository {
         images: {
           where: { isPrimary: true },
           take: 1
+        },
+        productType: true,
+        variants: {
+          take: 1,
+          orderBy: { createdAt: 'desc' }
         }
       }
     });
 
-    return product ? this.mapTodomainPicture(product) : undefined;
+    return product ? this.mapToDomainPicture(product) : undefined;
   }
 
   async getPictureById(id: string): Promise<Picture | undefined> {
@@ -41,21 +58,42 @@ export class DatabasePictureRepository implements PictureRepository {
         images: {
           where: { isPrimary: true },
           take: 1
+        },
+        productType: true,
+        variants: {
+          take: 1,
+          orderBy: { createdAt: 'desc' }
         }
       }
     });
 
-    return product ? this.mapTodomainPicture(product) : undefined;
+    return product ? this.mapToDomainPicture(product) : undefined;
   }
 
-  private mapTodomainPicture(dbProduct: any): Picture {
+  private mapToDomainPicture(dbProduct: ProductWithRelations): Picture {
+    const variant = dbProduct.variants[0];
+    const image = dbProduct.images[0];
+    
     return {
       id: dbProduct.id,
       title: dbProduct.title,
       description: dbProduct.description || '',
-      price: dbProduct.basePrice / 100,
-      size: '40x60',
+      price: variant ? variant.price : dbProduct.basePrice, // Price in cents
+      size: this.extractSizeFromTitle(dbProduct.title) || '120x90', // Default size
       slug: dbProduct.slug,
+      imageUrl: image ? image.url : `/pictures/${dbProduct.id}.webp`, // Fallback to convention
+      status: variant ? mapVariantStatusToPictureStatus(variant.status as VariantStatus) : 'AVAILABLE',
+      productTypeId: dbProduct.productTypeId,
+      productTypeName: dbProduct.productType?.displayName || 'Cuadros Originales',
+      stock: variant ? variant.stock : 1,
+      createdAt: dbProduct.createdAt.toISOString(),
+      updatedAt: dbProduct.updatedAt.toISOString()
     };
+  }
+
+  // Helper method to extract size from title (e.g., "Obra 120x90" -> "120x90")
+  private extractSizeFromTitle(title: string): string | null {
+    const sizeMatch = title.match(/(\d+)x(\d+)/);
+    return sizeMatch ? sizeMatch[0] : null;
   }
 }
