@@ -45,7 +45,8 @@ export function usePicture(id: string) {
       if (!response.ok) {
         throw new Error('Failed to fetch picture');
       }
-      return response.json();
+      const data = await response.json();
+      return data.picture || data;
     },
     enabled: !!id,
   });

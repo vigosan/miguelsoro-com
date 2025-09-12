@@ -80,11 +80,11 @@ export default function EditPicture() {
   useEffect(() => {
     if (picture) {
       setFormData({
-        title: picture.title,
+        title: picture.title || '',
         description: picture.description || '',
-        price: picture.price.toString(),
-        size: picture.size,
-        slug: picture.slug,
+        price: picture.price?.toString() || '0',
+        size: picture.size || '',
+        slug: picture.slug || '',
         productTypeId: picture.productTypeId || '',
         stock: picture.stock?.toString() || '1',
         imageUrl: picture.imageUrl || '',
