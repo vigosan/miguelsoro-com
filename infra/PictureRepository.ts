@@ -1,11 +1,11 @@
-import { Picture } from "@/domain/picture";
+import { Picture, getPictureStatus } from "@/domain/picture";
 import { pictures as pictureData } from "@/data/pictures";
 
 export interface PictureRepository {
   findAll(filters?: {
     productType?: string;
     inStock?: boolean;
-    status?: 'AVAILABLE' | 'SOLD';
+    status?: 'AVAILABLE' | 'NOT_AVAILABLE';
   }): Promise<Picture[]>;
   getPictureBySlug(slug: string): Promise<Picture | undefined>;
   getPictureById(id: string): Promise<Picture | undefined>;
@@ -24,7 +24,7 @@ export class InMemoryPictureRepository implements PictureRepository {
   async findAll(filters?: {
     productType?: string;
     inStock?: boolean;
-    status?: 'AVAILABLE' | 'SOLD';
+    status?: 'AVAILABLE' | 'NOT_AVAILABLE';
   }): Promise<Picture[]> {
     let results = [...this.pictures];
 
@@ -39,16 +39,16 @@ export class InMemoryPictureRepository implements PictureRepository {
     if (filters?.inStock !== undefined) {
       results = results.filter(picture => {
         if (filters.inStock) {
-          return picture.stock > 0 && picture.status === 'AVAILABLE';
+          return picture.stock > 0;
         } else {
-          return picture.stock === 0 || picture.status !== 'AVAILABLE';
+          return picture.stock === 0;
         }
       });
     }
 
     // Filter by status
     if (filters?.status) {
-      results = results.filter(picture => picture.status === filters.status);
+      results = results.filter(picture => getPictureStatus(picture) === filters.status);
     }
 
     return results;

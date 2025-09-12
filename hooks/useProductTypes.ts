@@ -9,24 +9,19 @@ export function useProductTypesPublic() {
   return useQuery({
     queryKey: productTypeKeys.public(),
     queryFn: async (): Promise<string[]> => {
-      // Get all pictures and extract unique product types
-      const response = await fetch('/api/pictures');
+      // Get product types from admin API
+      const response = await fetch('/api/admin/product-types');
       if (!response.ok) {
-        throw new Error('Failed to fetch pictures');
+        throw new Error('Failed to fetch product types');
       }
       const data = await response.json();
-      const pictures = data.pictures || [];
+      const productTypes = data.productTypes || [];
       
-      // Extract unique product type names
-      const productTypeNames: string[] = [];
-      pictures.forEach((picture: any) => {
-        if (picture.productTypeName && typeof picture.productTypeName === 'string') {
-          productTypeNames.push(picture.productTypeName);
-        }
-      });
-      
-      const uniqueTypes = Array.from(new Set(productTypeNames));
-      return uniqueTypes.sort();
+      // Extract displayName and filter active ones
+      return productTypes
+        .filter((type: any) => type.isActive)
+        .map((type: any) => type.displayName)
+        .sort();
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
   });

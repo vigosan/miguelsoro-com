@@ -11,7 +11,7 @@ export const publicPictureKeys = {
 export function usePicturesPublic(filters?: {
   productType?: string;
   inStock?: boolean;
-  status?: 'AVAILABLE' | 'SOLD';
+  status?: 'AVAILABLE' | 'NOT_AVAILABLE';
 }) {
   return useQuery({
     queryKey: publicPictureKeys.lists(filters),

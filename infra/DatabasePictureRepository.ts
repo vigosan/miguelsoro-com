@@ -1,4 +1,4 @@
-import { Picture, mapVariantStatusToPictureStatus, VariantStatus } from "@/domain/picture";
+import { Picture, getPictureStatus, VariantStatus } from "@/domain/picture";
 import { PictureRepository } from "./PictureRepository";
 import { prisma } from "@/lib/prisma";
 import { Product, ProductImage, ProductType, ProductVariant } from "@prisma/client";
@@ -13,7 +13,7 @@ export class DatabasePictureRepository implements PictureRepository {
   async findAll(filters?: {
     productType?: string;
     inStock?: boolean;
-    status?: 'AVAILABLE' | 'SOLD';
+    status?: 'AVAILABLE' | 'NOT_AVAILABLE';
   }): Promise<Picture[]> {
     const where: any = {
       isActive: true
@@ -22,7 +22,7 @@ export class DatabasePictureRepository implements PictureRepository {
     // Filter by product type
     if (filters?.productType) {
       where.productType = {
-        name: filters.productType
+        displayName: filters.productType
       };
     }
 
@@ -48,16 +48,16 @@ export class DatabasePictureRepository implements PictureRepository {
     if (filters?.inStock !== undefined) {
       results = results.filter(picture => {
         if (filters.inStock) {
-          return picture.stock > 0 && picture.status === 'AVAILABLE';
+          return picture.stock > 0;
         } else {
-          return picture.stock === 0 || picture.status !== 'AVAILABLE';
+          return picture.stock === 0;
         }
       });
     }
 
     // Filter by status
     if (filters?.status) {
-      results = results.filter(picture => picture.status === filters.status);
+      results = results.filter(picture => getPictureStatus(picture) === filters.status);
     }
 
     return results;
@@ -116,7 +116,6 @@ export class DatabasePictureRepository implements PictureRepository {
       size: this.extractSizeFromTitle(dbProduct.title) || '120x90', // Default size
       slug: dbProduct.slug,
       imageUrl: image ? image.url : `/pictures/${dbProduct.id}.webp`, // Fallback to convention
-      status: variant ? mapVariantStatusToPictureStatus(variant.status as VariantStatus) : 'AVAILABLE',
       productTypeId: dbProduct.productTypeId,
       productTypeName: dbProduct.productType?.displayName || 'Cuadros Originales',
       stock: variant ? variant.stock : 1,
@@ -130,7 +129,7 @@ export class DatabasePictureRepository implements PictureRepository {
   }
 
   async update(id: string, pictureData: any): Promise<Picture> {
-    const { title, description, price, slug, status, stock, productTypeId, imageUrl } = pictureData;
+    const { title, description, price, slug, stock, productTypeId, imageUrl } = pictureData;
     
     // Update product
     const productUpdateData: any = {};
@@ -175,13 +174,6 @@ export class DatabasePictureRepository implements PictureRepository {
     const variantUpdateData: any = {};
     if (price) variantUpdateData.price = Math.round(price * 100); // Convert euros to cents
     if (stock !== undefined) variantUpdateData.stock = stock;
-
-    // Update variant status
-    if (status) {
-      const variantStatus = status === 'AVAILABLE' ? 'AVAILABLE' : 
-                          status === 'SOLD' ? 'OUT_OF_STOCK' : 'AVAILABLE';
-      variantUpdateData.status = variantStatus;
-    }
 
     if (Object.keys(variantUpdateData).length > 0) {
       await prisma.productVariant.updateMany({

@@ -19,7 +19,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       filters.inStock = inStock === 'true';
     }
     
-    if (status && typeof status === 'string' && (status === 'AVAILABLE' || status === 'SOLD')) {
+    if (status && typeof status === 'string' && (status === 'AVAILABLE' || status === 'NOT_AVAILABLE')) {
       filters.status = status;
     }
 
