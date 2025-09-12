@@ -4,40 +4,58 @@ import { prisma } from "@/lib/prisma";
 
 export class DatabasePictureRepository implements PictureRepository {
   async findAll(): Promise<Picture[]> {
-    const pictures = await prisma.picture.findMany({
+    const products = await prisma.product.findMany({
       where: {
-        status: 'AVAILABLE'
+        isActive: true
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      include: {
+        images: {
+          where: { isPrimary: true },
+          take: 1
+        }
+      }
     });
 
-    return pictures.map(this.mapTodomainPicture);
+    return products.map(this.mapTodomainPicture);
   }
 
   async getPictureBySlug(slug: string): Promise<Picture | undefined> {
-    const picture = await prisma.picture.findUnique({
-      where: { slug }
+    const product = await prisma.product.findUnique({
+      where: { slug },
+      include: {
+        images: {
+          where: { isPrimary: true },
+          take: 1
+        }
+      }
     });
 
-    return picture ? this.mapTodomainPicture(picture) : undefined;
+    return product ? this.mapTodomainPicture(product) : undefined;
   }
 
   async getPictureById(id: string): Promise<Picture | undefined> {
-    const picture = await prisma.picture.findUnique({
-      where: { id }
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        images: {
+          where: { isPrimary: true },
+          take: 1
+        }
+      }
     });
 
-    return picture ? this.mapTodomainPicture(picture) : undefined;
+    return product ? this.mapTodomainPicture(product) : undefined;
   }
 
-  private mapTodomainPicture(dbPicture: any): Picture {
+  private mapTodomainPicture(dbProduct: any): Picture {
     return {
-      id: dbPicture.id,
-      title: dbPicture.title,
-      description: dbPicture.description || '',
-      price: dbPicture.price,
-      size: dbPicture.size,
-      slug: dbPicture.slug,
+      id: dbProduct.id,
+      title: dbProduct.title,
+      description: dbProduct.description || '',
+      price: dbProduct.basePrice / 100,
+      size: '40x60',
+      slug: dbProduct.slug,
     };
   }
 }

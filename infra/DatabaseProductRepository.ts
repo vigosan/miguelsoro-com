@@ -174,7 +174,7 @@ export class DatabaseProductTypeRepository implements ProductTypeRepository {
       id: pt.id,
       name: pt.name,
       displayName: pt.displayName,
-      description: pt.description,
+      description: pt.description ?? undefined,
       isActive: pt.isActive,
     }));
   }
@@ -188,7 +188,7 @@ export class DatabaseProductTypeRepository implements ProductTypeRepository {
       id: productType.id,
       name: productType.name,
       displayName: productType.displayName,
-      description: productType.description,
+      description: productType.description ?? undefined,
       isActive: productType.isActive,
     } : undefined;
   }
@@ -202,7 +202,7 @@ export class DatabaseProductTypeRepository implements ProductTypeRepository {
       id: productType.id,
       name: productType.name,
       displayName: productType.displayName,
-      description: productType.description,
+      description: productType.description ?? undefined,
       isActive: productType.isActive,
     } : undefined;
   }
@@ -216,7 +216,7 @@ export class DatabaseProductTypeRepository implements ProductTypeRepository {
       id: productType.id,
       name: productType.name,
       displayName: productType.displayName,
-      description: productType.description,
+      description: productType.description ?? undefined,
       isActive: productType.isActive,
     };
   }
@@ -231,7 +231,7 @@ export class DatabaseProductTypeRepository implements ProductTypeRepository {
       id: productType.id,
       name: productType.name,
       displayName: productType.displayName,
-      description: productType.description,
+      description: productType.description ?? undefined,
       isActive: productType.isActive,
     };
   }

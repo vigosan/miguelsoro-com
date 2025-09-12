@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Picture } from "@/domain/picture";
+import { Picture } from "@/hooks/usePicturesPublic";
 import { cn } from "@/utils/cn";
-import { getPath, getImgPath } from "@/domain/picture";
 
 type Props = {
   className?: string;
@@ -11,23 +10,36 @@ type Props = {
 
 export function Item({ item, className }: Props) {
   return (
-    <Link href={getPath(item)}>
-      <div className={cn("overflow-hidden", className)}>
-        <div className="group relative flex h-96 items-center justify-center lg:max-h-80">
-          <div className="aspect-h-1 aspect-w-1 lg:aspect-none absolute top-0 left-0 h-96 w-full bg-gray-200 lg:h-80 lg:max-h-80">
-            <Image
-              src={getImgPath(item)}
-              alt={item.title}
-              className="h-full w-full border-18 border-gray-900 object-cover object-top p-8"
-              width={260}
-              height={320}
-            />
-          </div>
-          <div className="absolute -inset-full top-0 z-1 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-40 transition-all group-hover:inset-0" />
+    <Link href={`/pictures/${item.slug}`}>
+      <div className={cn("h-full overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 hover:shadow-lg transition-shadow duration-200 flex flex-col", className)}>
+        <div className="group relative h-80 w-full bg-gray-50">
+          <Image
+            src={item.imageUrl}
+            alt={item.title}
+            className="h-full w-full object-cover group-hover:opacity-90 transition-opacity duration-200"
+            width={400}
+            height={320}
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         </div>
-        <div className="mt-4 flex flex-col gap-2">
-          <h3 className="text-sm text-gray-700">{item.title}</h3>
-          <p className="mt-1 text-sm text-gray-500">{item.size}</p>
+        <div className="p-4 flex-1 flex flex-col justify-between">
+          <h3 className="font-medium text-gray-900 group-hover:text-gray-700 transition-colors duration-200 line-clamp-2 min-h-[2.5rem]">
+            {item.title}
+          </h3>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-sm text-gray-500">{item.size}</p>
+            {item.status === 'AVAILABLE' && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Disponible
+              </span>
+            )}
+            {item.status === 'SOLD' && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                Vendido
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </Link>

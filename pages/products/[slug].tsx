@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { useProduct } from "@/hooks/useProduct";
-import { formatCurrency } from "@/utils/formatCurrency";
+import { formatPrice } from "@/domain/product";
 import { 
   ArrowLeftIcon,
   ShoppingBagIcon,
@@ -15,7 +15,7 @@ import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 export default function ProductPage() {
   const router = useRouter();
   const { slug } = router.query;
-  const product = useProduct(typeof slug === "string" ? slug : undefined);
+  const { product, loading, error } = useProduct(typeof slug === "string" ? slug : undefined);
   const [isFavorite, setIsFavorite] = useState(false);
 
   if (!product) {
@@ -71,14 +71,14 @@ export default function ProductPage() {
           <div className="space-y-6">
             <div>
               <p className="text-sm text-gray-500 uppercase tracking-wide mb-2">
-                {product.size}
+                {product.productType.displayName}
               </p>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
                 {product.title}
               </h1>
               <div className="flex items-center justify-between mb-6">
                 <p className="text-3xl font-bold text-gray-900">
-                  {formatCurrency(product.price)}
+                  {formatPrice(product.basePrice)}
                 </p>
                 <button
                   onClick={() => setIsFavorite(!isFavorite)}
