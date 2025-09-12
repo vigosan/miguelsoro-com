@@ -21,9 +21,8 @@ make logs           # Show database logs
 make clean          # Remove containers and volumes (DANGER: deletes all data)
 
 # Database operations
-make migrate        # Run Prisma migrations
-make seed           # Seed database with initial data
-make reset-db       # Reset database (migrate + seed)
+# Database migrations and seeding handled by Supabase
+# Use Supabase dashboard or CLI for database operations
 
 # Development
 make dev            # Start dev server with database
@@ -46,7 +45,7 @@ npm run format       # Format code with Prettier + Tailwind plugin
 ## Technology Stack
 
 - **Framework**: Next.js 14 with Pages Router (not App Router)
-- **Database**: PostgreSQL with Prisma ORM
+- **Database**: PostgreSQL with Supabase Client
 - **Authentication**: NextAuth.js with database sessions
 - **Styling**: Tailwind CSS v4 (alpha) with PostCSS
 - **Font**: Geist Sans via `geist` package

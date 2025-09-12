@@ -53,7 +53,7 @@ Transform the static Miguel Soro art gallery into a dynamic e-commerce platform 
   - [X] Remove conflicting type definitions in hooks/usePictures.ts ✅
   - [X] Create proper type exports and barrel files (following CLAUDE.md) ✅
   - [X] Update all imports to use domain types ✅
-  
+
 - [X] **Implement Testing Infrastructure** (CRITICAL):
   - [X] Install and configure Vitest (per CLAUDE.md requirements) ✅
   - [X] Add React Testing Library and @testing-library/jest-dom ✅
@@ -61,26 +61,26 @@ Transform the static Miguel Soro art gallery into a dynamic e-commerce platform 
   - [X] Add data-testid attributes to all interactive elements ✅
   - [X] Hybrid React plugin configuration with dynamic import ✅
   - [X] All existing tests passing (5/5) ✅
-  
+
 - [X] **Fix Database Layer** (HIGH PRIORITY):
   - [X] Resolve DatabasePictureRepository schema mismatch ✅
   - [X] Standardize on Product→Picture mapping or separate entities ✅
   - [X] Fix API endpoints to use correct database queries ✅
   - [X] Add proper error handling with contextual messages ✅
-  
+
 - [X] **Complete React Query Migration**:
   - [X] Update deprecated cacheTime to gcTime for v5 compatibility ✅
   - [X] Migrate server data fetching from useState/useEffect to React Query ✅
   - [X] Keep useState for local UI state (filters, modals, forms) - correct pattern ✅
   - [X] Add optimistic updates for better UX ✅
   - [X] Implement proper query invalidation strategies ✅
-  
+
 - [X] **Accessibility & Performance**:
   - [X] Add data-testid attributes throughout (CLAUDE.md requirement) ✅
   - [X] Implement proper ARIA labels and keyboard navigation ✅
   - [X] Add image optimization for admin interface ✅
   - [X] Fix unnecessary re-renders with useCallback/useMemo ✅
-  
+
 - [X] **Code Quality Improvements**:
   - [X] Complete Tailwind configuration ✅
   - [X] ESLint and Prettier working properly ✅
@@ -89,7 +89,6 @@ Transform the static Miguel Soro art gallery into a dynamic e-commerce platform 
 
 ### Remaining Advanced Tasks (Optional for Stage 3):
 - [ ] Create standard error response format
-- [ ] Add request validation with Zod schemas  
 - [ ] Add API endpoint testing
 - [ ] Write tests for critical admin components
 
@@ -190,7 +189,7 @@ CREATE TABLE admin_users (
 ```json
 {
   "prisma": "^5.0.0",
-  "@prisma/client": "^5.0.0", 
+  "@prisma/client": "^5.0.0",
   "next-auth": "^4.24.0",
   "@next-auth/prisma-adapter": "^1.0.0",
   "@vercel/blob": "^0.15.0",
@@ -358,7 +357,7 @@ CREATE TABLE admin_users (
 
 **CRITICAL (Must fix before Stage 3)**:
 1. Fix type system inconsistencies - breaks compilation
-2. Resolve database schema mismatches - breaks functionality  
+2. Resolve database schema mismatches - breaks functionality
 3. Add testing infrastructure - required by CLAUDE.md
 4. Complete React Query migration - performance and consistency
 
@@ -422,7 +421,7 @@ Following the stable architecture pattern from adj-xativa project, which has nev
   - [X] Update admin pictures CRUD operations ✅
   - [X] **Server-Side Rendering (SSR)**: Implement SSR for homepage and picture detail pages ✅
   - [X] **Performance Improvement**: Homepage loads with pre-fetched data from Supabase ✅
-  
+
 - [X] **Products Repository** → Supabase Client ✅
   - [X] Extend SupabaseProductRepository for full Product entity ✅
   - [X] Migrate `/api/products/*` endpoints ✅
@@ -438,7 +437,7 @@ Following the stable architecture pattern from adj-xativa project, which has nev
   - [X] Create SupabaseOrderRepository implementing OrderRepository ✅
   - [X] Migrate order management endpoints ✅
   - [X] **Clean Architecture**: Implement proper use cases for order operations ✅
-  
+
 - [🔄] **PayPal Integration** → Supabase Client ⚠️ CRITICAL (IN PROGRESS)
   - [X] Update order creation in create-order.ts to use Clean Architecture pattern ✅
   - [X] Migrate payment confirmation logic to use repository pattern ✅
@@ -453,7 +452,7 @@ Following the stable architecture pattern from adj-xativa project, which has nev
   - [ ] Remove all DatabaseXXXRepository classes
   - [ ] Clean up Prisma schema and migrations
   - [ ] Update dependency injection in infra/dependencies.ts
-  
+
 - [ ] **Environment Cleanup**
   - [ ] Remove POSTGRES_PRISMA_URL and POSTGRES_URL_NON_POOLING
   - [ ] Simplify to only Supabase environment variables
@@ -465,7 +464,7 @@ Following the stable architecture pattern from adj-xativa project, which has nev
 ```
 Prisma Client → PostgreSQL Connection → Supabase
 - Manual connection pooling
-- Custom retry logic needed  
+- Custom retry logic needed
 - Frequent timeouts
 - 5094ms response times
 ```
@@ -474,7 +473,7 @@ Prisma Client → PostgreSQL Connection → Supabase
 ```
 Supabase Client SSR → Supabase Infrastructure
 - Automatic connection management
-- Built-in retry & resilience  
+- Built-in retry & resilience
 - Consistent performance
 - 86-154ms response times
 ```

@@ -36,8 +36,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
-/generated/prisma
+# Generated files
+# (no prisma generation needed with Supabase)
 
 # docker
 docker-compose.override.yml

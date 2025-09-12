@@ -32,7 +32,7 @@ export function getPictureStatus(picture: Picture): PictureStatus {
   return picture.stock > 0 ? 'AVAILABLE' : 'NOT_AVAILABLE';
 }
 
-// Product variant status from Prisma - for mapping
+// Product variant status from database - for mapping
 export type VariantStatus = 'AVAILABLE' | 'OUT_OF_STOCK' | 'DISCONTINUED';
 
 // Helper functions
@@ -44,7 +44,7 @@ export function getImgPath(picture: Picture | BasicPicture): string {
   return `/pictures/${picture.id}.webp`;
 }
 
-// Map Prisma VariantStatus to PictureStatus
+// Map database VariantStatus to PictureStatus
 export function mapVariantStatusToPictureStatus(status: VariantStatus): PictureStatus {
   switch (status) {
     case 'AVAILABLE':

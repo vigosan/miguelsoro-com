@@ -31,21 +31,9 @@ clean: ## Remove containers and volumes (WARNING: This will delete all data)
 	@docker system prune -f
 	@echo "✅ Cleanup completed"
 
-# Database commands
-migrate: ## Run database migrations
-	@echo "🔄 Running migrations..."
-	@npx prisma migrate dev
-	@echo "✅ Migrations completed"
-
-seed: ## Seed the database with initial data
-	@echo "🌱 Seeding database..."
-	@npx prisma db seed
-	@echo "✅ Database seeded"
-
-reset-db: ## Reset database (migrate + seed)
-	@echo "🔄 Resetting database..."
-	@npx prisma migrate reset --force
-	@echo "✅ Database reset completed"
+# Database commands - Using Supabase directly
+# Database operations now handled via Supabase dashboard/CLI
+# No migration commands needed with Supabase
 
 # Development commands
 dev: up ## Start development server with database
@@ -88,12 +76,8 @@ setup: ## Complete setup for new developers
 	@make up
 	@echo "3. Waiting for database to be ready..."
 	@sleep 5
-	@echo "4. Generating Prisma client..."
-	@npx prisma generate
-	@echo "5. Running migrations..."
-	@make migrate
-	@echo "6. Seeding database..."
-	@make seed
+	@echo "4. Database ready (using Supabase)"
+	@echo "   No additional setup needed - Supabase handles migrations"
 	@echo "✅ Setup completed! Run 'make dev' to start development server"
 
 # Status check

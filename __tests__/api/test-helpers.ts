@@ -1,21 +1,16 @@
 import { vi } from 'vitest'
 
-// Mock Prisma client
-export const prismaMock = {
-  order: {
-    findUnique: vi.fn(),
-    findMany: vi.fn(),
-    count: vi.fn(),
-    aggregate: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    updateMany: vi.fn(),
-  },
-  productVariant: {
-    findUnique: vi.fn(),
-    findMany: vi.fn(),
-    update: vi.fn(),
-  },
+// Mock Supabase client (for testing)
+export const supabaseMock = {
+  from: vi.fn().mockReturnThis(),
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  in: vi.fn().mockReturnThis(),
+  single: vi.fn(),
+  order: vi.fn().mockReturnThis(),
 }
 
 // Mock data structures
