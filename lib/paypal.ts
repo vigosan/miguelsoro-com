@@ -20,10 +20,6 @@ export const getPayPalClientConfig = () => {
     'data-client-token': undefined,
     environment: (environment === Environment.Production ? 'production' : 'sandbox') as 'production' | 'sandbox',
   };
-  
-  console.log('PayPal Config:', config);
-  console.log('Environment variable:', process.env.NEXT_PUBLIC_PAYPAL_ENVIRONMENT);
-  console.log('Computed environment:', environment);
-  
+
   return config;
 };
