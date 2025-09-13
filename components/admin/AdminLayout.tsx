@@ -8,7 +8,9 @@ import {
   PhotoIcon, 
   ShoppingBagIcon,
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/cn";
 
@@ -28,6 +30,8 @@ const navigation = [
 export function AdminLayout({ children, title = "Admin - Miguel Soro" }: Props) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     // Check authentication on client side
@@ -64,6 +68,22 @@ export function AdminLayout({ children, title = "Admin - Miguel Soro" }: Props) 
     }
   };
 
+  const handleMenuOpen = () => {
+    setIsMobileMenuOpen(true);
+    // Small delay to allow DOM to update before starting animation
+    setTimeout(() => {
+      setIsAnimating(true);
+    }, 10);
+  };
+
+  const handleMenuClose = () => {
+    setIsAnimating(false);
+    // Shorter timeout to match faster animation
+    setTimeout(() => {
+      setIsMobileMenuOpen(false);
+    }, 200);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -81,19 +101,118 @@ export function AdminLayout({ children, title = "Admin - Miguel Soro" }: Props) 
       </Head>
 
       <div className="flex h-screen">
-        {/* Sidebar */}
-        <div className="w-14 sm:w-16 lg:w-64 bg-white shadow-sm">
-          <div className="flex h-full flex-col">
+        {/* Mobile menu button - positioned right */}
+        {!isMobileMenuOpen && (
+          <div className="lg:hidden fixed top-4 right-4 z-50">
+            <button
+              onClick={handleMenuOpen}
+              className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 bg-white shadow-md"
+            >
+              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
+        {/* Mobile drawer overlay */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden fixed inset-0 z-50">
+            {/* Overlay background - blur effect like iOS */}
+            <div 
+              className={cn(
+                "fixed inset-0 bg-black/20 backdrop-blur-sm transition-all duration-200 ease-out",
+                isAnimating ? "opacity-100" : "opacity-0"
+              )}
+              onClick={handleMenuClose}
+            />
+            
+            {/* Drawer panel - slides down from top */}
+            <div className={cn(
+              "fixed top-0 left-0 right-0 bg-white shadow-2xl transition-all duration-200 ease-out",
+              "max-h-[85vh] overflow-hidden rounded-b-3xl",
+              isAnimating ? "translate-y-0 opacity-100" : "-translate-y-full opacity-95"
+            )}>
+              {/* Drawer header */}
+              <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 bg-gray-50">
+                <Link href="/admin" className="text-lg font-semibold text-gray-900">
+                  Miguel Soro Admin
+                </Link>
+                <button
+                  onClick={handleMenuClose}
+                  className="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Drawer content */}
+              <div className="flex flex-col h-full max-h-[calc(85vh-73px)]">
+                {/* Navigation */}
+                <nav className="flex-1 py-6 space-y-1 overflow-y-auto">
+                  {navigation.map((item) => {
+                    const isActive = item.href === '/admin/settings' 
+                      ? router.pathname.startsWith('/admin/settings')
+                      : router.pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={handleMenuClose}
+                        className={cn(
+                          isActive
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700 hover:bg-gray-50",
+                          "group flex items-center px-4 py-3 text-base font-medium transition-colors duration-200 w-full"
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            isActive ? "text-gray-700" : "text-gray-500 group-hover:text-gray-700",
+                            "mr-3 h-6 w-6 flex-shrink-0"
+                          )}
+                          aria-hidden="true"
+                        />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </nav>
+
+                {/* User info at bottom */}
+                <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-4">
+                  <div className="flex items-center">
+                    <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                      <span className="text-sm font-medium text-gray-700">A</span>
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <p className="text-base font-medium text-gray-900">Admin</p>
+                      <button
+                        onClick={handleLogout}
+                        className="text-sm text-gray-600 hover:text-gray-800 cursor-pointer flex items-center gap-1 mt-1 transition-colors duration-200"
+                        data-testid="logout-button-mobile"
+                      >
+                        <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Desktop Sidebar - hidden on mobile */}
+        <div className="hidden lg:flex lg:w-64 bg-white shadow-sm">
+          <div className="flex h-full w-full flex-col">
             {/* Logo */}
-            <div className="flex h-16 items-center justify-center lg:justify-start px-2 sm:px-3 lg:px-6 border-b border-gray-200">
-              <Link href="/admin" className="text-base lg:text-xl font-semibold text-gray-900 truncate">
-                <span className="hidden lg:block">Miguel Soro Admin</span>
-                <span className="block lg:hidden text-center">MS</span>
+            <div className="flex h-16 items-center justify-start px-6 border-b border-gray-200">
+              <Link href="/admin" className="text-xl font-semibold text-gray-900 truncate">
+                Miguel Soro Admin
               </Link>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 space-y-1 px-1 sm:px-2 lg:px-3 py-4">
+            <nav className="flex-1 space-y-1 px-3 py-4">
               {navigation.map((item) => {
                 const isActive = item.href === '/admin/settings' 
                   ? router.pathname.startsWith('/admin/settings')
@@ -106,50 +225,37 @@ export function AdminLayout({ children, title = "Admin - Miguel Soro" }: Props) 
                       isActive
                         ? "bg-gray-100 text-gray-900"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                      "group flex items-center px-2 sm:px-3 py-2 text-sm font-medium rounded-md lg:justify-start justify-center cursor-pointer"
+                      "group flex items-center px-3 py-2 text-sm font-medium rounded-md"
                     )}
-                    title={item.name}
                   >
                     <item.icon
                       className={cn(
                         isActive ? "text-gray-700" : "text-gray-600 group-hover:text-gray-800",
-                        "lg:mr-3 mr-0 h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0"
+                        "mr-3 h-6 w-6 flex-shrink-0"
                       )}
                       aria-hidden="true"
                     />
-                    <span className="hidden lg:block truncate">{item.name}</span>
+                    {item.name}
                   </Link>
                 );
               })}
             </nav>
 
-            {/* User info */}
-            <div className="border-t border-gray-200 p-1 sm:p-2 lg:p-4">
-              <div className="flex items-center lg:flex-row flex-col">
-                <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                  <span className="text-xs sm:text-sm font-medium text-gray-700">A</span>
+            {/* Desktop user info */}
+            <div className="border-t border-gray-200 p-4">
+              <div className="flex items-center">
+                <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-sm font-medium text-gray-700">A</span>
                 </div>
-                <div className="lg:ml-3 ml-0 lg:block hidden">
+                <div className="ml-3">
                   <p className="text-sm font-medium text-gray-900">Admin</p>
                   <button
                     onClick={handleLogout}
                     className="text-xs text-gray-600 hover:text-gray-800 cursor-pointer flex items-center gap-1 mt-1"
                     data-testid="logout-button"
-                    title="Logout"
                   >
                     <ArrowRightOnRectangleIcon className="h-3 w-3" />
                     Logout
-                  </button>
-                </div>
-                {/* Mobile logout button */}
-                <div className="lg:hidden mt-2">
-                  <button
-                    onClick={handleLogout}
-                    className="p-1 text-gray-600 hover:text-gray-800 cursor-pointer"
-                    data-testid="logout-button-mobile"
-                    title="Logout"
-                  >
-                    <ArrowRightOnRectangleIcon className="h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -159,6 +265,11 @@ export function AdminLayout({ children, title = "Admin - Miguel Soro" }: Props) 
 
         {/* Main content */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          {/* Mobile header spacer */}
+          <div className="lg:hidden h-16 flex items-center justify-center">
+            <h1 className="text-lg font-semibold text-gray-900">Admin Panel</h1>
+          </div>
+          
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             {children}
           </main>
