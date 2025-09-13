@@ -177,11 +177,11 @@ export class DatabaseOrderRepository implements OrderRepository {
       throw new Error(`Failed to get stats: ${pendingError.message}`);
     }
 
-    // Get total revenue from delivered orders
+    // Get total revenue from paid and delivered orders
     const { data: revenueData, error: revenueError } = await supabase
       .from('orders')
       .select('total')
-      .eq('status', 'DELIVERED');
+      .in('status', ['PAID', 'DELIVERED']);
 
     if (revenueError) {
       console.error('Error getting revenue:', revenueError);
