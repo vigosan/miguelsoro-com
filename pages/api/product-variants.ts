@@ -28,7 +28,7 @@ export default async function handler(
         products!inner(id)
       `)
       .eq('products.id', productId)
-      .eq('status', 'AVAILABLE');
+      .gt('stock', 0); // Only variants with stock > 0
 
     if (error) {
       console.error('Error fetching variants:', error);

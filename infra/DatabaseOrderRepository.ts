@@ -1,13 +1,14 @@
 import { createAdminClient } from '@/utils/supabase/server';
-import { 
-  OrderRepository, 
-  OrderWithDetails, 
-  OrderSummary, 
-  OrderStats, 
+import {
+  OrderRepository,
+  OrderWithDetails,
+  OrderSummary,
+  OrderStats,
   CreateOrderData,
   ProductVariantRepository,
   ProductVariant
 } from './OrderRepository';
+import { v4 as uuidv4 } from 'uuid';
 
 export class DatabaseOrderRepository implements OrderRepository {
   private getClient() {
@@ -202,9 +203,11 @@ export class DatabaseOrderRepository implements OrderRepository {
     const supabase = this.getClient();
 
     // Create order
+    const orderId = uuidv4();
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
+        id: orderId,
         customerEmail: data.customerEmail,
         customerName: data.customerName,
         customerPhone: data.customerPhone,
@@ -372,7 +375,7 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
         )
       `)
       .in('id', ids)
-      .eq('status', 'AVAILABLE')
+      .gt('stock', 0) // Use stock instead of status
       .eq('products.product_images.isPrimary', true);
 
     if (error) {
