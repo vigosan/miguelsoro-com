@@ -75,7 +75,7 @@ export default function CheckoutPage() {
   };
 
   const isFormValid = () => {
-    return formData.customerEmail && formData.customerName && cartState.items.length > 0 && isCartValid;
+    return formData.customerEmail && formData.customerName && formData.shippingAddress && cartState.items.length > 0 && isCartValid;
   };
 
   const createOrder = async () => {
@@ -83,7 +83,7 @@ export default function CheckoutPage() {
       if (!isCartValid) {
         setError('Hay problemas con los artículos en tu carrito. Por favor revísalos antes de continuar.');
       } else {
-        setError('Por favor completa todos los campos obligatorios.');
+        setError('Por favor completa todos los campos obligatorios (email, nombre y dirección de envío).');
       }
       return;
     }
@@ -237,7 +237,7 @@ export default function CheckoutPage() {
 
                 <div>
                   <label htmlFor="shippingAddress" className="block text-sm/6 font-medium text-gray-900 mb-2">
-                    Dirección de envío
+                    Dirección de envío <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="shippingAddress"
@@ -247,6 +247,7 @@ export default function CheckoutPage() {
                     onChange={handleInputChange}
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6 resize-none"
                     placeholder="Calle, número, código postal, ciudad, país"
+                    required
                     data-testid="shipping-address"
                   />
                 </div>

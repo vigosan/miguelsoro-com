@@ -25,12 +25,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         updatedAt: order.updatedAt.toISOString(),
         items: order.items.map(item => ({
           id: item.id,
-          productTitle: item.variant.product.title,
-          productType: item.variant.product.productType?.displayName || '',
           variantId: item.variantId,
           quantity: item.quantity,
           price: item.price,
-          total: item.total
+          total: item.total,
+          variant: {
+            id: item.variant.id,
+            price: item.variant.price,
+            status: item.variant.status,
+            product: {
+              id: item.variant.product.id,
+              title: item.variant.product.title,
+              slug: item.variant.product.slug,
+              productType: item.variant.product.productType ? {
+                id: item.variant.product.productType.id,
+                displayName: item.variant.product.productType.displayName
+              } : undefined,
+              images: item.variant.product.images || []
+            }
+          }
         }))
       }
       
