@@ -116,12 +116,12 @@ export default async function handler(
       body: paypalOrderRequest
     });
 
-    console.log('PayPal create-order: PayPal API response received:', {
-      id: paypalOrderResponse?.id,
-      status: paypalOrderResponse?.status
-    });
-
     const paypalOrder = paypalOrderResponse as Order;
+
+    console.log('PayPal create-order: PayPal API response received:', {
+      id: paypalOrder?.id,
+      status: paypalOrder?.status
+    });
 
     // Create order in database
     const order = await createOrder.execute({
