@@ -397,6 +397,51 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
     }));
   }
 
+  async findByIds(ids: string[]): Promise<ProductVariant[]> {
+    const supabase = this.getClient();
+
+    const { data: variants, error } = await supabase
+      .from('product_variants')
+      .select(`
+        id,
+        price,
+        status,
+        stock,
+        products!inner(
+          id,
+          title,
+          product_images!inner(
+            id,
+            isPrimary,
+            url
+          )
+        )
+      `)
+      .in('id', ids)
+      .eq('products.product_images.isPrimary', true);
+
+    if (error) {
+      console.error('Error fetching variants:', error);
+      throw new Error(`Failed to fetch variants: ${error.message}`);
+    }
+
+    return (variants || []).map((variant: any) => ({
+      id: variant.id,
+      price: variant.price,
+      status: variant.status,
+      stock: variant.stock,
+      product: {
+        id: variant.products.id,
+        title: variant.products.title,
+        images: (variant.products.product_images || []).map((img: any) => ({
+          id: img.id,
+          isPrimary: img.isPrimary,
+          url: img.url
+        }))
+      }
+    }));
+  }
+
   async decrementStock(id: string, quantity: number): Promise<void> {
     const supabase = this.getClient();
 

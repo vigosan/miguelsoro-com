@@ -8,6 +8,8 @@ import { Input } from '../components/ui/Input';
 import Image from 'next/image';
 import { getPayPalClientConfig } from '../lib/paypal';
 import type { ShippingSettings } from '@/services/databaseShippingSettings';
+import { useCartValidation } from '../hooks/useCartValidation';
+import CartValidationBanner from '../components/cart/CartValidationBanner';
 
 interface CheckoutFormData {
   customerEmail: string;
@@ -19,6 +21,7 @@ interface CheckoutFormData {
 export default function CheckoutPage() {
   const router = useRouter();
   const { state: cartState, clearCart } = useCart();
+  const { isValid: isCartValid, issues: cartIssues } = useCartValidation();
   const [formData, setFormData] = useState<CheckoutFormData>({
     customerEmail: '',
     customerName: '',
@@ -72,12 +75,16 @@ export default function CheckoutPage() {
   };
 
   const isFormValid = () => {
-    return formData.customerEmail && formData.customerName && cartState.items.length > 0;
+    return formData.customerEmail && formData.customerName && cartState.items.length > 0 && isCartValid;
   };
 
   const createOrder = async () => {
     if (!isFormValid()) {
-      setError('Por favor completa todos los campos obligatorios.');
+      if (!isCartValid) {
+        setError('Hay problemas con los artículos en tu carrito. Por favor revísalos antes de continuar.');
+      } else {
+        setError('Por favor completa todos los campos obligatorios.');
+      }
       return;
     }
 
@@ -187,6 +194,8 @@ export default function CheckoutPage() {
           </p>
         </div>
 
+        <CartValidationBanner />
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Customer Information Form */}
           <div className="space-y-8">

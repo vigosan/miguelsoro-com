@@ -130,6 +130,9 @@ export interface ProductVariantRepository {
   // From /api/paypal/create-order - Find available variants by IDs
   findAvailableByIds(ids: string[]): Promise<ProductVariant[]>
   
+  // From /api/cart/validate - Find all variants by IDs (including unavailable ones)
+  findByIds(ids: string[]): Promise<ProductVariant[]>
+  
   // From /api/paypal/capture-order, webhook - Update stock and status
   decrementStock(id: string, quantity: number): Promise<void>
   markOutOfStockIfNeeded(id: string): Promise<void>

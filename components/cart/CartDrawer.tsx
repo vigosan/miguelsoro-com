@@ -5,6 +5,7 @@ import { useCart } from '../../contexts/CartContext';
 import { formatEuros } from '../../domain/order';
 import Image from 'next/image';
 import Link from 'next/link';
+import CartValidationBanner from './CartValidationBanner';
 
 export default function CartDrawer() {
   const { state, removeItem, updateQuantity, setCartOpen, getFormattedTotal } = useCart();
@@ -58,6 +59,7 @@ export default function CartDrawer() {
                       </div>
 
                       <div className="mt-8">
+                        <CartValidationBanner />
                         <div className="flow-root">
                           <ul role="list" className="-my-6 divide-y divide-gray-200" data-testid="cart-items">
                             {state.items.length === 0 ? (
@@ -210,6 +212,7 @@ export default function CartDrawer() {
                       </div>
 
                       <div className="mt-8">
+                        <CartValidationBanner />
                         <div className="flow-root">
                           <ul role="list" className="-my-6 divide-y divide-gray-200" data-testid="cart-items">
                             {state.items.length === 0 ? (
