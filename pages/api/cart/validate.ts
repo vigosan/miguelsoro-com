@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { productVariantRepository } from '../../../infra/dependencies';
+import { getShippingSettings } from '../../../services/databaseShippingSettings';
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,6 +23,9 @@ export default async function handler(
     // Also get unavailable variants to detect products that are no longer available
     const allVariants = await productVariantRepository.findByIds(variantIds);
 
+    // Get current shipping settings
+    const shippingSettings = await getShippingSettings();
+
     res.status(200).json({
       variants: allVariants.map(variant => ({
         id: variant.id,
@@ -31,7 +35,11 @@ export default async function handler(
         product: {
           title: variant.product?.title || 'Unknown Product'
         }
-      }))
+      })),
+      shippingSettings: {
+        standardRate: shippingSettings?.standardRate || 0,
+        freeShippingThreshold: shippingSettings?.freeShippingThreshold || 0
+      }
     });
 
   } catch (error) {

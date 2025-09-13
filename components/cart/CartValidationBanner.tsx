@@ -5,8 +5,9 @@ import { useState } from 'react';
 
 export default function CartValidationBanner() {
   const { isValid, issues, isLoading } = useCartValidation();
-  const { removeItem, updateQuantity } = useCart();
+  const { removeItem, updateQuantity, updatePrice } = useCart();
   const [dismissedIssues, setDismissedIssues] = useState<string[]>([]);
+
 
   if (isValid || isLoading || issues.length === 0) {
     return null;
@@ -32,8 +33,13 @@ export default function CartValidationBanner() {
         }
         break;
       case 'price_changed':
-        // For price changes, we just dismiss the warning
-        // The price will be updated at checkout
+        if (issue.currentValue !== undefined) {
+          updatePrice(issue.variantId, issue.currentValue);
+        }
+        break;
+      case 'shipping_changed':
+        // For shipping changes, we just dismiss the warning
+        // The new shipping costs will be applied automatically
         setDismissedIssues(prev => [...prev, issue.variantId]);
         break;
     }
@@ -61,12 +67,16 @@ export default function CartValidationBanner() {
                   <div className="ml-4 flex space-x-2">
                     {(issue.type === 'stock_unavailable' || 
                       issue.type === 'product_unavailable' || 
-                      issue.type === 'stock_reduced') && (
+                      issue.type === 'stock_reduced' ||
+                      issue.type === 'price_changed' ||
+                      issue.type === 'shipping_changed') && (
                       <button
                         onClick={() => handleFixIssue(issue)}
                         className="text-yellow-800 hover:text-yellow-900 font-medium underline"
                       >
-                        {issue.type === 'stock_reduced' ? 'Ajustar' : 'Eliminar'}
+                        {issue.type === 'stock_reduced' ? 'Ajustar' : 
+                         issue.type === 'price_changed' ? 'Actualizar' :
+                         issue.type === 'shipping_changed' ? 'Entendido' : 'Eliminar'}
                       </button>
                     )}
                     <button

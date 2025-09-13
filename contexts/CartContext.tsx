@@ -23,6 +23,7 @@ type CartAction =
   | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
   | { type: 'REMOVE_ITEM'; payload: { variantId: string } }
   | { type: 'UPDATE_QUANTITY'; payload: { variantId: string; quantity: number } }
+  | { type: 'UPDATE_PRICE'; payload: { variantId: string; price: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
   | { type: 'SET_CART_OPEN'; payload: boolean }
@@ -116,6 +117,24 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       };
     }
 
+    case 'UPDATE_PRICE': {
+      const newItems = state.items.map(item =>
+        item.variantId === action.payload.variantId
+          ? { ...item, price: action.payload.price }
+          : item
+      );
+
+      const total = newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
+
+      return {
+        ...state,
+        items: newItems,
+        total,
+        itemCount,
+      };
+    }
+
     case 'CLEAR_CART':
       return {
         ...state,
@@ -157,6 +176,7 @@ const CartContext = createContext<{
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
   removeItem: (variantId: string) => void;
   updateQuantity: (variantId: string, quantity: number) => void;
+  updatePrice: (variantId: string, price: number) => void;
   clearCart: () => void;
   toggleCart: () => void;
   setCartOpen: (open: boolean) => void;
@@ -196,6 +216,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { variantId, quantity } });
   };
 
+  const updatePrice = (variantId: string, price: number) => {
+    dispatch({ type: 'UPDATE_PRICE', payload: { variantId, price } });
+  };
+
   const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
   };
@@ -219,6 +243,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addItem,
         removeItem,
         updateQuantity,
+        updatePrice,
         clearCart,
         toggleCart,
         setCartOpen,
