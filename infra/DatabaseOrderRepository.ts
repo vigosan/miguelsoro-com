@@ -361,7 +361,7 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
         price,
         status,
         stock,
-        products(
+        products!inner(
           id,
           title,
           product_images!inner(
@@ -373,7 +373,7 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
       `)
       .in('id', ids)
       .eq('status', 'AVAILABLE')
-      .eq('product_images.isPrimary', true);
+      .eq('products.product_images.isPrimary', true);
 
     if (error) {
       console.error('Error fetching available variants:', error);
