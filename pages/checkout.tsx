@@ -4,6 +4,7 @@ import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import { useCart } from '../contexts/CartContext';
 import { calculateOrderTotal, formatPrice, formatEuros } from '../domain/order';
 import { Layout } from '../components/Layout';
+import { Input } from '../components/ui/Input';
 import Image from 'next/image';
 import { getPayPalClientConfig } from '../lib/paypal';
 import type { ShippingSettings } from '@/services/databaseShippingSettings';
@@ -99,10 +100,17 @@ export default function CheckoutPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create order');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('PayPal create order failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        throw new Error(`Failed to create order: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('PayPal order created successfully:', data.paypalOrderId);
       return data.paypalOrderId;
     } catch (error) {
       console.error('Error creating order:', error);
@@ -169,76 +177,67 @@ export default function CheckoutPage() {
 
   return (
     <Layout title="Checkout - Miguel Soro">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8" data-testid="checkout-title">
-          Finalizar compra
-        </h1>
+      <div className="space-y-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4" data-testid="checkout-title">
+            Finalizar compra
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Completa tu pedido y disfruta de arte ciclístico único
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Customer Information Form */}
-          <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg border">
-              <h2 className="text-xl font-semibold mb-4">Información de contacto</h2>
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">Información de contacto</h2>
               
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="customerEmail" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    id="customerEmail"
-                    name="customerEmail"
-                    value={formData.customerEmail}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    data-testid="customer-email"
-                  />
-                </div>
+              <div className="space-y-5">
+                <Input
+                  type="email"
+                  name="customerEmail"
+                  label="Email *"
+                  value={formData.customerEmail}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="tu@email.com"
+                  data-testid="customer-email"
+                />
+
+                <Input
+                  type="text"
+                  name="customerName"
+                  label="Nombre completo *"
+                  value={formData.customerName}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Tu nombre completo"
+                  data-testid="customer-name"
+                />
+
+                <Input
+                  type="tel"
+                  name="customerPhone"
+                  label="Teléfono"
+                  value={formData.customerPhone}
+                  onChange={handleInputChange}
+                  placeholder="+34 600 000 000"
+                  data-testid="customer-phone"
+                />
 
                 <div>
-                  <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre completo *
-                  </label>
-                  <input
-                    type="text"
-                    id="customerName"
-                    name="customerName"
-                    value={formData.customerName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    data-testid="customer-name"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="customerPhone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Teléfono
-                  </label>
-                  <input
-                    type="tel"
-                    id="customerPhone"
-                    name="customerPhone"
-                    value={formData.customerPhone}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    data-testid="customer-phone"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="shippingAddress" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="shippingAddress" className="block text-sm/6 font-medium text-gray-900 mb-2">
                     Dirección de envío
                   </label>
                   <textarea
                     id="shippingAddress"
                     name="shippingAddress"
-                    rows={3}
+                    rows={4}
                     value={formData.shippingAddress}
                     onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6 resize-none"
+                    placeholder="Calle, número, código postal, ciudad, país"
                     data-testid="shipping-address"
                   />
                 </div>
@@ -247,70 +246,79 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg border">
-              <h2 className="text-xl font-semibold mb-4">Resumen del pedido</h2>
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">Resumen del pedido</h2>
               
-              <div className="space-y-4 mb-6">
+              <div className="space-y-6 mb-10">
                 {cartState.items.map((item) => (
-                  <div key={item.variantId} className="flex items-center space-x-3" data-testid={`checkout-item-${item.variantId}`}>
+                  <div key={item.variantId} className="flex items-start space-x-4 pb-6 border-b border-gray-100 last:border-b-0 last:pb-0" data-testid={`checkout-item-${item.variantId}`}>
                     {item.imageUrl && (
-                      <div className="w-16 h-16 rounded-md overflow-hidden border">
+                      <div className="w-20 h-20 overflow-hidden flex-shrink-0">
                         <Image
                           src={item.imageUrl}
                           alt={item.title}
-                          width={64}
-                          height={64}
+                          width={80}
+                          height={80}
                           className="w-full h-full object-cover"
                         />
                       </div>
                     )}
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{item.title}</h3>
-                      <p className="text-sm text-gray-500">Cantidad: {item.quantity}</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-lg leading-tight">{item.title}</h3>
+                      <p className="text-sm text-gray-600 mt-1">Cantidad: {item.quantity}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">{formatEuros(item.price * item.quantity)}</p>
+                    <div className="text-right flex-shrink-0">
+                      <p className="font-bold text-lg text-gray-900">{formatEuros(item.price * item.quantity)}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="border-t pt-4 space-y-2">
-                <div className="flex justify-between text-sm">
+              <div className="space-y-4 pt-8 border-t border-gray-200">
+                <div className="flex justify-between text-base text-gray-600">
                   <span>Subtotal:</span>
                   <span data-testid="checkout-subtotal">{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-base text-gray-600">
                   <span>IVA (21%):</span>
                   <span data-testid="checkout-tax">{formatPrice(tax)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-base text-gray-600">
                   <span>Envío:</span>
                   <span data-testid="checkout-shipping">{formatPrice(shipping)}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold border-t pt-2">
-                  <span>Total:</span>
-                  <span data-testid="checkout-total">{formatPrice(total)}</span>
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex justify-between text-xl font-bold text-gray-900">
+                    <span>Total:</span>
+                    <span data-testid="checkout-total">{formatPrice(total)}</span>
+                  </div>
                 </div>
+                
+                {shipping === 0 && (
+                  <div className="pt-4">
+                    <p className="text-sm text-green-600 font-medium">¡Envío gratuito!</p>
+                  </div>
+                )}
               </div>
-
-              {shipping === 0 && (
-                <p className="text-sm text-green-600 mt-2">¡Envío gratuito!</p>
-              )}
             </div>
+          </div>
+        </div>
 
-            {/* PayPal Payment */}
-            <div className="bg-white p-6 rounded-lg border">
-              <h2 className="text-xl font-semibold mb-4">Pago</h2>
-              
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4" data-testid="checkout-error">
-                  <p className="text-red-800">{error}</p>
-                </div>
-              )}
+        {/* PayPal Payment - Moved to bottom for better visibility */}
+        <div className="pt-12 border-t border-gray-200 mt-12">
+          <div className="max-w-lg mx-auto text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Finalizar pago</h2>
+            <p className="text-gray-600 mb-8">Completa tu compra de forma segura con PayPal</p>
+            
+            {error && (
+              <div className="border border-red-200 p-4 mb-8 text-left" data-testid="checkout-error">
+                <p className="text-red-700 font-medium">{error}</p>
+              </div>
+            )}
 
-              {isFormValid() ? (
+            {isFormValid() ? (
+              <div>
                 <PayPalScriptProvider options={getPayPalClientConfig()}>
                   <PayPalButtons
                     disabled={isProcessing}
@@ -319,27 +327,35 @@ export default function CheckoutPage() {
                     onError={onError}
                     style={{
                       layout: 'vertical',
-                      color: 'blue',
+                      color: 'black',
                       shape: 'rect',
-                      label: 'paypal'
+                      label: 'paypal',
+                      height: 55
                     }}
                   />
                 </PayPalScriptProvider>
-              ) : (
-                <div className="text-center py-4 text-gray-500">
-                  Completa la información requerida para continuar con el pago.
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-gray-300 p-12 text-center">
+                <div className="text-gray-400 mb-4">
+                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
                 </div>
-              )}
+                <p className="text-gray-600 font-medium">
+                  Completa la información requerida para continuar con el pago
+                </p>
+              </div>
+            )}
 
-              {isProcessing && (
-                <div className="text-center py-4" data-testid="processing-indicator">
-                  <div className="inline-flex items-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
-                    <span className="ml-2">Procesando...</span>
-                  </div>
+            {isProcessing && (
+              <div className="border border-gray-200 p-6 text-center mt-8" data-testid="processing-indicator">
+                <div className="inline-flex items-center text-gray-900">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+                  <span className="ml-3 font-medium">Procesando tu pago...</span>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
