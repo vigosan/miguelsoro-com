@@ -13,20 +13,40 @@ export default async function handler(
   }
 
   try {
+    console.log('PayPal capture-order: Request received:', {
+      paypalOrderId: req.body.paypalOrderId ? 'provided' : 'missing'
+    });
+
     const { paypalOrderId } = req.body;
 
     if (!paypalOrderId) {
+      console.log('PayPal capture-order: Missing PayPal Order ID');
       return res.status(400).json({ error: 'PayPal Order ID is required' });
     }
+
+    console.log('PayPal capture-order: Capturing PayPal order:', paypalOrderId);
 
     // Capture the PayPal payment
     const { body: captureResponse } = await ordersController.captureOrder({
       id: paypalOrderId
     });
 
-    const paypalOrder = captureResponse as Order;
+    console.log('PayPal capture-order: Raw capture response:', JSON.stringify(captureResponse, null, 2));
+
+    // Parse the response if it's a string (like in create-order)
+    let paypalOrder: Order;
+    if (typeof captureResponse === 'string') {
+      paypalOrder = JSON.parse(captureResponse) as Order;
+      console.log('PayPal capture-order: Parsed JSON string response');
+    } else {
+      paypalOrder = captureResponse as Order;
+    }
+
+    console.log('PayPal capture-order: Parsed order status:', paypalOrder?.status);
+
     if (paypalOrder.status !== 'COMPLETED') {
-      return res.status(400).json({ error: 'Payment not completed' });
+      console.log('PayPal capture-order: Payment not completed, status:', paypalOrder.status);
+      return res.status(400).json({ error: 'Payment not completed', status: paypalOrder.status });
     }
 
     // Use the capture PayPal order use case
@@ -59,7 +79,11 @@ export default async function handler(
     });
 
   } catch (error) {
-    console.error('Error capturing PayPal payment:', error);
+    console.error('PayPal capture-order: Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      error: error
+    });
     res.status(500).json({ error: 'Failed to capture payment' });
   }
 }
