@@ -57,10 +57,22 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
     setIsAddingToCart(true);
     
     try {
-      // Para trabajar con nuestro sistema actual, vamos a crear un item compatible
-      // Más adelante cuando tengas ProductVariants, podrás usar el variantId real
+      // Fetch the actual variant ID from the database
+      const response = await fetch(`/api/product-variants?productId=${picture.id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch variant information');
+      }
+      
+      const variants = await response.json();
+      if (!variants || variants.length === 0) {
+        throw new Error('No variants available for this product');
+      }
+      
+      // Use the first available variant (assuming one variant per product for now)
+      const variant = variants[0];
+      
       const cartItem = {
-        variantId: `picture_${picture.id}`, // ID temporal para el sistema actual
+        variantId: variant.id, // Use the real variant ID from database
         productId: picture.id,
         title: picture.title,
         price: picture.price, // El precio ya está en euros en la DB
