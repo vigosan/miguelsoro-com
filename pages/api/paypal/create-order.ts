@@ -119,12 +119,18 @@ export default async function handler(
 
     console.log('PayPal create-order: Raw PayPal API response:', JSON.stringify(paypalOrderResponse, null, 2));
 
-    const paypalOrder = paypalOrderResponse as Order;
+    // Parse the response if it's a string
+    let paypalOrder: Order;
+    if (typeof paypalOrderResponse === 'string') {
+      paypalOrder = JSON.parse(paypalOrderResponse) as Order;
+      console.log('PayPal create-order: Parsed JSON string response');
+    } else {
+      paypalOrder = paypalOrderResponse as Order;
+    }
 
     console.log('PayPal create-order: PayPal API response received:', {
       id: paypalOrder?.id,
-      status: paypalOrder?.status,
-      fullResponse: paypalOrder
+      status: paypalOrder?.status
     });
 
     if (!paypalOrder || !paypalOrder.id) {
