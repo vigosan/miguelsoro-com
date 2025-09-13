@@ -111,17 +111,26 @@ export default async function handler(
     };
 
     console.log('PayPal create-order: Sending request to PayPal API...');
-    
+    console.log('PayPal create-order: Request payload:', JSON.stringify(paypalOrderRequest, null, 2));
+
     const { body: paypalOrderResponse } = await ordersController.createOrder({
       body: paypalOrderRequest
     });
+
+    console.log('PayPal create-order: Raw PayPal API response:', JSON.stringify(paypalOrderResponse, null, 2));
 
     const paypalOrder = paypalOrderResponse as Order;
 
     console.log('PayPal create-order: PayPal API response received:', {
       id: paypalOrder?.id,
-      status: paypalOrder?.status
+      status: paypalOrder?.status,
+      fullResponse: paypalOrder
     });
+
+    if (!paypalOrder || !paypalOrder.id) {
+      console.error('PayPal create-order: PayPal API did not return a valid order ID');
+      return res.status(500).json({ error: 'PayPal order creation failed - no order ID returned' });
+    }
 
     // Create order in database
     const order = await createOrder.execute({
@@ -129,7 +138,7 @@ export default async function handler(
       customerName,
       customerPhone,
       shippingAddress,
-      paypalOrderId: paypalOrder.id!,
+      paypalOrderId: paypalOrder.id,
       subtotal,
       tax,
       shipping,

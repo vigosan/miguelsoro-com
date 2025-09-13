@@ -204,6 +204,7 @@ export class DatabaseOrderRepository implements OrderRepository {
 
     // Create order
     const orderId = uuidv4();
+    const now = new Date().toISOString();
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -217,7 +218,9 @@ export class DatabaseOrderRepository implements OrderRepository {
         subtotal: data.subtotal,
         tax: data.tax,
         shipping: data.shipping,
-        total: data.total
+        total: data.total,
+        createdAt: now,
+        updatedAt: now
       })
       .select()
       .single();
