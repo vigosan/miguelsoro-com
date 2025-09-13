@@ -40,7 +40,7 @@ export class DatabaseOrderRepository implements OrderRepository {
                 id,
                 displayName
               ),
-              product_images!inner(
+              product_images(
                 id,
                 isPrimary,
                 url
@@ -50,7 +50,6 @@ export class DatabaseOrderRepository implements OrderRepository {
         )
       `)
       .eq('id', id)
-      .eq('product_images.isPrimary', true)
       .single();
 
     if (error) {
@@ -342,11 +341,13 @@ export class DatabaseOrderRepository implements OrderRepository {
               id: item.product_variants.products.product_types.id,
               displayName: item.product_variants.products.product_types.displayName
             } : undefined,
-            images: (item.product_variants.products.product_images || []).map((img: any) => ({
-              id: img.id,
-              isPrimary: img.isPrimary,
-              url: img.url
-            }))
+            images: (item.product_variants.products.product_images || [])
+              .filter((img: any) => img.isPrimary)
+              .map((img: any) => ({
+                id: img.id,
+                isPrimary: img.isPrimary,
+                url: img.url
+              }))
           }
         }
       }))
