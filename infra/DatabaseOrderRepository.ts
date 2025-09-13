@@ -232,8 +232,10 @@ export class DatabaseOrderRepository implements OrderRepository {
 
     // Create order items
     const orderItems = data.items.map(item => ({
+      id: uuidv4(),
       ...item,
-      orderId: order.id
+      orderId: order.id,
+      createdAt: now
     }));
 
     const { error: itemsError } = await supabase
