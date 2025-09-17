@@ -10,7 +10,8 @@ import {
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  NewspaperIcon
 } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/cn";
 
@@ -22,6 +23,7 @@ type Props = {
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: HomeIcon },
   { name: "Cuadros", href: "/admin/pictures", icon: PhotoIcon },
+  { name: "Noticias", href: "/admin/news", icon: NewspaperIcon },
   { name: "Pedidos", href: "/admin/orders", icon: ShoppingBagIcon },
   { name: "Tipos de Producto", href: "/admin/product-types", icon: Cog6ToothIcon },
   { name: "Configuración", href: "/admin/settings", icon: Cog6ToothIcon },
