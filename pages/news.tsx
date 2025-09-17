@@ -16,6 +16,43 @@ export default function NewsPage() {
         </div>
         
         <div className="max-w-4xl mx-auto space-y-6">
+          {/* Premio XXIII Certamen de Pintura de El Quite */}
+          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    Premio XXIII Certamen de Pintura de El Quite
+                  </h2>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mb-3">
+                    Septiembre 2025
+                  </span>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-4">
+                La obra &ldquo;Soy Leyenda&rdquo; de Miguel Soro ha sido galardonada con el primer premio del 
+                XXIII Certamen de Pintura de El Quite. Un reconocimiento más a su trayectoria artística 
+                que combina la pasión por el ciclismo con una técnica pictórica única.
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center text-sm text-gray-500">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                  Primer Premio
+                </div>
+                <a
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  href="https://nuevecuatrouno.com/2025/09/16/la-obra-soy-leyenda-se-hace-con-el-xxiii-certamen-de-pintura-de-el-quite/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ver noticia completa →
+                </a>
+              </div>
+            </div>
+          </div>
+
           {/* Exposición Copa del Mundo de Ciclocross 2025 - Benidorm */}
           <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
             <div className="p-6">
