@@ -26,7 +26,7 @@ export class SupabaseNewsRepository {
     };
   }
 
-  private mapNewsToDb(news: Partial<News>): any {
+  private mapNewsToDb(news: Partial<News> & { slug?: string }): any {
     const dbRecord: any = {};
     if (news.title !== undefined) dbRecord.title = news.title;
     if (news.slug !== undefined) dbRecord.slug = news.slug;
@@ -97,7 +97,8 @@ export class SupabaseNewsRepository {
   }
 
   async update(id: string, data: UpdateNewsData): Promise<News | null> {
-    const updateData = { ...data };
+    // Create update object with potential slug
+    const updateData: UpdateNewsData & { slug?: string } = { ...data };
     
     // Regenerate slug if title changed
     if (data.title) {
