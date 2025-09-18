@@ -253,9 +253,11 @@ export default function NewPicture() {
               
               {formData.imageUrl ? (
                 <div className="mb-4">
-                  <img
+                  <Image
                     src={formData.imageUrl}
                     alt={formData.title}
+                    width={600}
+                    height={192}
                     className="w-full h-48 object-cover rounded-lg border"
                   />
                 </div>

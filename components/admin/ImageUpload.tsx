@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 
@@ -126,9 +127,11 @@ export function ImageUpload({ currentImageUrl, onImageUploaded, onImageRemoved }
 
       {preview ? (
         <div className="relative">
-          <img
+          <Image
             src={preview}
             alt="Preview"
+            width={600}
+            height={192}
             className="w-full h-48 object-cover rounded-lg border"
           />
           <button
