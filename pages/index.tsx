@@ -78,7 +78,7 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
             Ex-ciclista profesional (1998-2003) • Centenares de obras de leyendas del ciclismo
           </p>
           <p className="text-base md:text-lg mb-8 opacity-70 max-w-xl mx-auto">
-            Exposiciones en 6 países • Reconocido por Forbes
+            Exposiciones en 7 países • Reconocido por Forbes
           </p>
           <button
             onClick={() => {
@@ -159,10 +159,10 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
         <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div className="text-center bg-white rounded-xl p-6 shadow-sm ring-1 ring-gray-200">
             <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-lg">6</span>
+              <span className="text-white font-bold text-lg">7</span>
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">Países</h3>
-            <p className="text-gray-600">Exposiciones internacionales en España, Italia, Francia, EEUU, Canadá y Australia</p>
+            <p className="text-gray-600">Exposiciones internacionales en España, Italia, Francia, EEUU, México, Canadá y Australia</p>
           </div>
           <div className="text-center bg-white rounded-xl p-6 shadow-sm ring-1 ring-gray-200">
             <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -238,7 +238,7 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
               <div className="w-4 h-4 bg-green-500 rounded-full border-4 border-white shadow-lg z-10 relative"></div>
               <div className="flex-1 text-left pl-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Reconocimiento Internacional</h3>
-                <p className="text-gray-600">Exposiciones en 6 países, reconocimiento de Forbes, apoyo de Giant Bicycles y centenares de obras de leyendas del ciclismo.</p>
+                <p className="text-gray-600">Exposiciones en 7 países, reconocimiento de Forbes, apoyo de Giant Bicycles y centenares de obras de leyendas del ciclismo.</p>
               </div>
             </div>
           </div>
