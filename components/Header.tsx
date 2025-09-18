@@ -2,17 +2,18 @@ import { useState } from "react";
 import Image from "next/image";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
-import { 
-  BiographyPageLink, 
-  ContactPageLink, 
-  IndexPageLink, 
-  NewsPageLink 
+import {
+  BiographyPageLink,
+  ContactPageLink,
+  IndexPageLink,
+  NewsPageLink,
+  ObraPageLink
 } from "@/components/navigation/PageLinks";
 import CartButton from "./cart/CartButton";
 
 export function Header() {
   const navigation = [
-    { name: "Obra", Link: IndexPageLink },
+    { name: "Obra", Link: ObraPageLink },
     { name: "Noticias", Link: NewsPageLink },
     { name: "Biografía", Link: BiographyPageLink },
     { name: "Contacto", Link: ContactPageLink },
