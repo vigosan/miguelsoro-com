@@ -1,4 +1,4 @@
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Layout } from "@/components/Layout";
@@ -312,7 +312,7 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<IndexPageProps> = async () => {
+export const getStaticProps: GetStaticProps<IndexPageProps> = async () => {
   try {
     const pictureRepository = new DatabasePictureRepository();
     const allPictures = await pictureRepository.findAll();
@@ -324,6 +324,8 @@ export const getServerSideProps: GetServerSideProps<IndexPageProps> = async () =
       props: {
         featuredPictures,
       },
+      // Revalidate every hour (3600 seconds)
+      revalidate: 3600,
     };
   } catch (error) {
     console.error('Error fetching data for homepage:', error);
@@ -333,6 +335,8 @@ export const getServerSideProps: GetServerSideProps<IndexPageProps> = async () =
       props: {
         featuredPictures: [],
       },
+      // On error, retry after 5 minutes
+      revalidate: 300,
     };
   }
 };
