@@ -41,6 +41,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!updatedNews) {
           return res.status(404).json({ error: 'News not found' });
         }
+        
+        // Revalidate the news page
+        try {
+          await res.revalidate('/news');
+        } catch (err) {
+          console.warn('Failed to revalidate /news:', err);
+        }
+        
         return res.status(200).json(updatedNews);
 
       case 'DELETE':
@@ -49,6 +57,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!deleted) {
           return res.status(404).json({ error: 'News not found' });
         }
+        
+        // Revalidate the news page
+        try {
+          await res.revalidate('/news');
+        } catch (err) {
+          console.warn('Failed to revalidate /news:', err);
+        }
+        
         return res.status(204).end();
 
       default:

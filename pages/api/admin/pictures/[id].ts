@@ -31,6 +31,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       
       const updatedPicture = await pictureRepository.update(id, updateData)
       
+      // Revalidate the homepage and picture detail page
+      try {
+        await res.revalidate('/')
+        if (updatedPicture.slug) {
+          await res.revalidate(`/pictures/${updatedPicture.slug}`)
+        }
+      } catch (err) {
+        console.warn('Failed to revalidate pages:', err)
+      }
+      
       return res.status(200).json(updatedPicture)
     } catch (error) {
       console.error('Error updating picture:', error)
@@ -47,6 +57,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       await pictureRepository.delete(id)
+
+      // Revalidate the homepage and picture detail page
+      try {
+        await res.revalidate('/')
+        if (picture.slug) {
+          await res.revalidate(`/pictures/${picture.slug}`)
+        }
+      } catch (err) {
+        console.warn('Failed to revalidate pages:', err)
+      }
 
       return res.status(200).json({ message: 'Picture deleted successfully' })
     } catch (error) {

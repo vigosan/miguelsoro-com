@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { GetServerSideProps } from "next";
+import { GetStaticProps, GetStaticPaths } from "next";
 import { Layout } from "@/components/Layout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatEuros } from "@/domain/order";
@@ -289,7 +289,31 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<PictureDetailProps> = async (context) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  try {
+    const pictureRepository = new DatabasePictureRepository();
+    const pictures = await pictureRepository.findAll();
+    
+    const paths = pictures.map((picture) => ({
+      params: { slug: picture.slug },
+    }));
+
+    return {
+      paths,
+      fallback: 'blocking', // Enable ISR for new pages
+    };
+  } catch (error) {
+    console.error('Error fetching pictures for static paths:', error);
+    
+    // Fallback to empty paths on error
+    return {
+      paths: [],
+      fallback: 'blocking',
+    };
+  }
+};
+
+export const getStaticProps: GetStaticProps<PictureDetailProps> = async (context) => {
   try {
     const slug = Array.isArray(context.params?.slug)
       ? context.params.slug[0]
@@ -315,11 +339,15 @@ export const getServerSideProps: GetServerSideProps<PictureDetailProps> = async 
         picture,
         slug,
       },
+      // Revalidate every hour (3600 seconds)
+      revalidate: 3600,
     };
   } catch (error) {
     console.error('Error fetching picture:', error);
     return {
       notFound: true,
+      // On error, retry after 5 minutes
+      revalidate: 300,
     };
   }
 };

@@ -19,6 +19,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Create new news item
         const createData: CreateNewsData = req.body;
         const newNews = await repository.create(createData);
+        
+        // Revalidate the news page
+        try {
+          await res.revalidate('/news');
+        } catch (err) {
+          console.warn('Failed to revalidate /news:', err);
+        }
+        
         return res.status(201).json(newNews);
 
       default:

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
@@ -69,7 +69,7 @@ export default function IndexPage({ initialPictures, availableTypes }: IndexPage
   );
 }
 
-export const getServerSideProps: GetServerSideProps<IndexPageProps> = async () => {
+export const getStaticProps: GetStaticProps<IndexPageProps> = async () => {
   try {
     const pictureRepository = new DatabasePictureRepository();
     const productTypeRepository = new DatabaseProductTypeRepository();
@@ -85,6 +85,8 @@ export const getServerSideProps: GetServerSideProps<IndexPageProps> = async () =
         initialPictures: pictures,
         availableTypes: productTypes,
       },
+      // Revalidate every hour (3600 seconds)
+      revalidate: 3600,
     };
   } catch (error) {
     console.error('Error fetching data for homepage:', error);
@@ -95,6 +97,8 @@ export const getServerSideProps: GetServerSideProps<IndexPageProps> = async () =
         initialPictures: [],
         availableTypes: [],
       },
+      // On error, retry after 5 minutes
+      revalidate: 300,
     };
   }
 };
