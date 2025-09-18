@@ -22,7 +22,7 @@ export function BiographyPageLink({
   className?: string;
 }) {
   return (
-    <Link href="/biography" className={className}>
+    <Link href="/biografia" className={className}>
       {children}
     </Link>
   );
@@ -36,7 +36,7 @@ export function ContactPageLink({
   className?: string;
 }) {
   return (
-    <Link href="/contact" className={className}>
+    <Link href="/contacto" className={className}>
       {children}
     </Link>
   );
@@ -50,7 +50,21 @@ export function NewsPageLink({
   className?: string;
 }) {
   return (
-    <Link href="/news" className={className}>
+    <Link href="/noticias" className={className}>
+      {children}
+    </Link>
+  );
+}
+
+export function ObraPageLink({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <Link href="/obra" className={className}>
       {children}
     </Link>
   );
