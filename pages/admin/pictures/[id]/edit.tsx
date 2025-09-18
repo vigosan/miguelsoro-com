@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { Toaster, toast } from "react-hot-toast";
@@ -317,9 +318,11 @@ export default function EditPicture() {
               
               {formData.imageUrl && (
                 <div className="mb-4">
-                  <img
+                  <Image
                     src={formData.imageUrl}
                     alt={formData.title}
+                    width={600}
+                    height={192}
                     className="w-full h-48 object-cover rounded-lg border"
                   />
                 </div>

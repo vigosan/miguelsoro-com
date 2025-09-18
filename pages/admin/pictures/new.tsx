@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { Toaster, toast } from "react-hot-toast";

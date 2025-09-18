@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { AdminLayout } from '../../../components/admin/AdminLayout';
 import { OrderWithDetails } from '../../../infra/OrderRepository';
 
@@ -187,9 +188,11 @@ function OrderDetails() {
             {order.items && order.items.length > 0 ? order.items.map((item) => (
               <div key={item.id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
                 {item.variant?.product?.images && item.variant.product.images.length > 0 && (
-                  <img
+                  <Image
                     src={item.variant.product.images[0].url}
                     alt={item.variant.product.title}
+                    width={64}
+                    height={64}
                     className="w-16 h-16 object-cover rounded"
                   />
                 )}

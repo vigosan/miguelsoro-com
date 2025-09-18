@@ -187,8 +187,8 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
           </svg>
 
           <blockquote className="text-2xl md:text-3xl font-light text-gray-800 leading-relaxed mb-8 italic">
-            "No quiero ser el pintor del deporte,
-            quiero ser el pintor del ciclismo."
+            &ldquo;No quiero ser el pintor del deporte,
+            quiero ser el pintor del ciclismo.&rdquo;
           </blockquote>
 
           <div className="flex items-center justify-center space-x-4">
