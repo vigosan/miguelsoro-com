@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Item } from "@/components/Item";
+import { PaintStrokes } from "@/components/PaintStrokes";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
 import { Picture } from "@/domain/picture";
@@ -12,93 +13,130 @@ interface IndexPageProps {
   featuredPictures: Picture[];
 }
 
-export default function IndexPage({ featuredPictures }: IndexPageProps) {
+// Array de quotes de Miguel Soro
+const QUOTES = [
+  {
+    text: "Decidí entrelazar mi recorrido en el ciclismo con el mundo de la pintura.",
+    context: "Sobre su transición del ciclismo al arte"
+  },
+  {
+    text: "No quiero ser el pintor del deporte, quiero ser el pintor del ciclismo.",
+    context: "Sobre su especialización artística"
+  },
+  {
+    text: "Durante las carreras absorbía cada detalle: los gestos, las emociones, la estrategia.",
+    context: "Sobre sus inspiraciones mientras corría"
+  },
+  {
+    text: "Cada pincelada lleva la emoción de haber vivido el ciclismo desde dentro.",
+    context: "Sobre su perspectiva única como ex-profesional"
+  }
+];
 
-  // Array de quotes de Miguel Soro
-  const quotes = [
-    {
-      text: "Decidí entrelazar mi recorrido en el ciclismo con el mundo de la pintura.",
-      context: "Sobre su transición del ciclismo al arte"
-    },
-    {
-      text: "No quiero ser el pintor del deporte, quiero ser el pintor del ciclismo.",
-      context: "Sobre su especialización artística"
-    },
-    {
-      text: "Durante los entrenamientos miraba a mi alrededor y me lo quedaba todo.",
-      context: "Sobre sus inspiraciones mientras corría"
-    },
-    {
-      text: "Cada pincelada lleva la emoción de haber vivido el ciclismo desde dentro.",
-      context: "Sobre su perspectiva única como ex-profesional"
-    }
-  ];
+export default function IndexPage({ featuredPictures }: IndexPageProps) {
 
   // Selección aleatoria basada en la fecha (cambia diariamente, compatible con SSR)
   const selectedQuote = useMemo(() => {
     const today = new Date();
     const seed = today.getFullYear() * 1000 + today.getMonth() * 100 + today.getDate();
-    const index = seed % quotes.length;
-    return quotes[index];
+    const index = seed % QUOTES.length;
+    return QUOTES[index];
   }, []);
 
   return (
     <>
       <WebsiteStructuredData />
+      <PaintStrokes />
       <Layout
         title="Miguel Soro - Arte Ciclístico Original | Ex-Ciclista Profesional Reconocido por Forbes"
         description="Descubre la colección única de Miguel Soro: centenares de obras de leyendas del ciclismo. Ex-profesional (1998-2003) con exposiciones internacionales en 6 países. Técnicas mixtas acrílico y collage. Reconocido por Forbes y Giant Bicycles."
         url="https://www.miguelsoro.com"
       >
-      {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] max-h-[600px] flex items-center justify-center overflow-hidden -mx-6 lg:mx-0">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "url('/estudio.webp')",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center 40%",
-          }}
-        />
+      {/* Hero Section - Minimal & Light */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-white -mx-6 lg:-mx-24">
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/25" />
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12 py-20">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-        {/* Content */}
-        <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-6 lg:px-4">
-          <h1 className="text-5xl md:text-7xl font-light mb-6 tracking-wide">
-            Miguel Soro
-          </h1>
-          <p className="text-xl md:text-2xl font-light mb-4 opacity-90">
-            Arte Ciclístico Original
-          </p>
-          <p className="text-lg md:text-xl mb-4 opacity-80 max-w-2xl mx-auto leading-relaxed">
-            Ex-ciclista profesional (1998-2003) • Centenares de obras de leyendas del ciclismo
-          </p>
-          <p className="text-base md:text-lg mb-8 opacity-70 max-w-xl mx-auto">
-            Exposiciones en 7 países • Reconocido por Forbes
-          </p>
-          <button
-            onClick={() => {
-              document.getElementById('about')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-            className="inline-block px-8 py-3 border border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all duration-300 text-sm font-medium tracking-wider uppercase"
-          >
-            Conocer más
-          </button>
-        </div>
+            {/* Left - Content */}
+            <div>
+              {/* Small label */}
+              <div className="mb-6">
+                <span className="text-sm text-gray-500 uppercase tracking-wider">El arte del ciclismo</span>
+              </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
-          <div className="animate-bounce">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
+              {/* Main Title */}
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6 leading-none tracking-tight">
+                Miguel<br />
+                Soro
+              </h1>
+
+              {/* Tagline */}
+              <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+                Del pelotón profesional al lienzo.<br />
+                Leyendas del ciclismo inmortalizadas en cada pincelada.
+              </p>
+
+              {/* Stats */}
+              <div className="flex gap-8 mb-10 pb-8 border-b border-gray-200">
+                <div>
+                  <div className="text-3xl font-bold text-gray-900 mb-1">300+</div>
+                  <div className="text-sm text-gray-500 uppercase tracking-wide">Obras</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-gray-900 mb-1">7</div>
+                  <div className="text-sm text-gray-500 uppercase tracking-wide">Países</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-gray-900 mb-1">Forbes</div>
+                  <div className="text-sm text-gray-500 uppercase tracking-wide">Prensa</div>
+                </div>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/obra"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-900 text-white font-medium hover:bg-gray-800 transition-all duration-300 cursor-pointer"
+                >
+                  Ver colección
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+
+                <button
+                  onClick={() => {
+                    document.getElementById('about')?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }}
+                  className="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-900 font-medium hover:bg-gray-50 transition-all duration-300 cursor-pointer"
+                >
+                  Su historia
+                </button>
+              </div>
+            </div>
+
+            {/* Right - Image */}
+            <div className="relative">
+              <div className="aspect-square relative rounded-lg overflow-hidden shadow-2xl">
+                <Image
+                  src="/estudio.webp"
+                  alt="Miguel Soro en su estudio"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+              {/* Floating badge */}
+              <div className="absolute -bottom-6 -left-6 bg-white px-6 py-4 shadow-xl rounded-lg border border-gray-100">
+                <div className="text-sm text-gray-500 mb-1">Ex-ciclista profesional</div>
+                <div className="text-lg font-semibold text-gray-900">1998-2003</div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
