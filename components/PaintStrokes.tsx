@@ -1,125 +1,154 @@
 import { useEffect, useState, useMemo } from 'react';
 
-interface PaintSplatter {
+interface ElegantBlob {
   id: string;
-  type: 'blob' | 'drip' | 'splatter';
-  path: string;
   x: number;
   y: number;
-  rotation: number;
   scale: number;
   opacity: number;
   delay: number;
-  color: string;
+  grayLevel: number;
+  rotation: number;
+  path: string;
+  type: 'connector' | 'accent' | 'background';
 }
+
+const GRAY_LEVELS = [
+  'rgba(0, 0, 0, 0.02)',
+  'rgba(0, 0, 0, 0.03)',
+  'rgba(0, 0, 0, 0.04)',
+  'rgba(0, 0, 0, 0.05)',
+  'rgba(0, 0, 0, 0.06)',
+  'rgba(255, 255, 255, 0.02)',
+  'rgba(255, 255, 255, 0.03)',
+];
 
 export function PaintStrokes() {
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Generar mancha simple y natural
-  const generateSimpleSplatter = (size: number) => {
-    // Solo un círculo irregular con pequeñas variaciones
-    const points = [];
-    const numPoints = 6 + Math.floor(Math.random() * 4);
+  // Generar formas blob suaves y redondeadas
+  const generateSmoothBlob = (seed: number): string => {
+    // Usar seed para que los blobs sean consistentes/estáticos
+    const random = (n: number) => {
+      const x = Math.sin(seed * n) * 10000;
+      return x - Math.floor(x);
+    };
+
+    const numPoints = 8; // Menos puntos para formas más suaves
+    const points: Array<{x: number; y: number; cp1x: number; cp1y: number; cp2x: number; cp2y: number}> = [];
 
     for (let i = 0; i < numPoints; i++) {
       const angle = (i / numPoints) * 2 * Math.PI;
-      // Variación más sutil para que se vea natural
-      const radiusVariation = 0.7 + Math.random() * 0.6;
-      const radius = size * radiusVariation;
+      const radiusVar = 0.7 + random(i) * 0.3; // Menos variación
+      const radius = 45 * radiusVar;
 
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
-      points.push(`${x},${y}`);
+      // Variaciones más suaves
+      const wiggle = (random(i + 10) - 0.5) * 8;
+      const x = 50 + Math.cos(angle) * (radius + wiggle);
+      const y = 50 + Math.sin(angle) * (radius + wiggle);
+
+      // Puntos de control para curvas Bézier suaves
+      const prevAngle = ((i - 1 + numPoints) % numPoints / numPoints) * 2 * Math.PI;
+      const nextAngle = ((i + 1) % numPoints / numPoints) * 2 * Math.PI;
+
+      const controlDistance = radius * 0.4;
+      const cp1x = x + Math.cos(prevAngle + Math.PI/2) * controlDistance * random(i + 20);
+      const cp1y = y + Math.sin(prevAngle + Math.PI/2) * controlDistance * random(i + 30);
+      const cp2x = x + Math.cos(nextAngle - Math.PI/2) * controlDistance * random(i + 40);
+      const cp2y = y + Math.sin(nextAngle - Math.PI/2) * controlDistance * random(i + 50);
+
+      points.push({ x, y, cp1x, cp1y, cp2x, cp2y });
     }
 
-    // Crear path suave
-    let path = `M ${points[0]}`;
-    for (let i = 1; i < points.length; i++) {
-      const nextIndex = (i + 1) % points.length;
-      const controlX = (parseFloat(points[i].split(',')[0]) + parseFloat(points[nextIndex].split(',')[0])) / 2;
-      const controlY = (parseFloat(points[i].split(',')[1]) + parseFloat(points[nextIndex].split(',')[1])) / 2;
-      path += ` Q ${points[i]} ${controlX},${controlY}`;
-    }
-    path += ` Q ${points[0]} ${points[0]} Z`;
+    // Crear path con curvas Bézier cúbicas para máxima suavidad
+    let path = `M ${points[0].x} ${points[0].y}`;
 
+    for (let i = 0; i < numPoints; i++) {
+      const current = points[i];
+      const next = points[(i + 1) % numPoints];
+
+      path += ` C ${current.cp2x} ${current.cp2y} ${next.cp1x} ${next.cp1y} ${next.x} ${next.y}`;
+    }
+
+    path += ' Z';
     return path;
   };
 
-  // Generar mancha tipo "gota derramada"
-  const generateBlobSplatter = (size: number) => {
-    // Forma más orgánica como una gota que se ha extendido
-    const baseRadius = size;
-    let path = '';
+  // Generar blobs elegantes estáticos
+  const elegantBlobs = useMemo(() => {
+    const blobs: ElegantBlob[] = [];
 
-    // Crear forma base irregular
-    const segments = [];
-    const numSegments = 8;
+    // Posiciones fijas para blobs de fondo
+    const backgroundPositions = [
+      { x: 15, y: 25, scale: 2.5, rotation: 15 },
+      { x: 75, y: 55, scale: 3.2, rotation: 45 },
+      { x: 35, y: 80, scale: 2.8, rotation: 120 }
+    ];
 
-    for (let i = 0; i < numSegments; i++) {
-      const angle = (i / numSegments) * 2 * Math.PI;
-      const radiusVar = 0.6 + Math.random() * 0.8; // Más variación
-      const radius = baseRadius * radiusVar;
-
-      // Añadir pequeñas "protuberancias" ocasionales
-      const hasProtrusion = Math.random() < 0.3;
-      const protrusionFactor = hasProtrusion ? 1.3 + Math.random() * 0.7 : 1;
-
-      const x = Math.cos(angle) * radius * protrusionFactor;
-      const y = Math.sin(angle) * radius * protrusionFactor;
-      segments.push(`${x},${y}`);
-    }
-
-    path = `M ${segments[0]}`;
-    for (let i = 1; i < segments.length; i++) {
-      path += ` L ${segments[i]}`;
-    }
-    path += ` Z`;
-
-    return path;
-  };
-
-  // Generar manchas simples y naturales
-  const paintSplatters = useMemo(() => {
-    const splatters: PaintSplatter[] = [];
-    const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
-
-    // Manchas pequeñas y simples
-    for (let i = 0; i < 5; i++) {
-      const size = 4 + Math.random() * 6;
-      splatters.push({
-        id: `simple-${i}`,
-        type: 'splatter',
-        path: generateSimpleSplatter(size),
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        rotation: Math.random() * 360,
-        scale: 1,
-        opacity: 0.03 + Math.random() * 0.04,
-        delay: i * 800,
-        color: colors[Math.floor(Math.random() * colors.length)],
+    backgroundPositions.forEach((pos, i) => {
+      blobs.push({
+        id: `background-${i}`,
+        x: pos.x,
+        y: pos.y,
+        scale: pos.scale,
+        opacity: 1,
+        delay: i * 1500,
+        grayLevel: i % 3, // Usar los primeros 3 grises
+        rotation: pos.rotation,
+        path: generateSmoothBlob(100 + i), // Seed fijo
+        type: 'background'
       });
-    }
+    });
 
-    // Manchas tipo "gota derramada"
-    for (let i = 0; i < 3; i++) {
-      const size = 6 + Math.random() * 8;
-      splatters.push({
-        id: `blob-${i}`,
-        type: 'blob',
-        path: generateBlobSplatter(size),
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        rotation: Math.random() * 360,
-        scale: 1,
-        opacity: 0.02 + Math.random() * 0.03,
-        delay: (i + 5) * 1000,
-        color: colors[Math.floor(Math.random() * colors.length)],
+    // Posiciones fijas para conectores
+    const connectorPositions = [
+      { x: 85, y: 15, scale: 1.2, rotation: 30 },
+      { x: 10, y: 45, scale: 1.5, rotation: 75 },
+      { x: 90, y: 75, scale: 1.3, rotation: 160 },
+      { x: 5, y: 85, scale: 1.1, rotation: 200 }
+    ];
+
+    connectorPositions.forEach((pos, i) => {
+      blobs.push({
+        id: `connector-${i}`,
+        x: pos.x,
+        y: pos.y,
+        scale: pos.scale,
+        opacity: 1,
+        delay: 800 + i * 1200,
+        grayLevel: (i + 3) % GRAY_LEVELS.length,
+        rotation: pos.rotation,
+        path: generateSmoothBlob(200 + i), // Seed fijo
+        type: 'connector'
       });
-    }
+    });
 
-    return splatters;
+    // Posiciones fijas para acentos
+    const accentPositions = [
+      { x: 25, y: 10, scale: 0.6, rotation: 0 },
+      { x: 65, y: 30, scale: 0.8, rotation: 90 },
+      { x: 20, y: 60, scale: 0.5, rotation: 180 },
+      { x: 80, y: 40, scale: 0.7, rotation: 270 },
+      { x: 50, y: 95, scale: 0.6, rotation: 45 }
+    ];
+
+    accentPositions.forEach((pos, i) => {
+      blobs.push({
+        id: `accent-${i}`,
+        x: pos.x,
+        y: pos.y,
+        scale: pos.scale,
+        opacity: 1,
+        delay: 400 + i * 600,
+        grayLevel: (i + 5) % GRAY_LEVELS.length,
+        rotation: pos.rotation,
+        path: generateSmoothBlob(300 + i), // Seed fijo
+        type: 'accent'
+      });
+    });
+
+    return blobs;
   }, []);
 
   // Manejar scroll
@@ -128,10 +157,8 @@ export function PaintStrokes() {
       const scrolled = window.scrollY;
       setScrollY(scrolled);
 
-      // Activar después de hacer scroll
-      if (scrolled > 50) {
-        setIsVisible(true);
-      }
+      // Activar inmediatamente
+      setIsVisible(true);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -140,12 +167,8 @@ export function PaintStrokes() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (!isVisible) {
-    return null;
-  }
-
-  // Calcular qué trazos deben estar visibles basado en scroll
-  const maxScroll = 800;
+  // Calcular progreso de scroll para animaciones
+  const maxScroll = 1200;
   const scrollProgress = Math.min(scrollY / maxScroll, 1);
 
   return (
@@ -154,65 +177,43 @@ export function PaintStrokes() {
         className="w-full h-full"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        style={{ mixBlendMode: 'multiply' }}
+        style={{ mixBlendMode: 'normal' }}
       >
         <defs>
-          {/* Filtro para textura de pintura más realista */}
-          <filter id="paint-texture" x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence
-              baseFrequency="0.8"
-              numOctaves="3"
-              stitchTiles="stitch"
-            />
-            <feDisplacementMap in="SourceGraphic" scale="0.4" />
-            <feGaussianBlur stdDeviation="0.1" />
-          </filter>
-
-          {/* Filtro especial para salpicaduras */}
-          <filter id="splatter-texture" x="-100%" y="-100%" width="300%" height="300%">
-            <feTurbulence
-              baseFrequency="1.2"
-              numOctaves="2"
-              stitchTiles="stitch"
-            />
-            <feDisplacementMap in="SourceGraphic" scale="0.6" />
+          {/* Filtro para suavizar bordes */}
+          <filter id="blur-filter" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" />
           </filter>
         </defs>
 
-        {paintSplatters.map((splatter, index) => {
-          const shouldBeVisible = scrollProgress > (index / paintSplatters.length);
-          const elementOpacity = shouldBeVisible
-            ? splatter.opacity * Math.min((scrollProgress - (index / paintSplatters.length)) * 2, 1)
-            : 0;
+        {elegantBlobs.map((blob, index) => {
+          // Calcular visibilidad basada en tipo y scroll
+          let visibilityFactor = 1;
+          if (blob.type === 'background') {
+            visibilityFactor = Math.min(scrollProgress * 1.5, 1);
+          } else if (blob.type === 'connector') {
+            const sectionProgress = (scrollProgress - 0.3) * 2;
+            visibilityFactor = Math.max(0, Math.min(sectionProgress, 1));
+          } else {
+            const accentProgress = (scrollProgress - 0.6) * 2.5;
+            visibilityFactor = Math.max(0, Math.min(accentProgress, 1));
+          }
+
+          const finalOpacity = blob.opacity * visibilityFactor;
 
           return (
-            <g key={splatter.id}>
+            <g key={blob.id}>
               <path
-                d={splatter.path}
-                fill={splatter.color}
-                opacity={elementOpacity}
-                transform={`translate(${splatter.x}, ${splatter.y}) rotate(${splatter.rotation}) scale(${splatter.scale})`}
-                filter={splatter.type === 'splatter' ? "url(#splatter-texture)" : "url(#paint-texture)"}
+                d={blob.path}
+                fill={GRAY_LEVELS[blob.grayLevel]}
+                opacity={finalOpacity}
+                filter="url(#blur-filter)"
+                transform={`translate(${blob.x}, ${blob.y}) scale(${blob.scale}) rotate(${blob.rotation})`}
                 className="transition-opacity duration-3000 ease-out"
                 style={{
-                  transitionDelay: `${splatter.delay}ms`,
+                  transitionDelay: `${blob.delay}ms`,
                 }}
               />
-
-              {/* Sombra sutil para dar profundidad */}
-              {splatter.type === 'blob' && (
-                <path
-                  d={splatter.path}
-                  fill={splatter.color}
-                  opacity={elementOpacity * 0.3}
-                  transform={`translate(${splatter.x + 0.2}, ${splatter.y + 0.2}) rotate(${splatter.rotation}) scale(${splatter.scale * 1.1})`}
-                  filter="url(#paint-texture)"
-                  className="transition-opacity duration-3000 ease-out"
-                  style={{
-                    transitionDelay: `${splatter.delay + 200}ms`,
-                  }}
-                />
-              )}
             </g>
           );
         })}
