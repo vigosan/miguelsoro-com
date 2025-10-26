@@ -1,5 +1,8 @@
 import { Fragment } from "react";
-import { ContactPageLink, TermsPageLink } from "@/components/navigation/PageLinks";
+import {
+  ContactPageLink,
+  TermsPageLink,
+} from "@/components/navigation/PageLinks";
 import { cn } from "@/utils/cn";
 
 const navigation = [

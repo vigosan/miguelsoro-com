@@ -10,13 +10,14 @@ export class DatabasePictureRepository implements PictureRepository {
   async findAll(filters?: {
     productType?: string;
     inStock?: boolean;
-    status?: 'AVAILABLE' | 'NOT_AVAILABLE';
+    status?: "AVAILABLE" | "NOT_AVAILABLE";
   }): Promise<Picture[]> {
     const supabase = this.getClient();
-    
+
     let query = supabase
-      .from('products')
-      .select(`
+      .from("products")
+      .select(
+        `
         *,
         product_images!inner(
           url,
@@ -31,30 +32,32 @@ export class DatabasePictureRepository implements PictureRepository {
           price,
           stock
         )
-      `)
-      .eq('isActive', true)
-      .eq('product_images.isPrimary', true);
+      `,
+      )
+      .eq("isActive", true)
+      .eq("product_images.isPrimary", true);
 
     // Filter by product type
     if (filters?.productType) {
-      query = query.eq('product_types.displayName', filters.productType);
+      query = query.eq("product_types.displayName", filters.productType);
     }
 
-    const { data: products, error } = await query
-      .order('createdAt', { ascending: false });
+    const { data: products, error } = await query.order("createdAt", {
+      ascending: false,
+    });
 
     if (error) {
-      console.error('Error fetching pictures:', error);
+      console.error("Error fetching pictures:", error);
       throw new Error(`Failed to fetch pictures: ${error.message}`);
     }
 
     if (!products) return [];
 
-    let results = products.map(product => this.mapToDomainPicture(product));
+    let results = products.map((product) => this.mapToDomainPicture(product));
 
     // Filter by stock availability (client-side filter)
     if (filters?.inStock !== undefined) {
-      results = results.filter(picture => {
+      results = results.filter((picture) => {
         if (filters.inStock) {
           return picture.stock > 0;
         } else {
@@ -65,7 +68,9 @@ export class DatabasePictureRepository implements PictureRepository {
 
     // Filter by status (client-side filter)
     if (filters?.status) {
-      results = results.filter(picture => getPictureStatus(picture) === filters.status);
+      results = results.filter(
+        (picture) => getPictureStatus(picture) === filters.status,
+      );
     }
 
     return results;
@@ -73,10 +78,11 @@ export class DatabasePictureRepository implements PictureRepository {
 
   async getPictureBySlug(slug: string): Promise<Picture | undefined> {
     const supabase = this.getClient();
-    
+
     const { data: product, error } = await supabase
-      .from('products')
-      .select(`
+      .from("products")
+      .select(
+        `
         *,
         product_images!inner(
           url,
@@ -91,17 +97,18 @@ export class DatabasePictureRepository implements PictureRepository {
           price,
           stock
         )
-      `)
-      .eq('slug', slug)
-      .eq('product_images.isPrimary', true)
+      `,
+      )
+      .eq("slug", slug)
+      .eq("product_images.isPrimary", true)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         // No rows returned
         return undefined;
       }
-      console.error('Error fetching picture by slug:', error);
+      console.error("Error fetching picture by slug:", error);
       throw new Error(`Failed to fetch picture: ${error.message}`);
     }
 
@@ -110,10 +117,11 @@ export class DatabasePictureRepository implements PictureRepository {
 
   async getPictureById(id: string): Promise<Picture | undefined> {
     const supabase = this.getClient();
-    
+
     const { data: product, error } = await supabase
-      .from('products')
-      .select(`
+      .from("products")
+      .select(
+        `
         *,
         product_images!inner(
           url,
@@ -128,17 +136,18 @@ export class DatabasePictureRepository implements PictureRepository {
           price,
           stock
         )
-      `)
-      .eq('id', id)
-      .eq('product_images.isPrimary', true)
+      `,
+      )
+      .eq("id", id)
+      .eq("product_images.isPrimary", true)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         // No rows returned
         return undefined;
       }
-      console.error('Error fetching picture by id:', error);
+      console.error("Error fetching picture by id:", error);
       throw new Error(`Failed to fetch picture: ${error.message}`);
     }
 
@@ -148,34 +157,40 @@ export class DatabasePictureRepository implements PictureRepository {
   private mapToDomainPicture(dbProduct: any): Picture {
     const variant = dbProduct.product_variants?.[0];
     const image = dbProduct.product_images?.[0];
-    
+
     const priceInCents = variant ? variant.price : dbProduct.basePrice;
     const priceInEuros = priceInCents ? priceInCents / 100 : 0; // Convert cents to euros
 
     return {
       id: dbProduct.id,
       title: dbProduct.title,
-      description: dbProduct.description || '',
+      description: dbProduct.description || "",
       price: priceInEuros, // Price in euros
-      size: this.extractSizeFromTitle(dbProduct.title) || '120x90', // Default size
+      size: this.extractSizeFromTitle(dbProduct.title) || "120x90", // Default size
       slug: dbProduct.slug,
       imageUrl: image ? image.url : `/pictures/${dbProduct.id}.webp`, // Fallback to convention
       productTypeId: dbProduct.productTypeId,
-      productTypeName: dbProduct.product_types?.displayName || 'Cuadros Originales',
+      productTypeName:
+        dbProduct.product_types?.displayName || "Cuadros Originales",
       stock: variant ? variant.stock : 1,
       createdAt: dbProduct.createdAt,
-      updatedAt: dbProduct.updatedAt
+      updatedAt: dbProduct.updatedAt,
     };
   }
 
-  async create(pictureData: Omit<Picture, 'id' | 'createdAt' | 'updatedAt'>): Promise<Picture> {
-    throw new Error('Picture creation not implemented yet - requires complex Product/Variant creation');
+  async create(
+    pictureData: Omit<Picture, "id" | "createdAt" | "updatedAt">,
+  ): Promise<Picture> {
+    throw new Error(
+      "Picture creation not implemented yet - requires complex Product/Variant creation",
+    );
   }
 
   async update(id: string, pictureData: any): Promise<Picture> {
     const supabase = this.getClient();
-    const { title, description, price, slug, stock, productTypeId, imageUrl } = pictureData;
-    
+    const { title, description, price, slug, stock, productTypeId, imageUrl } =
+      pictureData;
+
     // Update product
     const productUpdateData: any = {};
     if (title) productUpdateData.title = title;
@@ -186,12 +201,12 @@ export class DatabasePictureRepository implements PictureRepository {
 
     if (Object.keys(productUpdateData).length > 0) {
       const { error } = await supabase
-        .from('products')
+        .from("products")
         .update(productUpdateData)
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) {
-        console.error('Error updating product:', error);
+        console.error("Error updating product:", error);
         throw new Error(`Failed to update product: ${error.message}`);
       }
     }
@@ -200,34 +215,32 @@ export class DatabasePictureRepository implements PictureRepository {
     if (imageUrl) {
       // First, check for existing primary image
       const { data: existingImage } = await supabase
-        .from('product_images')
-        .select('id')
-        .eq('productId', id)
-        .eq('isPrimary', true)
+        .from("product_images")
+        .select("id")
+        .eq("productId", id)
+        .eq("isPrimary", true)
         .single();
 
       if (existingImage) {
         const { error } = await supabase
-          .from('product_images')
+          .from("product_images")
           .update({ url: imageUrl })
-          .eq('id', existingImage.id);
+          .eq("id", existingImage.id);
 
         if (error) {
-          console.error('Error updating product image:', error);
+          console.error("Error updating product image:", error);
           throw new Error(`Failed to update image: ${error.message}`);
         }
       } else {
-        const { error } = await supabase
-          .from('product_images')
-          .insert({
-            productId: id,
-            url: imageUrl,
-            isPrimary: true,
-            sortOrder: 0
-          });
+        const { error } = await supabase.from("product_images").insert({
+          productId: id,
+          url: imageUrl,
+          isPrimary: true,
+          sortOrder: 0,
+        });
 
         if (error) {
-          console.error('Error creating product image:', error);
+          console.error("Error creating product image:", error);
           throw new Error(`Failed to create image: ${error.message}`);
         }
       }
@@ -240,12 +253,12 @@ export class DatabasePictureRepository implements PictureRepository {
 
     if (Object.keys(variantUpdateData).length > 0) {
       const { error } = await supabase
-        .from('product_variants')
+        .from("product_variants")
         .update(variantUpdateData)
-        .eq('productId', id);
+        .eq("productId", id);
 
       if (error) {
-        console.error('Error updating product variant:', error);
+        console.error("Error updating product variant:", error);
         throw new Error(`Failed to update variant: ${error.message}`);
       }
     }
@@ -253,22 +266,19 @@ export class DatabasePictureRepository implements PictureRepository {
     // Return updated picture
     const updatedPicture = await this.getPictureById(id);
     if (!updatedPicture) {
-      throw new Error('Picture not found after update');
+      throw new Error("Picture not found after update");
     }
-    
+
     return updatedPicture;
   }
 
   async delete(id: string): Promise<void> {
     const supabase = this.getClient();
-    
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .eq('id', id);
+
+    const { error } = await supabase.from("products").delete().eq("id", id);
 
     if (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
       throw new Error(`Failed to delete product: ${error.message}`);
     }
   }

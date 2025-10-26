@@ -12,7 +12,8 @@ type GeneralSettings = {
 
 const defaultSettings: GeneralSettings = {
   siteName: "Miguel Soro - Arte Ciclista",
-  siteDescription: "Obras de arte originales inspiradas en el mundo del ciclismo",
+  siteDescription:
+    "Obras de arte originales inspiradas en el mundo del ciclismo",
   contactEmail: "info@miguelsoro.com",
 };
 
@@ -23,10 +24,10 @@ export default function GeneralSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Configuración guardada correctamente');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast.success("Configuración guardada correctamente");
     } catch (error) {
-      toast.error('Error al guardar la configuración');
+      toast.error("Error al guardar la configuración");
     } finally {
       setSaving(false);
     }
@@ -43,23 +44,29 @@ export default function GeneralSettings() {
             label="Nombre del sitio *"
             type="text"
             value={settings.siteName}
-            onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
+            onChange={(e) =>
+              setSettings({ ...settings, siteName: e.target.value })
+            }
           />
           <Textarea
             label="Descripción del sitio *"
             value={settings.siteDescription}
-            onChange={(e) => setSettings({ ...settings, siteDescription: e.target.value })}
+            onChange={(e) =>
+              setSettings({ ...settings, siteDescription: e.target.value })
+            }
             rows={3}
           />
           <Input
             label="Email de contacto *"
             type="email"
             value={settings.contactEmail}
-            onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
+            onChange={(e) =>
+              setSettings({ ...settings, contactEmail: e.target.value })
+            }
           />
         </div>
       </div>
-      
+
       <div className="px-4 sm:px-6 py-3 bg-gray-50 border-t border-gray-200">
         <div className="flex justify-end">
           <button
@@ -67,11 +74,11 @@ export default function GeneralSettings() {
             disabled={saving}
             className="w-full sm:w-auto px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
           >
-            {saving ? 'Guardando...' : 'Guardar Cambios'}
+            {saving ? "Guardando..." : "Guardar Cambios"}
           </button>
         </div>
       </div>
-      
+
       <Toaster position="top-right" />
     </SettingsLayout>
   );

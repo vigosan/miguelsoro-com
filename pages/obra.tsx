@@ -14,22 +14,30 @@ interface ObraPageProps {
   availableTypes: ProductType[];
 }
 
-export default function ObraPage({ initialPictures, availableTypes }: ObraPageProps) {
+export default function ObraPage({
+  initialPictures,
+  availableTypes,
+}: ObraPageProps) {
   const [pictures, setPictures] = useState<Picture[]>(initialPictures);
   const [filters, setFilters] = useState({
-    productType: '',
-    status: ''
+    productType: "",
+    status: "",
   });
 
   // Client-side filtering
   const filteredPictures = pictures.filter((picture) => {
-    if (filters.productType && !picture.productTypeName.toLowerCase().includes(filters.productType.toLowerCase())) {
+    if (
+      filters.productType &&
+      !picture.productTypeName
+        .toLowerCase()
+        .includes(filters.productType.toLowerCase())
+    ) {
       return false;
     }
-    if (filters.status === 'AVAILABLE' && picture.stock <= 0) {
+    if (filters.status === "AVAILABLE" && picture.stock <= 0) {
       return false;
     }
-    if (filters.status === 'NOT_AVAILABLE' && picture.stock > 0) {
+    if (filters.status === "NOT_AVAILABLE" && picture.stock > 0) {
       return false;
     }
     return true;
@@ -45,19 +53,18 @@ export default function ObraPage({ initialPictures, availableTypes }: ObraPagePr
       >
         <div className="space-y-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Obra
-            </h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Obra</h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Colección de obras de arte inspiradas en el mundo del ciclismo.
-              Cada pieza captura la emoción y la pasión del deporte sobre ruedas.
+              Cada pieza captura la emoción y la pasión del deporte sobre
+              ruedas.
             </p>
           </div>
 
           <Filters
             filters={filters}
             onFiltersChange={setFilters}
-            availableTypes={availableTypes.map(type => type.displayName)}
+            availableTypes={availableTypes.map((type) => type.displayName)}
             resultCount={filteredPictures.length}
           />
 
@@ -68,7 +75,9 @@ export default function ObraPage({ initialPictures, availableTypes }: ObraPagePr
   );
 }
 
-export const getServerSideProps: GetServerSideProps<ObraPageProps> = async () => {
+export const getServerSideProps: GetServerSideProps<
+  ObraPageProps
+> = async () => {
   try {
     const pictureRepository = new DatabasePictureRepository();
     const productTypeRepository = new DatabaseProductTypeRepository();
@@ -76,7 +85,7 @@ export const getServerSideProps: GetServerSideProps<ObraPageProps> = async () =>
     // Fetch pictures and product types in parallel
     const [pictures, productTypes] = await Promise.all([
       pictureRepository.findAll(),
-      productTypeRepository.findAll()
+      productTypeRepository.findAll(),
     ]);
 
     return {
@@ -86,7 +95,7 @@ export const getServerSideProps: GetServerSideProps<ObraPageProps> = async () =>
       },
     };
   } catch (error) {
-    console.error('Error fetching data for obra page:', error);
+    console.error("Error fetching data for obra page:", error);
 
     // Return empty arrays as fallback
     return {

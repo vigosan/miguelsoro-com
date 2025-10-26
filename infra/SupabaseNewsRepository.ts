@@ -1,5 +1,10 @@
-import { News, CreateNewsData, UpdateNewsData, generateSlug } from '@/domain/news';
-import { createClient } from '@supabase/supabase-js';
+import {
+  News,
+  CreateNewsData,
+  UpdateNewsData,
+  generateSlug,
+} from "@/domain/news";
+import { createClient } from "@supabase/supabase-js";
 
 export class SupabaseNewsRepository {
   private supabase;
@@ -22,7 +27,7 @@ export class SupabaseNewsRepository {
       externalUrl: dbRecord.external_url,
       published: dbRecord.published,
       createdAt: dbRecord.created_at,
-      updatedAt: dbRecord.updated_at
+      updatedAt: dbRecord.updated_at,
     };
   }
 
@@ -34,16 +39,17 @@ export class SupabaseNewsRepository {
     if (news.type !== undefined) dbRecord.type = news.type;
     if (news.date !== undefined) dbRecord.date = news.date;
     if (news.location !== undefined) dbRecord.location = news.location;
-    if (news.externalUrl !== undefined) dbRecord.external_url = news.externalUrl;
+    if (news.externalUrl !== undefined)
+      dbRecord.external_url = news.externalUrl;
     if (news.published !== undefined) dbRecord.published = news.published;
     return dbRecord;
   }
 
   async findAll(): Promise<News[]> {
     const { data, error } = await this.supabase
-      .from('news')
-      .select('*')
-      .order('date', { ascending: false });
+      .from("news")
+      .select("*")
+      .order("date", { ascending: false });
 
     if (error) throw new Error(error.message);
     return (data || []).map(this.mapDbToNews);
@@ -51,32 +57,32 @@ export class SupabaseNewsRepository {
 
   async findById(id: string): Promise<News | null> {
     const { data, error } = await this.supabase
-      .from('news')
-      .select('*')
-      .eq('id', id)
+      .from("news")
+      .select("*")
+      .eq("id", id)
       .single();
 
-    if (error && error.code !== 'PGRST116') throw new Error(error.message);
+    if (error && error.code !== "PGRST116") throw new Error(error.message);
     return data ? this.mapDbToNews(data) : null;
   }
 
   async findBySlug(slug: string): Promise<News | null> {
     const { data, error } = await this.supabase
-      .from('news')
-      .select('*')
-      .eq('slug', slug)
+      .from("news")
+      .select("*")
+      .eq("slug", slug)
       .single();
 
-    if (error && error.code !== 'PGRST116') throw new Error(error.message);
+    if (error && error.code !== "PGRST116") throw new Error(error.message);
     return data ? this.mapDbToNews(data) : null;
   }
 
   async findPublished(): Promise<News[]> {
     const { data, error } = await this.supabase
-      .from('news')
-      .select('*')
-      .eq('published', true)
-      .order('date', { ascending: false });
+      .from("news")
+      .select("*")
+      .eq("published", true)
+      .order("date", { ascending: false });
 
     if (error) throw new Error(error.message);
     return (data || []).map(this.mapDbToNews);
@@ -85,9 +91,9 @@ export class SupabaseNewsRepository {
   async create(data: CreateNewsData): Promise<News> {
     const slug = generateSlug(data.title);
     const dbData = this.mapNewsToDb({ ...data, slug });
-    
+
     const { data: news, error } = await this.supabase
-      .from('news')
+      .from("news")
       .insert(dbData)
       .select()
       .single();
@@ -99,38 +105,35 @@ export class SupabaseNewsRepository {
   async update(id: string, data: UpdateNewsData): Promise<News | null> {
     // Create update object with potential slug
     const updateData: UpdateNewsData & { slug?: string } = { ...data };
-    
+
     // Regenerate slug if title changed
     if (data.title) {
       updateData.slug = generateSlug(data.title);
     }
-    
+
     // Map to database format
     const dbData = this.mapNewsToDb(updateData);
 
-    console.log('Supabase update data:', dbData);
-    console.log('Supabase update ID:', id);
+    console.log("Supabase update data:", dbData);
+    console.log("Supabase update ID:", id);
 
     const { data: news, error } = await this.supabase
-      .from('news')
+      .from("news")
       .update(dbData)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      console.error('Supabase update error:', error);
+      console.error("Supabase update error:", error);
       throw new Error(`Update failed: ${error.message} (code: ${error.code})`);
     }
-    
+
     return news ? this.mapDbToNews(news) : null;
   }
 
   async delete(id: string): Promise<boolean> {
-    const { error } = await this.supabase
-      .from('news')
-      .delete()
-      .eq('id', id);
+    const { error } = await this.supabase.from("news").delete().eq("id", id);
 
     if (error) throw new Error(error.message);
     return true;

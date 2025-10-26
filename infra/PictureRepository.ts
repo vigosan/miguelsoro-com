@@ -6,11 +6,13 @@ export interface PictureRepository {
   findAll(filters?: {
     productType?: string;
     inStock?: boolean;
-    status?: 'AVAILABLE' | 'NOT_AVAILABLE';
+    status?: "AVAILABLE" | "NOT_AVAILABLE";
   }): Promise<Picture[]>;
   getPictureBySlug(slug: string): Promise<Picture | undefined>;
   getPictureById(id: string): Promise<Picture | undefined>;
-  create(pictureData: Omit<Picture, 'id' | 'createdAt' | 'updatedAt'>): Promise<Picture>;
+  create(
+    pictureData: Omit<Picture, "id" | "createdAt" | "updatedAt">,
+  ): Promise<Picture>;
   update(id: string, pictureData: Partial<Picture>): Promise<Picture>;
   delete(id: string): Promise<void>;
 }
@@ -26,20 +28,22 @@ export class InMemoryPictureRepository implements PictureRepository {
   async findAll(filters?: {
     productType?: string;
     inStock?: boolean;
-    status?: 'AVAILABLE' | 'NOT_AVAILABLE';
+    status?: "AVAILABLE" | "NOT_AVAILABLE";
   }): Promise<Picture[]> {
     let results = [...this.pictures];
 
     // Filter by product type
     if (filters?.productType) {
-      results = results.filter(picture => 
-        picture.productTypeName.toLowerCase().includes(filters.productType!.toLowerCase())
+      results = results.filter((picture) =>
+        picture.productTypeName
+          .toLowerCase()
+          .includes(filters.productType!.toLowerCase()),
       );
     }
 
     // Filter by stock availability
     if (filters?.inStock !== undefined) {
-      results = results.filter(picture => {
+      results = results.filter((picture) => {
         if (filters.inStock) {
           return picture.stock > 0;
         } else {
@@ -50,7 +54,9 @@ export class InMemoryPictureRepository implements PictureRepository {
 
     // Filter by status
     if (filters?.status) {
-      results = results.filter(picture => getPictureStatus(picture) === filters.status);
+      results = results.filter(
+        (picture) => getPictureStatus(picture) === filters.status,
+      );
     }
 
     return results;
@@ -64,15 +70,17 @@ export class InMemoryPictureRepository implements PictureRepository {
     return this.pictures.find((picture) => picture.id === id);
   }
 
-  async create(pictureData: Omit<Picture, 'id' | 'createdAt' | 'updatedAt'>): Promise<Picture> {
-    throw new Error('Create not implemented in InMemoryPictureRepository');
+  async create(
+    pictureData: Omit<Picture, "id" | "createdAt" | "updatedAt">,
+  ): Promise<Picture> {
+    throw new Error("Create not implemented in InMemoryPictureRepository");
   }
 
   async update(id: string, pictureData: Partial<Picture>): Promise<Picture> {
-    throw new Error('Update not implemented in InMemoryPictureRepository');
+    throw new Error("Update not implemented in InMemoryPictureRepository");
   }
 
   async delete(id: string): Promise<void> {
-    throw new Error('Delete not implemented in InMemoryPictureRepository');
+    throw new Error("Delete not implemented in InMemoryPictureRepository");
   }
 }

@@ -1,25 +1,25 @@
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/router';
-import Head from 'next/head';
-import { LockClosedIcon } from '@heroicons/react/24/solid';
-import PasswordInput from '@/components/PasswordInput';
+import { useState, FormEvent } from "react";
+import { useRouter } from "next/router";
+import Head from "next/head";
+import { LockClosedIcon } from "@heroicons/react/24/solid";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function AdminLogin() {
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const response = await fetch('/api/admin/auth', {
-        method: 'POST',
+      const response = await fetch("/api/admin/auth", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ password }),
       });
@@ -28,12 +28,12 @@ export default function AdminLogin() {
 
       if (response.ok) {
         // Successful login - redirect to admin dashboard
-        router.push('/admin');
+        router.push("/admin");
       } else {
-        setError(data.error || 'Authentication failed');
+        setError(data.error || "Authentication failed");
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -45,7 +45,7 @@ export default function AdminLogin() {
         <title>Admin Login - Miguel Soro</title>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      
+
       <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="mx-auto w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center">
@@ -76,7 +76,10 @@ export default function AdminLogin() {
               </div>
 
               {error && (
-                <div className="rounded-md bg-red-50 p-4" data-testid="error-message">
+                <div
+                  className="rounded-md bg-red-50 p-4"
+                  data-testid="error-message"
+                >
                   <div className="text-sm text-red-800">{error}</div>
                 </div>
               )}
@@ -88,7 +91,7 @@ export default function AdminLogin() {
                   className="flex w-full justify-center rounded-md bg-gray-900 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   data-testid="login-button"
                 >
-                  {loading ? 'Authenticating...' : 'Sign in'}
+                  {loading ? "Authenticating..." : "Sign in"}
                 </button>
               </div>
             </form>

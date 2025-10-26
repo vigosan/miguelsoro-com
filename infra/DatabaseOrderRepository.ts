@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/utils/supabase/server';
+import { createAdminClient } from "@/utils/supabase/server";
 import {
   OrderRepository,
   OrderWithDetails,
@@ -6,9 +6,9 @@ import {
   OrderStats,
   CreateOrderData,
   ProductVariantRepository,
-  ProductVariant
-} from './OrderRepository';
-import { v4 as uuidv4 } from 'uuid';
+  ProductVariant,
+} from "./OrderRepository";
+import { v4 as uuidv4 } from "uuid";
 
 export class DatabaseOrderRepository implements OrderRepository {
   private getClient() {
@@ -19,8 +19,9 @@ export class DatabaseOrderRepository implements OrderRepository {
     const supabase = this.getClient();
 
     const { data: order, error } = await supabase
-      .from('orders')
-      .select(`
+      .from("orders")
+      .select(
+        `
         *,
         order_items(
           id,
@@ -48,15 +49,16 @@ export class DatabaseOrderRepository implements OrderRepository {
             )
           )
         )
-      `)
-      .eq('id', id)
+      `,
+      )
+      .eq("id", id)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
-      console.error('Error fetching order by id:', error);
+      console.error("Error fetching order by id:", error);
       throw new Error(`Failed to fetch order: ${error.message}`);
     }
 
@@ -67,8 +69,9 @@ export class DatabaseOrderRepository implements OrderRepository {
     const supabase = this.getClient();
 
     const { data: orders, error } = await supabase
-      .from('orders')
-      .select(`
+      .from("orders")
+      .select(
+        `
         id,
         customerName,
         customerEmail,
@@ -88,15 +91,16 @@ export class DatabaseOrderRepository implements OrderRepository {
             )
           )
         )
-      `)
-      .order('createdAt', { ascending: false });
+      `,
+      )
+      .order("createdAt", { ascending: false });
 
     if (error) {
-      console.error('Error fetching all orders:', error);
+      console.error("Error fetching all orders:", error);
       throw new Error(`Failed to fetch orders: ${error.message}`);
     }
 
-    return (orders || []).map(order => ({
+    return (orders || []).map((order) => ({
       id: order.id,
       customerName: order.customerName,
       customerEmail: order.customerEmail,
@@ -108,8 +112,8 @@ export class DatabaseOrderRepository implements OrderRepository {
         productTitle: item.product_variants.products.title,
         productType: item.product_variants.products.product_types.displayName,
         quantity: item.quantity,
-        unitPrice: item.price
-      }))
+        unitPrice: item.price,
+      })),
     }));
   }
 
@@ -122,21 +126,21 @@ export class DatabaseOrderRepository implements OrderRepository {
     const supabase = this.getClient();
 
     const { error } = await supabase
-      .from('orders')
-      .update({ 
+      .from("orders")
+      .update({
         status,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       })
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) {
-      console.error('Error updating order status:', error);
+      console.error("Error updating order status:", error);
       throw new Error(`Failed to update order: ${error.message}`);
     }
 
     const updatedOrder = await this.findById(id);
     if (!updatedOrder) {
-      throw new Error('Order not found after update');
+      throw new Error("Order not found after update");
     }
 
     return updatedOrder;
@@ -147,54 +151,57 @@ export class DatabaseOrderRepository implements OrderRepository {
 
     // Get total orders count
     const { count: totalOrders, error: totalError } = await supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true });
+      .from("orders")
+      .select("*", { count: "exact", head: true });
 
     if (totalError) {
-      console.error('Error getting total orders:', totalError);
+      console.error("Error getting total orders:", totalError);
       throw new Error(`Failed to get stats: ${totalError.message}`);
     }
 
     // Get completed orders count
     const { count: completedOrders, error: completedError } = await supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'DELIVERED');
+      .from("orders")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "DELIVERED");
 
     if (completedError) {
-      console.error('Error getting completed orders:', completedError);
+      console.error("Error getting completed orders:", completedError);
       throw new Error(`Failed to get stats: ${completedError.message}`);
     }
 
-    // Get pending orders count  
+    // Get pending orders count
     const { count: pendingOrders, error: pendingError } = await supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true })
-      .in('status', ['PENDING', 'PAID', 'SHIPPED']);
+      .from("orders")
+      .select("*", { count: "exact", head: true })
+      .in("status", ["PENDING", "PAID", "SHIPPED"]);
 
     if (pendingError) {
-      console.error('Error getting pending orders:', pendingError);
+      console.error("Error getting pending orders:", pendingError);
       throw new Error(`Failed to get stats: ${pendingError.message}`);
     }
 
     // Get total revenue from paid and delivered orders
     const { data: revenueData, error: revenueError } = await supabase
-      .from('orders')
-      .select('total')
-      .in('status', ['PAID', 'DELIVERED']);
+      .from("orders")
+      .select("total")
+      .in("status", ["PAID", "DELIVERED"]);
 
     if (revenueError) {
-      console.error('Error getting revenue:', revenueError);
+      console.error("Error getting revenue:", revenueError);
       throw new Error(`Failed to get stats: ${revenueError.message}`);
     }
 
-    const totalRevenue = (revenueData || []).reduce((sum, order) => sum + (order.total || 0), 0);
+    const totalRevenue = (revenueData || []).reduce(
+      (sum, order) => sum + (order.total || 0),
+      0,
+    );
 
     return {
       totalOrders: totalOrders || 0,
       completedOrders: completedOrders || 0,
       pendingOrders: pendingOrders || 0,
-      totalRevenue
+      totalRevenue,
     };
   }
 
@@ -205,7 +212,7 @@ export class DatabaseOrderRepository implements OrderRepository {
     const orderId = uuidv4();
     const now = new Date().toISOString();
     const { data: order, error: orderError } = await supabase
-      .from('orders')
+      .from("orders")
       .insert({
         id: orderId,
         customerEmail: data.customerEmail,
@@ -219,91 +226,97 @@ export class DatabaseOrderRepository implements OrderRepository {
         shipping: data.shipping,
         total: data.total,
         createdAt: now,
-        updatedAt: now
+        updatedAt: now,
       })
       .select()
       .single();
 
     if (orderError) {
-      console.error('Error creating order:', orderError);
+      console.error("Error creating order:", orderError);
       throw new Error(`Failed to create order: ${orderError.message}`);
     }
 
     // Create order items
-    const orderItems = data.items.map(item => ({
+    const orderItems = data.items.map((item) => ({
       id: uuidv4(),
       ...item,
       orderId: order.id,
-      createdAt: now
+      createdAt: now,
     }));
 
     const { error: itemsError } = await supabase
-      .from('order_items')
+      .from("order_items")
       .insert(orderItems);
 
     if (itemsError) {
-      console.error('Error creating order items:', itemsError);
+      console.error("Error creating order items:", itemsError);
       throw new Error(`Failed to create order items: ${itemsError.message}`);
     }
 
     // Return the complete order
     const completeOrder = await this.findById(order.id);
     if (!completeOrder) {
-      throw new Error('Order not found after creation');
+      throw new Error("Order not found after creation");
     }
 
     return completeOrder;
   }
 
-  async updateByPayPalId(paypalOrderId: string, status: string): Promise<OrderWithDetails> {
+  async updateByPayPalId(
+    paypalOrderId: string,
+    status: string,
+  ): Promise<OrderWithDetails> {
     const supabase = this.getClient();
 
     const { error } = await supabase
-      .from('orders')
-      .update({ 
+      .from("orders")
+      .update({
         status,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       })
-      .eq('paypalOrderId', paypalOrderId);
+      .eq("paypalOrderId", paypalOrderId);
 
     if (error) {
-      console.error('Error updating order by PayPal ID:', error);
+      console.error("Error updating order by PayPal ID:", error);
       throw new Error(`Failed to update order: ${error.message}`);
     }
 
     // Find the updated order
     const { data: order, error: findError } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('paypalOrderId', paypalOrderId)
+      .from("orders")
+      .select("id")
+      .eq("paypalOrderId", paypalOrderId)
       .single();
 
     if (findError) {
-      console.error('Error finding updated order:', findError);
+      console.error("Error finding updated order:", findError);
       throw new Error(`Failed to find updated order: ${findError.message}`);
     }
 
     const updatedOrder = await this.findById(order.id);
     if (!updatedOrder) {
-      throw new Error('Order not found after PayPal update');
+      throw new Error("Order not found after PayPal update");
     }
 
     return updatedOrder;
   }
 
-  async updateManyByPayPalId(paypalOrderId: string, status: string): Promise<void> {
+  async updateManyByPayPalId(
+    paypalOrderId: string,
+    status: string,
+  ): Promise<void> {
     const supabase = this.getClient();
 
     const { error } = await supabase
-      .from('orders')
-      .update({ 
+      .from("orders")
+      .update({
         status,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       })
-      .eq('paypalOrderId', paypalOrderId);
+      .eq("paypalOrderId", paypalOrderId);
 
     if (error) {
-      console.error('Error updating many orders by PayPal ID:', error);
+      console.error("Error updating many orders by PayPal ID:", error);
       throw new Error(`Failed to update orders: ${error.message}`);
     }
   }
@@ -337,25 +350,30 @@ export class DatabaseOrderRepository implements OrderRepository {
             id: item.product_variants.products.id,
             title: item.product_variants.products.title,
             slug: item.product_variants.products.slug,
-            productType: item.product_variants.products.product_types ? {
-              id: item.product_variants.products.product_types.id,
-              displayName: item.product_variants.products.product_types.displayName
-            } : undefined,
+            productType: item.product_variants.products.product_types
+              ? {
+                  id: item.product_variants.products.product_types.id,
+                  displayName:
+                    item.product_variants.products.product_types.displayName,
+                }
+              : undefined,
             images: (item.product_variants.products.product_images || [])
               .filter((img: any) => img.isPrimary)
               .map((img: any) => ({
                 id: img.id,
                 isPrimary: img.isPrimary,
-                url: img.url
-              }))
-          }
-        }
-      }))
+                url: img.url,
+              })),
+          },
+        },
+      })),
     };
   }
 }
 
-export class DatabaseProductVariantRepository implements ProductVariantRepository {
+export class DatabaseProductVariantRepository
+  implements ProductVariantRepository
+{
   private getClient() {
     return createAdminClient();
   }
@@ -364,8 +382,9 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
     const supabase = this.getClient();
 
     const { data: variants, error } = await supabase
-      .from('product_variants')
-      .select(`
+      .from("product_variants")
+      .select(
+        `
         id,
         price,
         status,
@@ -379,13 +398,14 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
             url
           )
         )
-      `)
-      .in('id', ids)
-      .gt('stock', 0) // Use stock instead of status
-      .eq('products.product_images.isPrimary', true);
+      `,
+      )
+      .in("id", ids)
+      .gt("stock", 0) // Use stock instead of status
+      .eq("products.product_images.isPrimary", true);
 
     if (error) {
-      console.error('Error fetching available variants:', error);
+      console.error("Error fetching available variants:", error);
       throw new Error(`Failed to fetch variants: ${error.message}`);
     }
 
@@ -400,9 +420,9 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
         images: (variant.products.product_images || []).map((img: any) => ({
           id: img.id,
           isPrimary: img.isPrimary,
-          url: img.url
-        }))
-      }
+          url: img.url,
+        })),
+      },
     }));
   }
 
@@ -410,8 +430,9 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
     const supabase = this.getClient();
 
     const { data: variants, error } = await supabase
-      .from('product_variants')
-      .select(`
+      .from("product_variants")
+      .select(
+        `
         id,
         price,
         status,
@@ -425,12 +446,13 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
             url
           )
         )
-      `)
-      .in('id', ids)
-      .eq('products.product_images.isPrimary', true);
+      `,
+      )
+      .in("id", ids)
+      .eq("products.product_images.isPrimary", true);
 
     if (error) {
-      console.error('Error fetching variants:', error);
+      console.error("Error fetching variants:", error);
       throw new Error(`Failed to fetch variants: ${error.message}`);
     }
 
@@ -445,9 +467,9 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
         images: (variant.products.product_images || []).map((img: any) => ({
           id: img.id,
           isPrimary: img.isPrimary,
-          url: img.url
-        }))
-      }
+          url: img.url,
+        })),
+      },
     }));
   }
 
@@ -456,25 +478,25 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
 
     // Get current stock first
     const { data: variant, error: getError } = await supabase
-      .from('product_variants')
-      .select('stock')
-      .eq('id', id)
+      .from("product_variants")
+      .select("stock")
+      .eq("id", id)
       .single();
 
     if (getError) {
-      console.error('Error getting variant stock:', getError);
+      console.error("Error getting variant stock:", getError);
       throw new Error(`Failed to get variant: ${getError.message}`);
     }
 
     const newStock = variant.stock - quantity;
 
     const { error } = await supabase
-      .from('product_variants')
+      .from("product_variants")
       .update({ stock: newStock })
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) {
-      console.error('Error decrementing stock:', error);
+      console.error("Error decrementing stock:", error);
       throw new Error(`Failed to update stock: ${error.message}`);
     }
   }
@@ -483,24 +505,24 @@ export class DatabaseProductVariantRepository implements ProductVariantRepositor
     const supabase = this.getClient();
 
     const { data: variant, error: getError } = await supabase
-      .from('product_variants')
-      .select('stock')
-      .eq('id', id)
+      .from("product_variants")
+      .select("stock")
+      .eq("id", id)
       .single();
 
     if (getError) {
-      console.error('Error getting variant for stock check:', getError);
+      console.error("Error getting variant for stock check:", getError);
       throw new Error(`Failed to get variant: ${getError.message}`);
     }
 
     if (variant && variant.stock <= 0) {
       const { error } = await supabase
-        .from('product_variants')
-        .update({ status: 'OUT_OF_STOCK' })
-        .eq('id', id);
+        .from("product_variants")
+        .update({ status: "OUT_OF_STOCK" })
+        .eq("id", id);
 
       if (error) {
-        console.error('Error marking out of stock:', error);
+        console.error("Error marking out of stock:", error);
         throw new Error(`Failed to mark out of stock: ${error.message}`);
       }
     }

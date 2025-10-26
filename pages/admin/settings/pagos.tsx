@@ -27,18 +27,18 @@ export default function PaymentSettings() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const response = await fetch('/api/admin/shipping-settings');
+        const response = await fetch("/api/admin/shipping-settings");
         if (response.ok) {
           const data = await response.json();
-          setSettings(prev => ({
+          setSettings((prev) => ({
             ...prev,
             shippingCost: data.standardRate / 100, // Convert cents to euros
-            freeShippingThreshold: data.freeShippingThreshold / 100 // Convert cents to euros
+            freeShippingThreshold: data.freeShippingThreshold / 100, // Convert cents to euros
           }));
         }
       } catch (error) {
-        console.error('Error loading shipping settings:', error);
-        toast.error('Error al cargar la configuración');
+        console.error("Error loading shipping settings:", error);
+        toast.error("Error al cargar la configuración");
       } finally {
         setLoading(false);
       }
@@ -50,10 +50,10 @@ export default function PaymentSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await fetch('/api/admin/shipping-settings', {
-        method: 'POST',
+      const response = await fetch("/api/admin/shipping-settings", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           standardRate: settings.shippingCost,
@@ -62,13 +62,13 @@ export default function PaymentSettings() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save settings');
+        throw new Error("Failed to save settings");
       }
 
-      toast.success('Configuración guardada correctamente');
+      toast.success("Configuración guardada correctamente");
     } catch (error) {
-      console.error('Error saving settings:', error);
-      toast.error('Error al guardar la configuración');
+      console.error("Error saving settings:", error);
+      toast.error("Error al guardar la configuración");
     } finally {
       setSaving(false);
     }
@@ -94,7 +94,9 @@ export default function PaymentSettings() {
           <Select
             label="Moneda"
             value={settings.currency}
-            onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
+            onChange={(e) =>
+              setSettings({ ...settings, currency: e.target.value })
+            }
           >
             <option value="EUR">Euro (€)</option>
             <option value="USD">Dólar ($)</option>
@@ -107,7 +109,12 @@ export default function PaymentSettings() {
             max="50"
             step="0.01"
             value={settings.taxRate}
-            onChange={(e) => setSettings({ ...settings, taxRate: parseFloat(e.target.value) || 0 })}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                taxRate: parseFloat(e.target.value) || 0,
+              })
+            }
           />
           <div>
             <Input
@@ -116,7 +123,12 @@ export default function PaymentSettings() {
               min="0"
               step="0.01"
               value={settings.shippingCost}
-              onChange={(e) => setSettings({ ...settings, shippingCost: parseFloat(e.target.value) || 0 })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  shippingCost: parseFloat(e.target.value) || 0,
+                })
+              }
               disabled={loading}
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -130,16 +142,22 @@ export default function PaymentSettings() {
               min="0"
               step="0.01"
               value={settings.freeShippingThreshold}
-              onChange={(e) => setSettings({ ...settings, freeShippingThreshold: parseFloat(e.target.value) || 0 })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  freeShippingThreshold: parseFloat(e.target.value) || 0,
+                })
+              }
               disabled={loading}
             />
             <p className="text-xs text-gray-500 mt-1">
-              Pedidos superiores a esta cantidad tendrán envío gratuito. 0 para desactivar envío gratuito.
+              Pedidos superiores a esta cantidad tendrán envío gratuito. 0 para
+              desactivar envío gratuito.
             </p>
           </div>
         </div>
       </div>
-      
+
       <div className="px-4 sm:px-6 py-3 bg-gray-50 border-t border-gray-200">
         <div className="flex justify-end">
           <button
@@ -147,11 +165,11 @@ export default function PaymentSettings() {
             disabled={saving}
             className="w-full sm:w-auto px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
           >
-            {saving ? 'Guardando...' : 'Guardar Cambios'}
+            {saving ? "Guardando..." : "Guardar Cambios"}
           </button>
         </div>
       </div>
-      
+
       <Toaster position="top-right" />
     </SettingsLayout>
   );

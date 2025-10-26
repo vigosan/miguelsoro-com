@@ -21,10 +21,10 @@ export default function InventorySettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Configuración guardada correctamente');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast.success("Configuración guardada correctamente");
     } catch (error) {
-      toast.error('Error al guardar la configuración');
+      toast.error("Error al guardar la configuración");
     } finally {
       setSaving(false);
     }
@@ -40,7 +40,12 @@ export default function InventorySettings() {
           <Toggle
             label="Habilitar seguimiento de inventario"
             checked={settings.enableInventoryTracking}
-            onChange={(e) => setSettings({ ...settings, enableInventoryTracking: e.target.checked })}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                enableInventoryTracking: e.target.checked,
+              })
+            }
           />
           {settings.enableInventoryTracking && (
             <div>
@@ -49,7 +54,12 @@ export default function InventorySettings() {
                 type="number"
                 min="0"
                 value={settings.lowStockThreshold}
-                onChange={(e) => setSettings({ ...settings, lowStockThreshold: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    lowStockThreshold: parseInt(e.target.value) || 0,
+                  })
+                }
               />
               <p className="text-xs text-gray-500 mt-1">
                 Notificar cuando el stock esté por debajo de este número
@@ -58,7 +68,7 @@ export default function InventorySettings() {
           )}
         </div>
       </div>
-      
+
       <div className="px-4 sm:px-6 py-3 bg-gray-50 border-t border-gray-200">
         <div className="flex justify-end">
           <button
@@ -66,11 +76,11 @@ export default function InventorySettings() {
             disabled={saving}
             className="w-full sm:w-auto px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
           >
-            {saving ? 'Guardando...' : 'Guardar Cambios'}
+            {saving ? "Guardando..." : "Guardar Cambios"}
           </button>
         </div>
       </div>
-      
+
       <Toaster position="top-right" />
     </SettingsLayout>
   );

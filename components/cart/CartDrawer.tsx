@@ -1,18 +1,28 @@
-import { Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon, MinusIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { useCart } from '../../contexts/CartContext';
-import { formatEuros } from '../../domain/order';
-import Image from 'next/image';
-import Link from 'next/link';
-import CartValidationBanner from './CartValidationBanner';
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import {
+  XMarkIcon,
+  MinusIcon,
+  PlusIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
+import { useCart } from "../../contexts/CartContext";
+import { formatEuros } from "../../domain/order";
+import Image from "next/image";
+import Link from "next/link";
+import CartValidationBanner from "./CartValidationBanner";
 
 export default function CartDrawer() {
-  const { state, removeItem, updateQuantity, setCartOpen, getFormattedTotal } = useCart();
+  const { state, removeItem, updateQuantity, setCartOpen, getFormattedTotal } =
+    useCart();
 
   return (
     <Transition.Root show={state.isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={() => setCartOpen(false)}>
+      <Dialog
+        as="div"
+        className="relative z-50"
+        onClose={() => setCartOpen(false)}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-in-out duration-300"
@@ -61,14 +71,22 @@ export default function CartDrawer() {
                       <div className="mt-8">
                         <CartValidationBanner />
                         <div className="flow-root">
-                          <ul role="list" className="-my-6 divide-y divide-gray-200" data-testid="cart-items">
+                          <ul
+                            role="list"
+                            className="-my-6 divide-y divide-gray-200"
+                            data-testid="cart-items"
+                          >
                             {state.items.length === 0 ? (
                               <li className="py-6 text-center text-gray-500">
                                 Tu carrito está vacío
                               </li>
                             ) : (
                               state.items.map((item) => (
-                                <li key={item.variantId} className="flex py-6" data-testid={`cart-item-${item.variantId}`}>
+                                <li
+                                  key={item.variantId}
+                                  className="flex py-6"
+                                  data-testid={`cart-item-${item.variantId}`}
+                                >
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     {item.imageUrl && (
                                       <Image
@@ -85,7 +103,7 @@ export default function CartDrawer() {
                                     <div>
                                       <div className="flex justify-between text-base font-medium text-gray-900">
                                         <h3>
-                                          <Link 
+                                          <Link
                                             href={`/pictures/${item.slug}`}
                                             onClick={() => setCartOpen(false)}
                                             className="hover:text-gray-600"
@@ -93,28 +111,44 @@ export default function CartDrawer() {
                                             {item.title}
                                           </Link>
                                         </h3>
-                                        <p className="ml-4">{formatEuros(item.price)}</p>
+                                        <p className="ml-4">
+                                          {formatEuros(item.price)}
+                                        </p>
                                       </div>
                                     </div>
                                     <div className="flex flex-1 items-end justify-between text-sm">
                                       <div className="flex items-center space-x-2">
                                         <button
-                                          onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                                          onClick={() =>
+                                            updateQuantity(
+                                              item.variantId,
+                                              item.quantity - 1,
+                                            )
+                                          }
                                           className="p-1 text-gray-400 hover:text-gray-600"
                                           data-testid={`decrease-quantity-${item.variantId}`}
                                         >
                                           <MinusIcon className="h-4 w-4" />
                                         </button>
-                                        <span 
+                                        <span
                                           className="text-gray-700 px-2 py-1 border rounded"
                                           data-testid={`quantity-${item.variantId}`}
                                         >
                                           {item.quantity}
                                         </span>
                                         <button
-                                          onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-                                          disabled={item.stock ? item.quantity >= item.stock : false}
-                                          className={`p-1 ${item.stock && item.quantity >= item.stock ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-gray-600'}`}
+                                          onClick={() =>
+                                            updateQuantity(
+                                              item.variantId,
+                                              item.quantity + 1,
+                                            )
+                                          }
+                                          disabled={
+                                            item.stock
+                                              ? item.quantity >= item.stock
+                                              : false
+                                          }
+                                          className={`p-1 ${item.stock && item.quantity >= item.stock ? "text-gray-300 cursor-not-allowed" : "text-gray-400 hover:text-gray-600"}`}
                                           data-testid={`increase-quantity-${item.variantId}`}
                                         >
                                           <PlusIcon className="h-4 w-4" />
@@ -124,7 +158,9 @@ export default function CartDrawer() {
                                       <div className="flex">
                                         <button
                                           type="button"
-                                          onClick={() => removeItem(item.variantId)}
+                                          onClick={() =>
+                                            removeItem(item.variantId)
+                                          }
                                           className="font-medium text-red-600 hover:text-red-500"
                                           data-testid={`remove-item-${item.variantId}`}
                                         >
@@ -162,7 +198,7 @@ export default function CartDrawer() {
                         </div>
                         <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                           <p>
-                            o{' '}
+                            o{" "}
                             <button
                               type="button"
                               className="font-medium text-gray-900 hover:text-gray-600"
@@ -179,7 +215,7 @@ export default function CartDrawer() {
                 </Dialog.Panel>
               </Transition.Child>
             </div>
-            
+
             {/* Desktop: Right slide */}
             <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 hidden md:flex">
               <Transition.Child
@@ -214,14 +250,22 @@ export default function CartDrawer() {
                       <div className="mt-8">
                         <CartValidationBanner />
                         <div className="flow-root">
-                          <ul role="list" className="-my-6 divide-y divide-gray-200" data-testid="cart-items">
+                          <ul
+                            role="list"
+                            className="-my-6 divide-y divide-gray-200"
+                            data-testid="cart-items"
+                          >
                             {state.items.length === 0 ? (
                               <li className="py-6 text-center text-gray-500">
                                 Tu carrito está vacío
                               </li>
                             ) : (
                               state.items.map((item) => (
-                                <li key={item.variantId} className="flex py-6" data-testid={`cart-item-${item.variantId}`}>
+                                <li
+                                  key={item.variantId}
+                                  className="flex py-6"
+                                  data-testid={`cart-item-${item.variantId}`}
+                                >
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     {item.imageUrl && (
                                       <Image
@@ -238,7 +282,7 @@ export default function CartDrawer() {
                                     <div>
                                       <div className="flex justify-between text-base font-medium text-gray-900">
                                         <h3>
-                                          <Link 
+                                          <Link
                                             href={`/pictures/${item.slug}`}
                                             onClick={() => setCartOpen(false)}
                                             className="hover:text-gray-600"
@@ -246,28 +290,44 @@ export default function CartDrawer() {
                                             {item.title}
                                           </Link>
                                         </h3>
-                                        <p className="ml-4">{formatEuros(item.price)}</p>
+                                        <p className="ml-4">
+                                          {formatEuros(item.price)}
+                                        </p>
                                       </div>
                                     </div>
                                     <div className="flex flex-1 items-end justify-between text-sm">
                                       <div className="flex items-center space-x-2">
                                         <button
-                                          onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                                          onClick={() =>
+                                            updateQuantity(
+                                              item.variantId,
+                                              item.quantity - 1,
+                                            )
+                                          }
                                           className="p-1 text-gray-400 hover:text-gray-600"
                                           data-testid={`decrease-quantity-${item.variantId}`}
                                         >
                                           <MinusIcon className="h-4 w-4" />
                                         </button>
-                                        <span 
+                                        <span
                                           className="text-gray-700 px-2 py-1 border rounded"
                                           data-testid={`quantity-${item.variantId}`}
                                         >
                                           {item.quantity}
                                         </span>
                                         <button
-                                          onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-                                          disabled={item.stock ? item.quantity >= item.stock : false}
-                                          className={`p-1 ${item.stock && item.quantity >= item.stock ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-gray-600'}`}
+                                          onClick={() =>
+                                            updateQuantity(
+                                              item.variantId,
+                                              item.quantity + 1,
+                                            )
+                                          }
+                                          disabled={
+                                            item.stock
+                                              ? item.quantity >= item.stock
+                                              : false
+                                          }
+                                          className={`p-1 ${item.stock && item.quantity >= item.stock ? "text-gray-300 cursor-not-allowed" : "text-gray-400 hover:text-gray-600"}`}
                                           data-testid={`increase-quantity-${item.variantId}`}
                                         >
                                           <PlusIcon className="h-4 w-4" />
@@ -277,7 +337,9 @@ export default function CartDrawer() {
                                       <div className="flex">
                                         <button
                                           type="button"
-                                          onClick={() => removeItem(item.variantId)}
+                                          onClick={() =>
+                                            removeItem(item.variantId)
+                                          }
                                           className="font-medium text-red-600 hover:text-red-500"
                                           data-testid={`remove-item-${item.variantId}`}
                                         >
@@ -315,7 +377,7 @@ export default function CartDrawer() {
                         </div>
                         <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                           <p>
-                            o{' '}
+                            o{" "}
                             <button
                               type="button"
                               className="font-medium text-gray-900 hover:text-gray-600"

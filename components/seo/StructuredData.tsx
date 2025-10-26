@@ -25,58 +25,60 @@ export function ArtworkStructuredData({ artwork, url }: ArtworkSchemaProps) {
     creator: {
       "@type": "Person",
       name: "Miguel Soro",
-      description: "Ex-ciclista profesional y artista contemporáneo especializado en arte ciclístico",
+      description:
+        "Ex-ciclista profesional y artista contemporáneo especializado en arte ciclístico",
       url: "https://www.miguelsoro.com/biography",
-      sameAs: [
-        "https://www.miguelsoro.com"
-      ]
+      sameAs: ["https://www.miguelsoro.com"],
     },
     artform: "Painting",
     artMedium: "Acrílico y collage sobre lienzo",
     artworkSurface: "Canvas",
     width: {
       "@type": "QuantitativeValue",
-      value: artwork.size.split('x')[0],
-      unitCode: "CMT"
+      value: artwork.size.split("x")[0],
+      unitCode: "CMT",
     },
     height: {
-      "@type": "QuantitativeValue", 
-      value: artwork.size.split('x')[1],
-      unitCode: "CMT"
+      "@type": "QuantitativeValue",
+      value: artwork.size.split("x")[1],
+      unitCode: "CMT",
     },
     material: ["Acrylic paint", "Canvas", "Collage"],
     genre: "Contemporary Art",
     category: "Cycling Art",
-    offers: artwork.price > 0 ? {
-      "@type": "Offer",
-      price: (artwork.price / 100).toFixed(2),
-      priceCurrency: "EUR",
-      availability: "https://schema.org/InStock",
-      url: url,
-      seller: {
-        "@type": "Person",
-        name: "Miguel Soro"
-      },
-      itemCondition: "https://schema.org/NewCondition"
-    } : {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "EUR",
-      availability: "https://schema.org/InStock",
-      url: url,
-      seller: {
-        "@type": "Person", 
-        name: "Miguel Soro"
-      },
-      priceSpecification: {
-        "@type": "PriceSpecification",
-        price: "Consultar",
-        priceCurrency: "EUR"
-      }
-    },
+    offers:
+      artwork.price > 0
+        ? {
+            "@type": "Offer",
+            price: (artwork.price / 100).toFixed(2),
+            priceCurrency: "EUR",
+            availability: "https://schema.org/InStock",
+            url: url,
+            seller: {
+              "@type": "Person",
+              name: "Miguel Soro",
+            },
+            itemCondition: "https://schema.org/NewCondition",
+          }
+        : {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "EUR",
+            availability: "https://schema.org/InStock",
+            url: url,
+            seller: {
+              "@type": "Person",
+              name: "Miguel Soro",
+            },
+            priceSpecification: {
+              "@type": "PriceSpecification",
+              price: "Consultar",
+              priceCurrency: "EUR",
+            },
+          },
     keywords: [
       "arte ciclístico",
-      "cycling art", 
+      "cycling art",
       "Miguel Soro",
       "ciclismo profesional",
       "arte contemporáneo",
@@ -84,12 +86,12 @@ export function ArtworkStructuredData({ artwork, url }: ArtworkSchemaProps) {
       "collage",
       "deporte arte",
       "ex-ciclista",
-      "obra original"
+      "obra original",
     ],
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": url
-    }
+      "@id": url,
+    },
   };
 
   return (
@@ -97,7 +99,7 @@ export function ArtworkStructuredData({ artwork, url }: ArtworkSchemaProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(artworkSchema)
+          __html: JSON.stringify(artworkSchema),
         }}
       />
     </Head>
@@ -108,24 +110,28 @@ interface WebsiteSchemaProps {
   url?: string;
 }
 
-export function WebsiteStructuredData({ url = "https://www.miguelsoro.com" }: WebsiteSchemaProps) {
+export function WebsiteStructuredData({
+  url = "https://www.miguelsoro.com",
+}: WebsiteSchemaProps) {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": `${url}#website`,
     url: url,
     name: "Miguel Soro - Arte Ciclístico",
-    description: "Galería de arte de Miguel Soro, ex-ciclista profesional. Obras originales inspiradas en el mundo del ciclismo. Acrílico y collage sobre lienzo.",
+    description:
+      "Galería de arte de Miguel Soro, ex-ciclista profesional. Obras originales inspiradas en el mundo del ciclismo. Acrílico y collage sobre lienzo.",
     publisher: {
       "@type": "Person",
       "@id": `${url}#artist`,
       name: "Miguel Soro",
-      description: "Ex-ciclista profesional español convertido en artista. Especializado en arte contemporáneo inspirado en el ciclismo.",
+      description:
+        "Ex-ciclista profesional español convertido en artista. Especializado en arte contemporáneo inspirado en el ciclismo.",
       url: `${url}/biography`,
       birthDate: "1976-02-27",
       birthPlace: {
         "@type": "Place",
-        name: "Xàtiva, Valencia, España"
+        name: "Xàtiva, Valencia, España",
       },
       nationality: "Spanish",
       jobTitle: "Artista y Ex-ciclista Profesional",
@@ -133,36 +139,39 @@ export function WebsiteStructuredData({ url = "https://www.miguelsoro.com" }: We
         {
           "@type": "Occupation",
           name: "Visual Artist",
-          description: "Contemporary artist specializing in cycling-themed artwork"
+          description:
+            "Contemporary artist specializing in cycling-themed artwork",
         },
         {
-          "@type": "Occupation", 
+          "@type": "Occupation",
           name: "Professional Cyclist",
-          description: "Former professional cyclist who competed in Portugal and Italy"
-        }
+          description:
+            "Former professional cyclist who competed in Portugal and Italy",
+        },
       ],
       knowsAbout: [
         "Cycling",
-        "Contemporary Art", 
+        "Contemporary Art",
         "Acrylic Painting",
         "Collage Techniques",
-        "Sports Art"
-      ]
+        "Sports Art",
+      ],
     },
     mainEntity: {
       "@type": "ItemList",
       name: "Colección de Arte Ciclístico",
-      description: "Obras de arte originales inspiradas en el mundo del ciclismo profesional",
-      numberOfItems: "13+"
+      description:
+        "Obras de arte originales inspiradas en el mundo del ciclismo profesional",
+      numberOfItems: "13+",
     },
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${url}/search?q={search_term_string}`
+        urlTemplate: `${url}/search?q={search_term_string}`,
       },
-      "query-input": "required name=search_term_string"
-    }
+      "query-input": "required name=search_term_string",
+    },
   };
 
   return (
@@ -170,7 +179,7 @@ export function WebsiteStructuredData({ url = "https://www.miguelsoro.com" }: We
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(websiteSchema)
+          __html: JSON.stringify(websiteSchema),
         }}
       />
     </Head>
@@ -181,37 +190,40 @@ interface LocalBusinessSchemaProps {
   url?: string;
 }
 
-export function LocalBusinessStructuredData({ url = "https://www.miguelsoro.com" }: LocalBusinessSchemaProps) {
+export function LocalBusinessStructuredData({
+  url = "https://www.miguelsoro.com",
+}: LocalBusinessSchemaProps) {
   const businessSchema = {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "ArtGallery"],
     "@id": `${url}#business`,
     name: "Miguel Soro Art Studio",
-    description: "Estudio y galería de arte de Miguel Soro. Especializado en arte ciclístico y obras contemporáneas. Venta de obras originales.",
+    description:
+      "Estudio y galería de arte de Miguel Soro. Especializado en arte ciclístico y obras contemporáneas. Venta de obras originales.",
     url: url,
     founder: {
       "@type": "Person",
-      "@id": `${url}#artist`
+      "@id": `${url}#artist`,
     },
     address: {
       "@type": "PostalAddress",
       addressCountry: "ES",
       addressLocality: "Valencia",
-      addressRegion: "Comunidad Valenciana"
+      addressRegion: "Comunidad Valenciana",
     },
     areaServed: [
       {
         "@type": "Country",
-        name: "España"
+        name: "España",
       },
       {
-        "@type": "Country", 
-        name: "Europa"
+        "@type": "Country",
+        name: "Europa",
       },
       {
         "@type": "Place",
-        name: "Internacional"
-      }
+        name: "Internacional",
+      },
     ],
     email: "info@miguelsoro.com",
     hasOfferCatalog: {
@@ -222,16 +234,16 @@ export function LocalBusinessStructuredData({ url = "https://www.miguelsoro.com"
           "@type": "Offer",
           itemOffered: {
             "@type": "VisualArtwork",
-            name: "Arte Ciclístico Original"
-          }
-        }
-      ]
+            name: "Arte Ciclístico Original",
+          },
+        },
+      ],
     },
     knowsLanguage: ["es", "en"],
     paymentAccepted: ["Cash", "PayPal", "Bank Transfer"],
     priceRange: "€€€",
     serviceType: "Art Sales",
-    slogan: "Del pedal al pincel - Arte inspirado en el ciclismo"
+    slogan: "Del pedal al pincel - Arte inspirado en el ciclismo",
   };
 
   return (
@@ -239,7 +251,7 @@ export function LocalBusinessStructuredData({ url = "https://www.miguelsoro.com"
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(businessSchema)
+          __html: JSON.stringify(businessSchema),
         }}
       />
     </Head>
@@ -261,8 +273,8 @@ export function BreadcrumbStructuredData({ items }: BreadcrumbSchemaProps) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: item.url
-    }))
+      item: item.url,
+    })),
   };
 
   return (
@@ -270,7 +282,7 @@ export function BreadcrumbStructuredData({ items }: BreadcrumbSchemaProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbSchema)
+          __html: JSON.stringify(breadcrumbSchema),
         }}
       />
     </Head>

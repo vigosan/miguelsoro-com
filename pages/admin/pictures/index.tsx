@@ -7,11 +7,11 @@ import { PictureStatus, getPictureStatus } from "@/domain/picture";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatEuros } from "@/domain/order";
 import { Toaster, toast } from "react-hot-toast";
-import { 
+import {
   PlusIcon,
   PencilIcon,
   EyeIcon,
-  PhotoIcon
+  PhotoIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/cn";
 import { Input } from "@/components/ui/Input";
@@ -19,7 +19,7 @@ import { Select } from "@/components/ui/Select";
 
 const statusColors = {
   AVAILABLE: "bg-green-100 text-green-800",
-  NOT_AVAILABLE: "bg-gray-100 text-gray-800", 
+  NOT_AVAILABLE: "bg-gray-100 text-gray-800",
 };
 
 const statusLabels = {
@@ -28,25 +28,29 @@ const statusLabels = {
 };
 
 export default function AdminPictures() {
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Build filters for React Query
   const filters = {
-    ...(statusFilter !== 'ALL' && { status: statusFilter as PictureStatus }),
-    ...(searchQuery && { search: searchQuery })
+    ...(statusFilter !== "ALL" && { status: statusFilter as PictureStatus }),
+    ...(searchQuery && { search: searchQuery }),
   };
 
-  const { data: pictures = [], isLoading: loading, error } = usePictures(filters);
+  const {
+    data: pictures = [],
+    isLoading: loading,
+    error,
+  } = usePictures(filters);
   const deletePictureMutation = useDeletePicture();
 
   const handleDelete = async (id: string, title: string) => {
     if (confirm(`¿Estás seguro de que quieres eliminar "${title}"?`)) {
       try {
         await deletePictureMutation.mutateAsync(id);
-        toast.success('Cuadro eliminado correctamente');
+        toast.success("Cuadro eliminado correctamente");
       } catch (err) {
-        toast.error('Error al eliminar el cuadro');
+        toast.error("Error al eliminar el cuadro");
       }
     }
   };
@@ -77,7 +81,9 @@ export default function AdminPictures() {
         {/* Header */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Cuadros</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Cuadros
+            </h1>
             <p className="mt-2 text-sm sm:text-base text-gray-600">
               Gestiona todos los cuadros de la galería
             </p>
@@ -93,7 +99,7 @@ export default function AdminPictures() {
 
         {/* Filters */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-          <Select 
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="w-full sm:w-48"
@@ -145,10 +151,12 @@ export default function AdminPictures() {
                         {formatEuros(picture.price)}
                       </span>
                       <span>·</span>
-                      <span className={cn(
-                        "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                        statusColors[getPictureStatus(picture)]
-                      )}>
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
+                          statusColors[getPictureStatus(picture)],
+                        )}
+                      >
                         {statusLabels[getPictureStatus(picture)]}
                       </span>
                       <span>·</span>
@@ -182,12 +190,16 @@ export default function AdminPictures() {
             <div className="text-center py-12">
               <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-semibold text-gray-900">
-                {(statusFilter !== 'ALL' || searchQuery) ? 'No se encontraron cuadros' : 'No hay cuadros'}
+                {statusFilter !== "ALL" || searchQuery
+                  ? "No se encontraron cuadros"
+                  : "No hay cuadros"}
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                {(statusFilter !== 'ALL' || searchQuery) ? 'Intenta cambiar los filtros de búsqueda.' : 'Empieza añadiendo tu primer cuadro.'}
+                {statusFilter !== "ALL" || searchQuery
+                  ? "Intenta cambiar los filtros de búsqueda."
+                  : "Empieza añadiendo tu primer cuadro."}
               </p>
-              {!(statusFilter !== 'ALL' || searchQuery) && (
+              {!(statusFilter !== "ALL" || searchQuery) && (
                 <div className="mt-6">
                   <Link
                     href="/admin/pictures/new"

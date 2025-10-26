@@ -25,15 +25,15 @@ export interface BasicPicture {
   slug: string;
 }
 
-export type PictureStatus = 'AVAILABLE' | 'NOT_AVAILABLE';
+export type PictureStatus = "AVAILABLE" | "NOT_AVAILABLE";
 
 // Computed property - status is derived from stock
 export function getPictureStatus(picture: Picture): PictureStatus {
-  return picture.stock > 0 ? 'AVAILABLE' : 'NOT_AVAILABLE';
+  return picture.stock > 0 ? "AVAILABLE" : "NOT_AVAILABLE";
 }
 
 // Product variant status from database - for mapping
-export type VariantStatus = 'AVAILABLE' | 'OUT_OF_STOCK' | 'DISCONTINUED';
+export type VariantStatus = "AVAILABLE" | "OUT_OF_STOCK" | "DISCONTINUED";
 
 // Helper functions
 export function getPath(picture: Picture | BasicPicture): string {
@@ -45,15 +45,17 @@ export function getImgPath(picture: Picture | BasicPicture): string {
 }
 
 // Map database VariantStatus to PictureStatus
-export function mapVariantStatusToPictureStatus(status: VariantStatus): PictureStatus {
+export function mapVariantStatusToPictureStatus(
+  status: VariantStatus,
+): PictureStatus {
   switch (status) {
-    case 'AVAILABLE':
-      return 'AVAILABLE';
-    case 'OUT_OF_STOCK':
-    case 'DISCONTINUED':
-      return 'NOT_AVAILABLE'; // Treat both as not available for UI purposes
+    case "AVAILABLE":
+      return "AVAILABLE";
+    case "OUT_OF_STOCK":
+    case "DISCONTINUED":
+      return "NOT_AVAILABLE"; // Treat both as not available for UI purposes
     default:
-      return 'AVAILABLE';
+      return "AVAILABLE";
   }
 }
 
@@ -62,10 +64,10 @@ export function enrichPicture(basic: BasicPicture): Picture {
   return {
     ...basic,
     imageUrl: getImgPath(basic),
-    productTypeId: 'default',
-    productTypeName: 'Cuadros Originales', 
+    productTypeId: "default",
+    productTypeName: "Cuadros Originales",
     stock: 1,
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 }

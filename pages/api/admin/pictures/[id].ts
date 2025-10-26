@@ -1,79 +1,82 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { DatabasePictureRepository } from '@/infra/DatabasePictureRepository'
+import type { NextApiRequest, NextApiResponse } from "next";
+import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { id } = req.query
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  const { id } = req.query;
 
-  if (typeof id !== 'string') {
-    return res.status(400).json({ error: 'Invalid picture ID' })
+  if (typeof id !== "string") {
+    return res.status(400).json({ error: "Invalid picture ID" });
   }
 
-  const pictureRepository = new DatabasePictureRepository()
+  const pictureRepository = new DatabasePictureRepository();
 
-  if (req.method === 'GET') {
+  if (req.method === "GET") {
     try {
-      const picture = await pictureRepository.getPictureById(id)
+      const picture = await pictureRepository.getPictureById(id);
 
       if (!picture) {
-        return res.status(404).json({ error: 'Picture not found' })
+        return res.status(404).json({ error: "Picture not found" });
       }
 
-      return res.status(200).json({ picture })
+      return res.status(200).json({ picture });
     } catch (error) {
-      console.error('Error fetching picture:', error)
-      return res.status(500).json({ error: 'Failed to fetch picture' })
+      console.error("Error fetching picture:", error);
+      return res.status(500).json({ error: "Failed to fetch picture" });
     }
   }
 
-  if (req.method === 'PUT') {
+  if (req.method === "PUT") {
     try {
-      const updateData = req.body
-      
-      const updatedPicture = await pictureRepository.update(id, updateData)
-      
+      const updateData = req.body;
+
+      const updatedPicture = await pictureRepository.update(id, updateData);
+
       // Revalidate the homepage and picture detail page
       try {
-        await res.revalidate('/')
+        await res.revalidate("/");
         if (updatedPicture.slug) {
-          await res.revalidate(`/pictures/${updatedPicture.slug}`)
+          await res.revalidate(`/pictures/${updatedPicture.slug}`);
         }
       } catch (err) {
-        console.warn('Failed to revalidate pages:', err)
+        console.warn("Failed to revalidate pages:", err);
       }
-      
-      return res.status(200).json(updatedPicture)
+
+      return res.status(200).json(updatedPicture);
     } catch (error) {
-      console.error('Error updating picture:', error)
-      return res.status(500).json({ error: 'Failed to update picture' })
+      console.error("Error updating picture:", error);
+      return res.status(500).json({ error: "Failed to update picture" });
     }
   }
 
-  if (req.method === 'DELETE') {
+  if (req.method === "DELETE") {
     try {
-      const picture = await pictureRepository.getPictureById(id)
+      const picture = await pictureRepository.getPictureById(id);
 
       if (!picture) {
-        return res.status(404).json({ error: 'Picture not found' })
+        return res.status(404).json({ error: "Picture not found" });
       }
 
-      await pictureRepository.delete(id)
+      await pictureRepository.delete(id);
 
       // Revalidate the homepage and picture detail page
       try {
-        await res.revalidate('/')
+        await res.revalidate("/");
         if (picture.slug) {
-          await res.revalidate(`/pictures/${picture.slug}`)
+          await res.revalidate(`/pictures/${picture.slug}`);
         }
       } catch (err) {
-        console.warn('Failed to revalidate pages:', err)
+        console.warn("Failed to revalidate pages:", err);
       }
 
-      return res.status(200).json({ message: 'Picture deleted successfully' })
+      return res.status(200).json({ message: "Picture deleted successfully" });
     } catch (error) {
-      console.error('Error deleting picture:', error)
-      return res.status(500).json({ error: 'Failed to delete picture' })
+      console.error("Error deleting picture:", error);
+      return res.status(500).json({ error: "Failed to delete picture" });
     }
   }
 
-  return res.status(405).json({ error: 'Method not allowed' })
+  return res.status(405).json({ error: "Method not allowed" });
 }

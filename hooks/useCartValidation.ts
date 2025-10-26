@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useCart, CartItem } from '../contexts/CartContext';
+import { useEffect, useState, useCallback } from "react";
+import { useCart, CartItem } from "../contexts/CartContext";
 
 interface ShippingSettings {
   standardRate: number;
@@ -8,7 +8,12 @@ interface ShippingSettings {
 
 export interface CartValidationIssue {
   variantId: string;
-  type: 'stock_unavailable' | 'stock_reduced' | 'price_changed' | 'product_unavailable' | 'shipping_changed';
+  type:
+    | "stock_unavailable"
+    | "stock_reduced"
+    | "price_changed"
+    | "product_unavailable"
+    | "shipping_changed";
   currentValue?: number;
   cartValue?: number;
   message: string;
@@ -23,13 +28,15 @@ export interface CartValidationResult {
 
 export function useCartValidation() {
   const { state } = useCart();
-  const [validationResult, setValidationResult] = useState<CartValidationResult>({
-    isValid: true,
-    issues: [],
-    isLoading: false,
-    lastChecked: null
-  });
-  const [lastShippingSettings, setLastShippingSettings] = useState<ShippingSettings | null>(null);
+  const [validationResult, setValidationResult] =
+    useState<CartValidationResult>({
+      isValid: true,
+      issues: [],
+      isLoading: false,
+      lastChecked: null,
+    });
+  const [lastShippingSettings, setLastShippingSettings] =
+    useState<ShippingSettings | null>(null);
 
   const validateCart = useCallback(async () => {
     if (state.items.length === 0) {
@@ -37,26 +44,26 @@ export function useCartValidation() {
         isValid: true,
         issues: [],
         isLoading: false,
-        lastChecked: new Date()
+        lastChecked: new Date(),
       });
       return;
     }
 
-    setValidationResult(prev => ({ ...prev, isLoading: true }));
+    setValidationResult((prev) => ({ ...prev, isLoading: true }));
 
     try {
-      const variantIds = state.items.map(item => item.variantId);
-      
-      const response = await fetch('/api/cart/validate', {
-        method: 'POST',
+      const variantIds = state.items.map((item) => item.variantId);
+
+      const response = await fetch("/api/cart/validate", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ variantIds }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to validate cart');
+        throw new Error("Failed to validate cart");
       }
 
       const data = await response.json();
@@ -65,47 +72,56 @@ export function useCartValidation() {
       // Check for shipping settings changes
       if (lastShippingSettings) {
         const currentShipping = data.shippingSettings;
-        if (currentShipping.standardRate !== lastShippingSettings.standardRate ||
-            currentShipping.freeShippingThreshold !== lastShippingSettings.freeShippingThreshold) {
-          
-          let message = 'Los costes de envío han cambiado. ';
-          if (currentShipping.standardRate !== lastShippingSettings.standardRate) {
+        if (
+          currentShipping.standardRate !== lastShippingSettings.standardRate ||
+          currentShipping.freeShippingThreshold !==
+            lastShippingSettings.freeShippingThreshold
+        ) {
+          let message = "Los costes de envío han cambiado. ";
+          if (
+            currentShipping.standardRate !== lastShippingSettings.standardRate
+          ) {
             message += `Coste: €${(lastShippingSettings.standardRate / 100).toFixed(2)} → €${(currentShipping.standardRate / 100).toFixed(2)}. `;
           }
-          if (currentShipping.freeShippingThreshold !== lastShippingSettings.freeShippingThreshold) {
+          if (
+            currentShipping.freeShippingThreshold !==
+            lastShippingSettings.freeShippingThreshold
+          ) {
             message += `Envío gratis desde: €${(lastShippingSettings.freeShippingThreshold / 100).toFixed(2)} → €${(currentShipping.freeShippingThreshold / 100).toFixed(2)}`;
           }
-          
+
           issues.push({
-            variantId: 'shipping', // Special ID for shipping changes
-            type: 'shipping_changed',
-            message: message.trim()
+            variantId: "shipping", // Special ID for shipping changes
+            type: "shipping_changed",
+            message: message.trim(),
           });
         }
       }
-      
+
       // Store current shipping settings for next comparison
       setLastShippingSettings(data.shippingSettings);
 
       // Check each cart item against current database state
-      state.items.forEach(cartItem => {
-        const currentVariant = data.variants.find((v: any) => v.id === cartItem.variantId);
-        
+      state.items.forEach((cartItem) => {
+        const currentVariant = data.variants.find(
+          (v: any) => v.id === cartItem.variantId,
+        );
+
         if (!currentVariant) {
           issues.push({
             variantId: cartItem.variantId,
-            type: 'product_unavailable',
-            message: `${cartItem.title} ya no está disponible`
+            type: "product_unavailable",
+            message: `${cartItem.title} ya no está disponible`,
           });
           return;
         }
 
         // Check stock availability
-        if (currentVariant.status !== 'AVAILABLE') {
+        if (currentVariant.status !== "AVAILABLE") {
           issues.push({
             variantId: cartItem.variantId,
-            type: 'stock_unavailable',
-            message: `${cartItem.title} ya no está disponible`
+            type: "stock_unavailable",
+            message: `${cartItem.title} ya no está disponible`,
           });
           return;
         }
@@ -115,16 +131,16 @@ export function useCartValidation() {
           if (currentVariant.stock === 0) {
             issues.push({
               variantId: cartItem.variantId,
-              type: 'stock_unavailable',
-              message: `${cartItem.title} se ha agotado`
+              type: "stock_unavailable",
+              message: `${cartItem.title} se ha agotado`,
             });
           } else {
             issues.push({
               variantId: cartItem.variantId,
-              type: 'stock_reduced',
+              type: "stock_reduced",
               currentValue: currentVariant.stock,
               cartValue: cartItem.quantity,
-              message: `${cartItem.title}: solo quedan ${currentVariant.stock} unidades (tienes ${cartItem.quantity} en el carrito)`
+              message: `${cartItem.title}: solo quedan ${currentVariant.stock} unidades (tienes ${cartItem.quantity} en el carrito)`,
             });
           }
         }
@@ -134,10 +150,10 @@ export function useCartValidation() {
         if (currentPriceInEuros !== cartItem.price) {
           issues.push({
             variantId: cartItem.variantId,
-            type: 'price_changed',
+            type: "price_changed",
             currentValue: currentPriceInEuros,
             cartValue: cartItem.price,
-            message: `${cartItem.title}: el precio ha cambiado de €${cartItem.price.toFixed(2)} a €${currentPriceInEuros.toFixed(2)}`
+            message: `${cartItem.title}: el precio ha cambiado de €${cartItem.price.toFixed(2)} a €${currentPriceInEuros.toFixed(2)}`,
           });
         }
       });
@@ -146,15 +162,14 @@ export function useCartValidation() {
         isValid: issues.length === 0,
         issues,
         isLoading: false,
-        lastChecked: new Date()
+        lastChecked: new Date(),
       });
-
     } catch (error) {
-      console.error('Error validating cart:', error);
-      setValidationResult(prev => ({
+      console.error("Error validating cart:", error);
+      setValidationResult((prev) => ({
         ...prev,
         isLoading: false,
-        lastChecked: new Date()
+        lastChecked: new Date(),
       }));
     }
   }, [state.items]);
@@ -177,6 +192,6 @@ export function useCartValidation() {
 
   return {
     ...validationResult,
-    validateCart
+    validateCart,
   };
 }

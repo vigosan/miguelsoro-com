@@ -1,10 +1,10 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Link from "next/link";
-import { 
-  PhotoIcon, 
+import {
+  PhotoIcon,
   ShoppingBagIcon,
   CurrencyEuroIcon,
-  EyeIcon
+  EyeIcon,
 } from "@heroicons/react/24/outline";
 import { usePictureStats } from "@/hooks/usePictures";
 import { useOrderStats } from "@/hooks/useOrders";
@@ -12,15 +12,16 @@ import { useOrderStats } from "@/hooks/useOrders";
 const recentActivity: any[] = [];
 
 export default function AdminDashboard() {
-  const { data: pictureStats, isLoading: pictureStatsLoading } = usePictureStats();
+  const { data: pictureStats, isLoading: pictureStatsLoading } =
+    usePictureStats();
   const { data: orderStats, isLoading: orderStatsLoading } = useOrderStats();
-  
+
   const loading = pictureStatsLoading || orderStatsLoading;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR',
+    return new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "EUR",
     }).format(amount / 100);
   };
 
@@ -30,28 +31,32 @@ export default function AdminDashboard() {
       value: loading ? "..." : (pictureStats?.totalPictures || 0).toString(),
       icon: PhotoIcon,
       href: "/admin/pictures",
-      color: "bg-gray-900"
+      color: "bg-gray-900",
     },
     {
-      name: "Cuadros Disponibles", 
-      value: loading ? "..." : (pictureStats?.availablePictures || 0).toString(),
+      name: "Cuadros Disponibles",
+      value: loading
+        ? "..."
+        : (pictureStats?.availablePictures || 0).toString(),
       icon: EyeIcon,
       href: "/admin/pictures?status=available",
-      color: "bg-green-500"
+      color: "bg-green-500",
     },
     {
       name: "No Disponibles",
-      value: loading ? "..." : (pictureStats?.notAvailablePictures || 0).toString(), 
+      value: loading
+        ? "..."
+        : (pictureStats?.notAvailablePictures || 0).toString(),
       icon: ShoppingBagIcon,
       href: "/admin/pictures?status=not-available",
-      color: "bg-gray-500"
+      color: "bg-gray-500",
     },
     {
       name: "Ingresos Totales",
       value: loading ? "..." : formatCurrency(orderStats?.totalRevenue || 0),
       icon: CurrencyEuroIcon,
       href: "/admin/orders",
-      color: "bg-yellow-500"
+      color: "bg-yellow-500",
     },
   ];
   return (
@@ -59,7 +64,9 @@ export default function AdminDashboard() {
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Dashboard
+          </h1>
           <p className="mt-2 text-sm sm:text-base text-gray-600">
             Resumen de la galería Miguel Soro
           </p>
@@ -75,13 +82,18 @@ export default function AdminDashboard() {
             >
               <div className="flex items-center">
                 <div className={`p-2 sm:p-3 rounded-lg ${stat.color}`}>
-                  <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" aria-hidden="true" />
+                  <stat.icon
+                    className="h-5 w-5 sm:h-6 sm:w-6 text-white"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="ml-3 sm:ml-4 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 group-hover:text-gray-900 truncate">
                     {stat.name}
                   </p>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{stat.value}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
+                    {stat.value}
+                  </p>
                 </div>
               </div>
             </Link>
@@ -143,20 +155,21 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {recentActivity.length > 0 ? (
                 recentActivity.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start space-x-3"
-                  >
+                  <div key={activity.id} className="flex items-start space-x-3">
                     <div className="h-2 w-2 bg-gray-900 rounded-full mt-2 flex-shrink-0"></div>
                     <div>
-                      <p className="text-sm text-gray-900">{activity.message}</p>
+                      <p className="text-sm text-gray-900">
+                        {activity.message}
+                      </p>
                       <p className="text-xs text-gray-500">{activity.time}</p>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-sm text-gray-500">No hay actividad reciente</p>
+                  <p className="text-sm text-gray-500">
+                    No hay actividad reciente
+                  </p>
                   <p className="text-xs text-gray-400 mt-1">
                     Los eventos aparecerán aquí cuando ocurran
                   </p>

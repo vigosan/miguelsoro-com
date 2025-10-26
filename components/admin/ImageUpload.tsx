@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import Image from 'next/image';
-import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { toast } from 'react-hot-toast';
+import { useState, useRef } from "react";
+import Image from "next/image";
+import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-hot-toast";
 
 type Props = {
   currentImageUrl?: string;
@@ -9,23 +9,28 @@ type Props = {
   onImageRemoved?: () => void;
 };
 
-export function ImageUpload({ currentImageUrl, onImageUploaded, onImageRemoved }: Props) {
+export function ImageUpload({
+  currentImageUrl,
+  onImageUploaded,
+  onImageRemoved,
+}: Props) {
   const [uploading, setUploading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(currentImageUrl || null);
+  const [preview, setPreview] = useState<string | null>(
+    currentImageUrl || null,
+  );
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = async (file: File) => {
-
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Por favor selecciona una imagen válida');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Por favor selecciona una imagen válida");
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('La imagen no puede ser mayor a 5MB');
+      toast.error("La imagen no puede ser mayor a 5MB");
       return;
     }
 
@@ -41,12 +46,12 @@ export function ImageUpload({ currentImageUrl, onImageUploaded, onImageRemoved }
 
       // Upload to Vercel Blob
       const base64 = await fileToBase64(file);
-      const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+      const filename = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
 
-      const response = await fetch('/api/admin/upload-image', {
-        method: 'POST',
+      const response = await fetch("/api/admin/upload-image", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           filename,
@@ -57,21 +62,25 @@ export function ImageUpload({ currentImageUrl, onImageUploaded, onImageRemoved }
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al subir la imagen');
+        throw new Error(data.error || "Error al subir la imagen");
       }
 
       onImageUploaded(data.url);
-      toast.success('Imagen subida correctamente');
+      toast.success("Imagen subida correctamente");
     } catch (error) {
-      console.error('Error uploading image:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al subir la imagen');
+      console.error("Error uploading image:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Error al subir la imagen",
+      );
       setPreview(currentImageUrl || null);
     } finally {
       setUploading(false);
     }
   };
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
     await processFile(file);
@@ -81,7 +90,7 @@ export function ImageUpload({ currentImageUrl, onImageUploaded, onImageRemoved }
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     const files = e.dataTransfer.files;
     if (files && files[0]) {
       await processFile(files[0]);
@@ -106,7 +115,7 @@ export function ImageUpload({ currentImageUrl, onImageUploaded, onImageRemoved }
       onImageRemoved();
     }
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -150,22 +159,19 @@ export function ImageUpload({ currentImageUrl, onImageUploaded, onImageRemoved }
           onDragLeave={handleDragLeave}
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
             dragActive
-              ? 'border-gray-400 bg-gray-50'
-              : 'border-gray-300 hover:border-gray-400'
+              ? "border-gray-400 bg-gray-50"
+              : "border-gray-300 hover:border-gray-400"
           }`}
         >
           <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
           <p className="mt-2 text-sm text-gray-600">
-            {uploading 
-              ? 'Subiendo imagen...' 
-              : dragActive 
-                ? 'Suelta la imagen aquí'
-                : 'Haz clic o arrastra una imagen aquí'
-            }
+            {uploading
+              ? "Subiendo imagen..."
+              : dragActive
+                ? "Suelta la imagen aquí"
+                : "Haz clic o arrastra una imagen aquí"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
-            PNG, JPG, WebP hasta 5MB
-          </p>
+          <p className="text-xs text-gray-400 mt-1">PNG, JPG, WebP hasta 5MB</p>
         </div>
       )}
 

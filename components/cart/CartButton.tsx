@@ -1,11 +1,13 @@
-import { ShoppingBagIcon } from '@heroicons/react/24/outline';
-import { useCart } from '../../contexts/CartContext';
+import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { useCart } from "../../contexts/CartContext";
 
 interface CartButtonProps {
   className?: string;
 }
 
-export default function CartButton({ className = 'text-gray-700 hover:text-gray-900' }: CartButtonProps) {
+export default function CartButton({
+  className = "text-gray-700 hover:text-gray-900",
+}: CartButtonProps) {
   const { state, toggleCart } = useCart();
 
   return (

@@ -6,10 +6,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { Toaster, toast } from "react-hot-toast";
 import { slugify } from "@/utils/slug";
 import { ImageUpload } from "@/components/admin/ImageUpload";
-import { 
-  ArrowLeftIcon,
-  PhotoIcon
-} from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -30,26 +27,26 @@ export default function NewPicture() {
   const [saving, setSaving] = useState(false);
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    price: '',
-    size: '',
-    slug: '',
-    productTypeId: '',
-    stock: '1',
-    imageUrl: '',
+    title: "",
+    description: "",
+    price: "",
+    size: "",
+    slug: "",
+    productTypeId: "",
+    stock: "1",
+    imageUrl: "",
   });
 
   useEffect(() => {
     const fetchProductTypes = async () => {
       try {
-        const response = await fetch('/api/admin/product-types');
+        const response = await fetch("/api/admin/product-types");
         if (response.ok) {
           const data = await response.json();
           setProductTypes(data.productTypes);
         }
       } catch (error) {
-        console.error('Error fetching product types:', error);
+        console.error("Error fetching product types:", error);
       }
     };
 
@@ -59,38 +56,38 @@ export default function NewPicture() {
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
   const handleTitleChange = (title: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       title,
-      slug: !slugManuallyEdited ? slugify(title) : prev.slug // Auto-generate slug unless manually modified
+      slug: !slugManuallyEdited ? slugify(title) : prev.slug, // Auto-generate slug unless manually modified
     }));
   };
 
   const handleSlugChange = (slug: string) => {
     setSlugManuallyEdited(true);
-    setFormData(prev => ({ ...prev, slug }));
+    setFormData((prev) => ({ ...prev, slug }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.imageUrl) {
-      toast.error('Por favor sube una imagen para el cuadro');
+      toast.error("Por favor sube una imagen para el cuadro");
       return;
     }
 
     if (!formData.productTypeId) {
-      toast.error('Por favor selecciona un tipo de producto');
+      toast.error("Por favor selecciona un tipo de producto");
       return;
     }
-    
+
     setSaving(true);
-    
+
     try {
-      const response = await fetch('/api/admin/pictures', {
-        method: 'POST',
+      const response = await fetch("/api/admin/pictures", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
@@ -98,18 +95,20 @@ export default function NewPicture() {
           stock: parseInt(formData.stock) || 1,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(data.error || 'Error al crear el cuadro');
+        throw new Error(data.error || "Error al crear el cuadro");
       }
-      
-      toast.success('Cuadro creado correctamente');
-      router.push('/admin/pictures');
+
+      toast.success("Cuadro creado correctamente");
+      router.push("/admin/pictures");
     } catch (error) {
-      console.error('Error creating picture:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al crear el cuadro');
+      console.error("Error creating picture:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Error al crear el cuadro",
+      );
     } finally {
       setSaving(false);
     }
@@ -137,7 +136,10 @@ export default function NewPicture() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white shadow rounded-lg p-6 space-y-6"
+            >
               <Input
                 label="Título *"
                 type="text"
@@ -150,7 +152,9 @@ export default function NewPicture() {
               <Textarea
                 label="Descripción"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 rows={4}
                 placeholder="Descripción del cuadro..."
               />
@@ -158,11 +162,13 @@ export default function NewPicture() {
               <Select
                 label="Tipo de Producto *"
                 value={formData.productTypeId}
-                onChange={(e) => setFormData({ ...formData, productTypeId: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, productTypeId: e.target.value })
+                }
                 required
               >
                 <option value="">Selecciona un tipo</option>
-                {productTypes.map(type => (
+                {productTypes.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.displayName}
                   </option>
@@ -175,7 +181,9 @@ export default function NewPicture() {
                   type="number"
                   step="0.01"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
                   required
                   placeholder="450.00"
                 />
@@ -185,7 +193,9 @@ export default function NewPicture() {
                   type="number"
                   min="0"
                   value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, stock: e.target.value })
+                  }
                   required
                   placeholder="1"
                 />
@@ -194,7 +204,9 @@ export default function NewPicture() {
                   label="Tamaño"
                   type="text"
                   value={formData.size}
-                  onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, size: e.target.value })
+                  }
                   placeholder="120x90 cm"
                 />
               </div>
@@ -209,7 +221,7 @@ export default function NewPicture() {
                   placeholder="eddy-merckx-el-canibal"
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  URL: /pictures/{formData.slug || 'url-del-cuadro'}
+                  URL: /pictures/{formData.slug || "url-del-cuadro"}
                 </p>
                 {!slugManuallyEdited && (
                   <p className="text-xs text-gray-700 mt-1">
@@ -222,8 +234,12 @@ export default function NewPicture() {
 
               <ImageUpload
                 currentImageUrl={formData.imageUrl}
-                onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
-                onImageRemoved={() => setFormData({ ...formData, imageUrl: '' })}
+                onImageUploaded={(url) =>
+                  setFormData({ ...formData, imageUrl: url })
+                }
+                onImageRemoved={() =>
+                  setFormData({ ...formData, imageUrl: "" })
+                }
               />
 
               <div className="flex justify-end space-x-3 pt-6 border-t">
@@ -238,7 +254,7 @@ export default function NewPicture() {
                   disabled={saving}
                   className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                 >
-                  {saving ? 'Creando...' : 'Crear Cuadro'}
+                  {saving ? "Creando..." : "Crear Cuadro"}
                 </button>
               </div>
             </form>
@@ -250,7 +266,7 @@ export default function NewPicture() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Vista Previa
               </h3>
-              
+
               {formData.imageUrl ? (
                 <div className="mb-4">
                   <Image
@@ -269,29 +285,44 @@ export default function NewPicture() {
 
               <div className="space-y-3">
                 <div>
-                  <h4 className="font-semibold text-gray-900">{formData.title || 'Sin título'}</h4>
-                  <p className="text-sm text-gray-500">{formData.size || 'Sin tamaño'}</p>
+                  <h4 className="font-semibold text-gray-900">
+                    {formData.title || "Sin título"}
+                  </h4>
+                  <p className="text-sm text-gray-500">
+                    {formData.size || "Sin tamaño"}
+                  </p>
                   <p className="text-sm text-gray-700">
-                    {productTypes.find(t => t.id === formData.productTypeId)?.displayName || 'Sin tipo'}
+                    {productTypes.find((t) => t.id === formData.productTypeId)
+                      ?.displayName || "Sin tipo"}
                   </p>
                 </div>
-                
+
                 <div>
                   <p className="text-lg font-bold text-gray-900">
-                    {formData.price ? formatCurrency(Math.round(parseFloat(formData.price) * 100)) : '€0.00'}
+                    {formData.price
+                      ? formatCurrency(
+                          Math.round(parseFloat(formData.price) * 100),
+                        )
+                      : "€0.00"}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      parseInt(formData.stock) > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {parseInt(formData.stock) > 0 ? 'Disponible' : 'No disponible'}
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        parseInt(formData.stock) > 0
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {parseInt(formData.stock) > 0
+                        ? "Disponible"
+                        : "No disponible"}
                     </span>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                       Stock: {formData.stock || 0}
                     </span>
                   </div>
                 </div>
-                
+
                 {formData.description && (
                   <p className="text-sm text-gray-600 line-clamp-3">
                     {formData.description}
@@ -299,7 +330,6 @@ export default function NewPicture() {
                 )}
               </div>
             </div>
-
           </div>
         </div>
 

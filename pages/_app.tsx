@@ -7,15 +7,18 @@ import { CartProvider } from "../contexts/CartContext";
 import "./globals.css";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        gcTime: 1000 * 60 * 30, // 30 minutes
-        refetchOnWindowFocus: false,
-      },
-    },
-  }));
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 1000 * 60 * 5, // 5 minutes
+            gcTime: 1000 * 60 * 30, // 30 minutes
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

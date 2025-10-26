@@ -1,5 +1,9 @@
-import { useState } from 'react';
-import { FunnelIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { useState } from "react";
+import {
+  FunnelIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@heroicons/react/24/outline";
 
 interface FiltersProps {
   filters: {
@@ -11,9 +15,14 @@ interface FiltersProps {
   resultCount: number;
 }
 
-export function Filters({ filters, onFiltersChange, availableTypes, resultCount }: FiltersProps) {
+export function Filters({
+  filters,
+  onFiltersChange,
+  availableTypes,
+  resultCount,
+}: FiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const handleProductTypeChange = (productType: string) => {
     onFiltersChange({ ...filters, productType });
   };
@@ -23,7 +32,7 @@ export function Filters({ filters, onFiltersChange, availableTypes, resultCount 
   };
 
   const clearFilters = () => {
-    onFiltersChange({ productType: '', status: '' });
+    onFiltersChange({ productType: "", status: "" });
   };
 
   const hasActiveFilters = filters.productType || filters.status;
@@ -33,7 +42,8 @@ export function Filters({ filters, onFiltersChange, availableTypes, resultCount 
       {/* Header Row */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          {resultCount} obra{resultCount !== 1 ? 's' : ''} encontrada{resultCount !== 1 ? 's' : ''}
+          {resultCount} obra{resultCount !== 1 ? "s" : ""} encontrada
+          {resultCount !== 1 ? "s" : ""}
         </p>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -68,7 +78,7 @@ export function Filters({ filters, onFiltersChange, availableTypes, resultCount 
               </button>
             )}
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tipo de producto */}
             <div>

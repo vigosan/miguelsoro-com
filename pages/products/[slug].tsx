@@ -5,17 +5,21 @@ import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { useProduct } from "@/hooks/useProduct";
 import { formatPrice } from "@/domain/product";
-import { 
+import {
   ArrowLeftIcon,
   ShoppingBagIcon,
-  HeartIcon
+  HeartIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
 
 export default function ProductPage() {
   const router = useRouter();
   const { slug } = router.query;
-  const { data: product, isLoading, error } = useProduct(typeof slug === "string" ? slug : undefined);
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useProduct(typeof slug === "string" ? slug : undefined);
   const [isFavorite, setIsFavorite] = useState(false);
 
   if (isLoading) {

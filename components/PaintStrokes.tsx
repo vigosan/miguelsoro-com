@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from "react";
 
 interface ElegantBlob {
   id: string;
@@ -10,17 +10,17 @@ interface ElegantBlob {
   grayLevel: number;
   rotation: number;
   path: string;
-  type: 'connector' | 'accent' | 'background';
+  type: "connector" | "accent" | "background";
 }
 
 const GRAY_LEVELS = [
-  'rgba(0, 0, 0, 0.02)',
-  'rgba(0, 0, 0, 0.03)',
-  'rgba(0, 0, 0, 0.04)',
-  'rgba(0, 0, 0, 0.05)',
-  'rgba(0, 0, 0, 0.06)',
-  'rgba(255, 255, 255, 0.02)',
-  'rgba(255, 255, 255, 0.03)',
+  "rgba(0, 0, 0, 0.02)",
+  "rgba(0, 0, 0, 0.03)",
+  "rgba(0, 0, 0, 0.04)",
+  "rgba(0, 0, 0, 0.05)",
+  "rgba(0, 0, 0, 0.06)",
+  "rgba(255, 255, 255, 0.02)",
+  "rgba(255, 255, 255, 0.03)",
 ];
 
 export function PaintStrokes() {
@@ -36,7 +36,14 @@ export function PaintStrokes() {
     };
 
     const numPoints = 8; // Menos puntos para formas más suaves
-    const points: Array<{x: number; y: number; cp1x: number; cp1y: number; cp2x: number; cp2y: number}> = [];
+    const points: Array<{
+      x: number;
+      y: number;
+      cp1x: number;
+      cp1y: number;
+      cp2x: number;
+      cp2y: number;
+    }> = [];
 
     for (let i = 0; i < numPoints; i++) {
       const angle = (i / numPoints) * 2 * Math.PI;
@@ -49,14 +56,23 @@ export function PaintStrokes() {
       const y = 50 + Math.sin(angle) * (radius + wiggle);
 
       // Puntos de control para curvas Bézier suaves
-      const prevAngle = ((i - 1 + numPoints) % numPoints / numPoints) * 2 * Math.PI;
-      const nextAngle = ((i + 1) % numPoints / numPoints) * 2 * Math.PI;
+      const prevAngle =
+        (((i - 1 + numPoints) % numPoints) / numPoints) * 2 * Math.PI;
+      const nextAngle = (((i + 1) % numPoints) / numPoints) * 2 * Math.PI;
 
       const controlDistance = radius * 0.4;
-      const cp1x = x + Math.cos(prevAngle + Math.PI/2) * controlDistance * random(i + 20);
-      const cp1y = y + Math.sin(prevAngle + Math.PI/2) * controlDistance * random(i + 30);
-      const cp2x = x + Math.cos(nextAngle - Math.PI/2) * controlDistance * random(i + 40);
-      const cp2y = y + Math.sin(nextAngle - Math.PI/2) * controlDistance * random(i + 50);
+      const cp1x =
+        x +
+        Math.cos(prevAngle + Math.PI / 2) * controlDistance * random(i + 20);
+      const cp1y =
+        y +
+        Math.sin(prevAngle + Math.PI / 2) * controlDistance * random(i + 30);
+      const cp2x =
+        x +
+        Math.cos(nextAngle - Math.PI / 2) * controlDistance * random(i + 40);
+      const cp2y =
+        y +
+        Math.sin(nextAngle - Math.PI / 2) * controlDistance * random(i + 50);
 
       points.push({ x, y, cp1x, cp1y, cp2x, cp2y });
     }
@@ -71,7 +87,7 @@ export function PaintStrokes() {
       path += ` C ${current.cp2x} ${current.cp2y} ${next.cp1x} ${next.cp1y} ${next.x} ${next.y}`;
     }
 
-    path += ' Z';
+    path += " Z";
     return path;
   };
 
@@ -83,7 +99,7 @@ export function PaintStrokes() {
     const backgroundPositions = [
       { x: 15, y: 25, scale: 2.5, rotation: 15 },
       { x: 75, y: 55, scale: 3.2, rotation: 45 },
-      { x: 35, y: 80, scale: 2.8, rotation: 120 }
+      { x: 35, y: 80, scale: 2.8, rotation: 120 },
     ];
 
     backgroundPositions.forEach((pos, i) => {
@@ -97,7 +113,7 @@ export function PaintStrokes() {
         grayLevel: i % 3, // Usar los primeros 3 grises
         rotation: pos.rotation,
         path: generateSmoothBlob(100 + i), // Seed fijo
-        type: 'background'
+        type: "background",
       });
     });
 
@@ -106,7 +122,7 @@ export function PaintStrokes() {
       { x: 85, y: 15, scale: 1.2, rotation: 30 },
       { x: 10, y: 45, scale: 1.5, rotation: 75 },
       { x: 90, y: 75, scale: 1.3, rotation: 160 },
-      { x: 5, y: 85, scale: 1.1, rotation: 200 }
+      { x: 5, y: 85, scale: 1.1, rotation: 200 },
     ];
 
     connectorPositions.forEach((pos, i) => {
@@ -120,7 +136,7 @@ export function PaintStrokes() {
         grayLevel: (i + 3) % GRAY_LEVELS.length,
         rotation: pos.rotation,
         path: generateSmoothBlob(200 + i), // Seed fijo
-        type: 'connector'
+        type: "connector",
       });
     });
 
@@ -130,7 +146,7 @@ export function PaintStrokes() {
       { x: 65, y: 30, scale: 0.8, rotation: 90 },
       { x: 20, y: 60, scale: 0.5, rotation: 180 },
       { x: 80, y: 40, scale: 0.7, rotation: 270 },
-      { x: 50, y: 95, scale: 0.6, rotation: 45 }
+      { x: 50, y: 95, scale: 0.6, rotation: 45 },
     ];
 
     accentPositions.forEach((pos, i) => {
@@ -144,7 +160,7 @@ export function PaintStrokes() {
         grayLevel: (i + 5) % GRAY_LEVELS.length,
         rotation: pos.rotation,
         path: generateSmoothBlob(300 + i), // Seed fijo
-        type: 'accent'
+        type: "accent",
       });
     });
 
@@ -161,10 +177,10 @@ export function PaintStrokes() {
       setIsVisible(true);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Calcular progreso de scroll para animaciones
@@ -177,7 +193,7 @@ export function PaintStrokes() {
         className="w-full h-full"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        style={{ mixBlendMode: 'normal' }}
+        style={{ mixBlendMode: "normal" }}
       >
         <defs>
           {/* Filtro para suavizar bordes */}
@@ -189,9 +205,9 @@ export function PaintStrokes() {
         {elegantBlobs.map((blob, index) => {
           // Calcular visibilidad basada en tipo y scroll
           let visibilityFactor = 1;
-          if (blob.type === 'background') {
+          if (blob.type === "background") {
             visibilityFactor = Math.min(scrollProgress * 1.5, 1);
-          } else if (blob.type === 'connector') {
+          } else if (blob.type === "connector") {
             const sectionProgress = (scrollProgress - 0.3) * 2;
             visibilityFactor = Math.max(0, Math.min(sectionProgress, 1));
           } else {

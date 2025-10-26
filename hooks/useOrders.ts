@@ -1,7 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Types
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
 
 export type Order = {
   id: string;
@@ -41,12 +46,13 @@ export type OrderStats = {
 
 // Query keys
 export const orderKeys = {
-  all: ['orders'] as const,
-  lists: () => [...orderKeys.all, 'list'] as const,
-  list: (filters: Record<string, any>) => [...orderKeys.lists(), { filters }] as const,
-  details: () => [...orderKeys.all, 'detail'] as const,
+  all: ["orders"] as const,
+  lists: () => [...orderKeys.all, "list"] as const,
+  list: (filters: Record<string, any>) =>
+    [...orderKeys.lists(), { filters }] as const,
+  details: () => [...orderKeys.all, "detail"] as const,
   detail: (id: string) => [...orderKeys.details(), id] as const,
-  stats: () => [...orderKeys.all, 'stats'] as const,
+  stats: () => [...orderKeys.all, "stats"] as const,
 };
 
 // Custom hooks
@@ -55,12 +61,12 @@ export function useOrders(filters?: { status?: OrderStatus; search?: string }) {
     queryKey: orderKeys.list(filters || {}),
     queryFn: async (): Promise<Order[]> => {
       const params = new URLSearchParams();
-      if (filters?.status) params.append('status', filters.status);
-      if (filters?.search) params.append('search', filters.search);
-      
+      if (filters?.status) params.append("status", filters.status);
+      if (filters?.search) params.append("search", filters.search);
+
       const response = await fetch(`/api/admin/orders?${params}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch orders');
+        throw new Error("Failed to fetch orders");
       }
       const data = await response.json();
       return data.orders || [];
@@ -75,7 +81,7 @@ export function useOrder(id: string) {
     queryFn: async (): Promise<Order> => {
       const response = await fetch(`/api/admin/orders/${id}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch order');
+        throw new Error("Failed to fetch order");
       }
       return response.json();
     },
@@ -87,9 +93,9 @@ export function useOrderStats() {
   return useQuery({
     queryKey: orderKeys.stats(),
     queryFn: async (): Promise<OrderStats> => {
-      const response = await fetch('/api/admin/orders/stats');
+      const response = await fetch("/api/admin/orders/stats");
       if (!response.ok) {
-        throw new Error('Failed to fetch order stats');
+        throw new Error("Failed to fetch order stats");
       }
       return response.json();
     },
@@ -103,15 +109,15 @@ export function useUpdateOrderStatus() {
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: OrderStatus }) => {
       const response = await fetch(`/api/admin/orders/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ status }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update order status');
+        throw new Error("Failed to update order status");
       }
 
       return response.json();
@@ -131,11 +137,11 @@ export function useDeleteOrder() {
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(`/api/admin/orders/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete order');
+        throw new Error("Failed to delete order");
       }
 
       return { id };

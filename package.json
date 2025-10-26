@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "format": "prettier --write --plugin=prettier-plugin-tailwindcss \"./**/*.+(ts|tsx|css)\"",
+    "format": "prettier --write \"./**/*.+(ts|tsx|css)\"",
     "start": "next start",
     "test": "vitest",
     "test:watch": "vitest --watch",

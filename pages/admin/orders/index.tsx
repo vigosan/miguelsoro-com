@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { GetServerSideProps } from 'next';
-import { isAuthenticated } from '../../../lib/auth';
-import { AdminLayout } from '../../../components/admin/AdminLayout';
-import { formatPrice } from '../../../domain/order';
-import { orderRepository } from '../../../infra/dependencies';
-import Link from 'next/link';
-import { Input } from '../../../components/ui/Input';
-import { Select } from '../../../components/ui/Select';
+import { useState } from "react";
+import { GetServerSideProps } from "next";
+import { isAuthenticated } from "../../../lib/auth";
+import { AdminLayout } from "../../../components/admin/AdminLayout";
+import { formatPrice } from "../../../domain/order";
+import { orderRepository } from "../../../infra/dependencies";
+import Link from "next/link";
+import { Input } from "../../../components/ui/Input";
+import { Select } from "../../../components/ui/Select";
 
 interface Order {
   id: string;
@@ -27,43 +27,47 @@ interface Props {
 }
 
 const statusColors = {
-  PENDING: 'bg-yellow-100 text-yellow-800',
-  PAID: 'bg-green-100 text-green-800',
-  PROCESSING: 'bg-blue-100 text-blue-800',
-  SHIPPED: 'bg-purple-100 text-purple-800',
-  DELIVERED: 'bg-green-100 text-green-800',
-  CANCELLED: 'bg-red-100 text-red-800',
-  REFUNDED: 'bg-gray-100 text-gray-800',
+  PENDING: "bg-yellow-100 text-yellow-800",
+  PAID: "bg-green-100 text-green-800",
+  PROCESSING: "bg-blue-100 text-blue-800",
+  SHIPPED: "bg-purple-100 text-purple-800",
+  DELIVERED: "bg-green-100 text-green-800",
+  CANCELLED: "bg-red-100 text-red-800",
+  REFUNDED: "bg-gray-100 text-gray-800",
 };
 
 const statusLabels = {
-  PENDING: 'Pendiente',
-  PAID: 'Pagado',
-  PROCESSING: 'Procesando',
-  SHIPPED: 'Enviado',
-  DELIVERED: 'Entregado',
-  CANCELLED: 'Cancelado',
-  REFUNDED: 'Reembolsado',
+  PENDING: "Pendiente",
+  PAID: "Pagado",
+  PROCESSING: "Procesando",
+  SHIPPED: "Enviado",
+  DELIVERED: "Entregado",
+  CANCELLED: "Cancelado",
+  REFUNDED: "Reembolsado",
 };
 
 export default function AdminOrdersPage({ orders }: Props) {
-  const [filter, setFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredOrders = orders.filter(order => {
-    const matchesFilter = filter === 'all' || order.status === filter;
-    const matchesSearch = searchTerm === '' || 
+  const filteredOrders = orders.filter((order) => {
+    const matchesFilter = filter === "all" || order.status === filter;
+    const matchesSearch =
+      searchTerm === "" ||
       order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.id.includes(searchTerm);
-    
+
     return matchesFilter && matchesSearch;
   });
 
-  const orderStats = orders.reduce((acc, order) => {
-    acc[order.status] = (acc[order.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const orderStats = orders.reduce(
+    (acc, order) => {
+      acc[order.status] = (acc[order.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   return (
     <AdminLayout title="Gestión de Pedidos">
@@ -71,7 +75,9 @@ export default function AdminOrdersPage({ orders }: Props) {
         {/* Header */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Pedidos</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Pedidos
+            </h1>
             <p className="mt-2 text-sm sm:text-base text-gray-600">
               Gestiona todos los pedidos de la tienda
             </p>
@@ -81,19 +87,27 @@ export default function AdminOrdersPage({ orders }: Props) {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <div className="text-2xl font-bold text-gray-900">{orders.length}</div>
+            <div className="text-2xl font-bold text-gray-900">
+              {orders.length}
+            </div>
             <div className="text-sm text-gray-500">Total pedidos</div>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <div className="text-2xl font-bold text-green-600">{orderStats.PAID || 0}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {orderStats.PAID || 0}
+            </div>
             <div className="text-sm text-gray-500">Pagados</div>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <div className="text-2xl font-bold text-yellow-600">{orderStats.PENDING || 0}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {orderStats.PENDING || 0}
+            </div>
             <div className="text-sm text-gray-500">Pendientes</div>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <div className="text-2xl font-bold text-blue-600">{orderStats.PROCESSING || 0}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {orderStats.PROCESSING || 0}
+            </div>
             <div className="text-sm text-gray-500">Procesando</div>
           </div>
         </div>
@@ -150,17 +164,21 @@ export default function AdminOrdersPage({ orders }: Props) {
                         {formatPrice(order.total)}
                       </span>
                       <span>·</span>
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
-                        {statusLabels[order.status as keyof typeof statusLabels] || order.status}
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status as keyof typeof statusColors] || "bg-gray-100 text-gray-800"}`}
+                      >
+                        {statusLabels[
+                          order.status as keyof typeof statusLabels
+                        ] || order.status}
                       </span>
                       <span>·</span>
                       <span>
-                        {new Date(order.createdAt).toLocaleDateString('es-ES', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
+                        {new Date(order.createdAt).toLocaleDateString("es-ES", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })}
                       </span>
                     </div>
@@ -180,9 +198,24 @@ export default function AdminOrdersPage({ orders }: Props) {
                     title="Ver detalles"
                     data-testid={`view-order-${order.id}`}
                   >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
                     </svg>
                   </Link>
                 </div>
@@ -192,14 +225,28 @@ export default function AdminOrdersPage({ orders }: Props) {
 
           {filteredOrders.length === 0 && (
             <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                />
               </svg>
               <h3 className="mt-2 text-sm font-semibold text-gray-900">
-                {(filter !== 'all' || searchTerm) ? 'No se encontraron pedidos' : 'No hay pedidos'}
+                {filter !== "all" || searchTerm
+                  ? "No se encontraron pedidos"
+                  : "No hay pedidos"}
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                {(filter !== 'all' || searchTerm) ? 'Intenta cambiar los filtros de búsqueda.' : 'Los pedidos aparecerán aquí cuando se realicen.'}
+                {filter !== "all" || searchTerm
+                  ? "Intenta cambiar los filtros de búsqueda."
+                  : "Los pedidos aparecerán aquí cuando se realicen."}
               </p>
             </div>
           )}
@@ -215,7 +262,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!authenticated) {
     return {
       redirect: {
-        destination: '/admin/login',
+        destination: "/admin/login",
         permanent: false,
       },
     };
@@ -226,7 +273,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     return {
       props: {
-        orders: orders.map(order => ({
+        orders: orders.map((order) => ({
           id: order.id,
           customerEmail: order.customerEmail,
           customerName: order.customerName,
@@ -242,7 +289,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error("Error fetching orders:", error);
     return {
       props: {
         orders: [],

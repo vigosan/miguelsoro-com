@@ -1,70 +1,96 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { ordersController } from '../../../lib/paypal';
-import { Order, OrderRequest, CheckoutPaymentIntent } from '@paypal/paypal-server-sdk';
-import { productVariantRepository, createOrder } from '../../../infra/dependencies';
-import { CreateOrderRequest, calculateOrderTotal } from '../../../domain/order';
+import { NextApiRequest, NextApiResponse } from "next";
+import { ordersController } from "../../../lib/paypal";
+import {
+  Order,
+  OrderRequest,
+  CheckoutPaymentIntent,
+} from "@paypal/paypal-server-sdk";
+import {
+  productVariantRepository,
+  createOrder,
+} from "../../../infra/dependencies";
+import { CreateOrderRequest, calculateOrderTotal } from "../../../domain/order";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    console.log('PayPal create-order: Request received:', { 
-      customerEmail: req.body.customerEmail ? 'provided' : 'missing',
-      customerName: req.body.customerName ? 'provided' : 'missing',
-      itemsCount: req.body.items?.length || 0
+    console.log("PayPal create-order: Request received:", {
+      customerEmail: req.body.customerEmail ? "provided" : "missing",
+      customerName: req.body.customerName ? "provided" : "missing",
+      itemsCount: req.body.items?.length || 0,
     });
 
-    const { customerEmail, customerName, customerPhone, shippingAddress, items }: CreateOrderRequest = req.body;
+    const {
+      customerEmail,
+      customerName,
+      customerPhone,
+      shippingAddress,
+      items,
+    }: CreateOrderRequest = req.body;
 
     if (!customerEmail || !customerName || !items || items.length === 0) {
-      console.log('PayPal create-order: Missing required fields validation failed');
-      return res.status(400).json({ error: 'Missing required fields' });
+      console.log(
+        "PayPal create-order: Missing required fields validation failed",
+      );
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
     // Fetch product variants to calculate pricing
-    const variantIds = items.map(item => item.variantId);
-    console.log('PayPal create-order: Fetching variants for IDs:', variantIds);
-    
-    const variants = await productVariantRepository.findAvailableByIds(variantIds);
-    console.log('PayPal create-order: Found variants:', variants.length, 'out of', variantIds.length);
+    const variantIds = items.map((item) => item.variantId);
+    console.log("PayPal create-order: Fetching variants for IDs:", variantIds);
+
+    const variants =
+      await productVariantRepository.findAvailableByIds(variantIds);
+    console.log(
+      "PayPal create-order: Found variants:",
+      variants.length,
+      "out of",
+      variantIds.length,
+    );
 
     if (variants.length !== variantIds.length) {
-      console.log('PayPal create-order: Some variants not found. Expected:', variantIds.length, 'Found:', variants.length);
-      return res.status(400).json({ error: 'Some products are not available' });
+      console.log(
+        "PayPal create-order: Some variants not found. Expected:",
+        variantIds.length,
+        "Found:",
+        variants.length,
+      );
+      return res.status(400).json({ error: "Some products are not available" });
     }
 
     // Calculate order totals
-    const orderItems = items.map(item => {
-      const variant = variants.find(v => v.id === item.variantId);
-      if (!variant) throw new Error('Variant not found');
+    const orderItems = items.map((item) => {
+      const variant = variants.find((v) => v.id === item.variantId);
+      if (!variant) throw new Error("Variant not found");
 
       return {
         variantId: variant.id,
         quantity: item.quantity,
         price: variant.price,
         total: variant.price * item.quantity,
-        variant
+        variant,
       };
     });
 
     const { subtotal, tax, shipping, total } = calculateOrderTotal(
-      orderItems.map(item => ({
-        id: '',
-        orderId: '',
+      orderItems.map((item) => ({
+        id: "",
+        orderId: "",
         variantId: item.variantId,
         quantity: item.quantity,
         price: item.price,
         total: item.total,
-        createdAt: new Date()
-      }))
+        createdAt: new Date(),
+      })),
     );
 
-    console.log('PayPal create-order: Order totals calculated:', {
+    console.log("PayPal create-order: Order totals calculated:", {
       subtotal,
       tax,
       shipping,
@@ -72,7 +98,7 @@ export default async function handler(
       subtotalEur: (subtotal / 100).toFixed(2),
       taxEur: (tax / 100).toFixed(2),
       shippingEur: (shipping / 100).toFixed(2),
-      totalEur: (total / 100).toFixed(2)
+      totalEur: (total / 100).toFixed(2),
     });
 
     // Create PayPal order
@@ -81,61 +107,71 @@ export default async function handler(
       purchaseUnits: [
         {
           amount: {
-            currencyCode: 'EUR',
+            currencyCode: "EUR",
             value: (total / 100).toFixed(2),
             breakdown: {
               itemTotal: {
-                currencyCode: 'EUR',
-                value: (subtotal / 100).toFixed(2)
+                currencyCode: "EUR",
+                value: (subtotal / 100).toFixed(2),
               },
               taxTotal: {
-                currencyCode: 'EUR',
-                value: (tax / 100).toFixed(2)
+                currencyCode: "EUR",
+                value: (tax / 100).toFixed(2),
               },
               shipping: {
-                currencyCode: 'EUR',
-                value: (shipping / 100).toFixed(2)
-              }
-            }
+                currencyCode: "EUR",
+                value: (shipping / 100).toFixed(2),
+              },
+            },
           },
-          items: orderItems.map(item => ({
+          items: orderItems.map((item) => ({
             name: item.variant.product.title,
             quantity: item.quantity.toString(),
             unitAmount: {
-              currencyCode: 'EUR',
-              value: (item.price / 100).toFixed(2)
-            }
-          }))
-        }
-      ]
+              currencyCode: "EUR",
+              value: (item.price / 100).toFixed(2),
+            },
+          })),
+        },
+      ],
     };
 
-    console.log('PayPal create-order: Sending request to PayPal API...');
-    console.log('PayPal create-order: Request payload:', JSON.stringify(paypalOrderRequest, null, 2));
+    console.log("PayPal create-order: Sending request to PayPal API...");
+    console.log(
+      "PayPal create-order: Request payload:",
+      JSON.stringify(paypalOrderRequest, null, 2),
+    );
 
     const { body: paypalOrderResponse } = await ordersController.createOrder({
-      body: paypalOrderRequest
+      body: paypalOrderRequest,
     });
 
-    console.log('PayPal create-order: Raw PayPal API response:', JSON.stringify(paypalOrderResponse, null, 2));
+    console.log(
+      "PayPal create-order: Raw PayPal API response:",
+      JSON.stringify(paypalOrderResponse, null, 2),
+    );
 
     // Parse the response if it's a string
     let paypalOrder: Order;
-    if (typeof paypalOrderResponse === 'string') {
+    if (typeof paypalOrderResponse === "string") {
       paypalOrder = JSON.parse(paypalOrderResponse) as Order;
-      console.log('PayPal create-order: Parsed JSON string response');
+      console.log("PayPal create-order: Parsed JSON string response");
     } else {
       paypalOrder = paypalOrderResponse as Order;
     }
 
-    console.log('PayPal create-order: PayPal API response received:', {
+    console.log("PayPal create-order: PayPal API response received:", {
       id: paypalOrder?.id,
-      status: paypalOrder?.status
+      status: paypalOrder?.status,
     });
 
     if (!paypalOrder || !paypalOrder.id) {
-      console.error('PayPal create-order: PayPal API did not return a valid order ID');
-      return res.status(500).json({ error: 'PayPal order creation failed - no order ID returned' });
+      console.error(
+        "PayPal create-order: PayPal API did not return a valid order ID",
+      );
+      return res
+        .status(500)
+        .json({ error: "PayPal order creation failed - no order ID returned" });
     }
 
     // Create order in database
@@ -149,25 +185,25 @@ export default async function handler(
       tax,
       shipping,
       total,
-      items: items.map(item => ({
+      items: items.map((item) => ({
         variantId: item.variantId,
-        quantity: item.quantity
-      }))
+        quantity: item.quantity,
+      })),
     });
 
     res.status(200).json({
       paypalOrderId: paypalOrder.id,
       orderId: order.id,
       total: order.total,
-      approvalUrl: paypalOrder.links?.find(link => link.rel === 'approve')?.href
+      approvalUrl: paypalOrder.links?.find((link) => link.rel === "approve")
+        ?.href,
     });
-
   } catch (error) {
-    console.error('PayPal create-order: Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
+    console.error("PayPal create-order: Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
-      error: error
+      error: error,
     });
-    res.status(500).json({ error: 'Failed to create order' });
+    res.status(500).json({ error: "Failed to create order" });
   }
 }

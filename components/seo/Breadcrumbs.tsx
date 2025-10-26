@@ -15,29 +15,29 @@ interface BreadcrumbsProps {
 export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
   return (
     <nav className={`mb-8 ${className}`} aria-label="Breadcrumb">
-      <ol 
+      <ol
         className="flex items-center space-x-2 text-sm"
-        itemScope 
+        itemScope
         itemType="https://schema.org/BreadcrumbList"
       >
         {items.map((item, index) => (
-          <li 
+          <li
             key={item.href}
-            className={`flex items-center ${item.current ? 'text-gray-900 font-medium' : 'text-gray-500'}`}
+            className={`flex items-center ${item.current ? "text-gray-900 font-medium" : "text-gray-500"}`}
             itemProp="itemListElement"
             itemScope
             itemType="https://schema.org/ListItem"
           >
             {!item.current ? (
-              <Link 
-                href={item.href} 
+              <Link
+                href={item.href}
                 className="hover:text-gray-700 transition-colors"
                 itemProp="item"
               >
                 <span itemProp="name">{item.name}</span>
               </Link>
             ) : (
-              <span 
+              <span
                 className="truncate max-w-xs sm:max-w-sm md:max-w-md"
                 itemProp="name"
                 aria-current="page"
@@ -46,10 +46,10 @@ export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
               </span>
             )}
             <meta itemProp="position" content={(index + 1).toString()} />
-            
+
             {index < items.length - 1 && (
-              <ChevronRightIcon 
-                className="ml-2 h-4 w-4 text-gray-400 flex-shrink-0" 
+              <ChevronRightIcon
+                className="ml-2 h-4 w-4 text-gray-400 flex-shrink-0"
                 aria-hidden="true"
               />
             )}

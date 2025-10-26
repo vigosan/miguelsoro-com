@@ -1,60 +1,64 @@
-import React from 'react'
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@/test/renderWithProviders'
-import { Item } from '@/components/Item'
-import { Picture } from '@/domain/picture'
+import React from "react";
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@/test/renderWithProviders";
+import { Item } from "@/components/Item";
+import { Picture } from "@/domain/picture";
 
 const mockPicture: Picture = {
-  id: '1',
-  title: 'Test Picture',
-  description: 'A test picture description',
+  id: "1",
+  title: "Test Picture",
+  description: "A test picture description",
   price: 100000, // 1000 EUR in cents
-  size: '120x90',
-  slug: 'test-picture',
-  imageUrl: '/pictures/1.webp',
-  status: 'AVAILABLE',
-  productTypeId: 'cuadros',
-  productTypeName: 'Cuadros Originales',
+  size: "120x90",
+  slug: "test-picture",
+  imageUrl: "/pictures/1.webp",
+  status: "AVAILABLE",
+  productTypeId: "cuadros",
+  productTypeName: "Cuadros Originales",
   stock: 1,
-  createdAt: '2024-01-01T00:00:00.000Z',
-  updatedAt: '2024-01-01T00:00:00.000Z'
-}
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-01T00:00:00.000Z",
+};
 
-describe('Item Component', () => {
-  it('renders picture title and size', () => {
-    render(<Item item={mockPicture} />)
-    
-    expect(screen.getByText('Test Picture')).toBeInTheDocument()
-    expect(screen.getByText('120x90cm')).toBeInTheDocument()
-  })
+describe("Item Component", () => {
+  it("renders picture title and size", () => {
+    render(<Item item={mockPicture} />);
 
-  it('shows available status when picture is available', () => {
-    render(<Item item={mockPicture} />)
-    
-    expect(screen.getByText('Disponible')).toBeInTheDocument()
-  })
+    expect(screen.getByText("Test Picture")).toBeInTheDocument();
+    expect(screen.getByText("120x90cm")).toBeInTheDocument();
+  });
 
-  it('shows not available status when picture has no stock', () => {
-    const soldPicture = { ...mockPicture, stock: 0 }
-    render(<Item item={soldPicture} />)
-    
-    expect(screen.getByText('No disponible')).toBeInTheDocument()
-  })
+  it("shows available status when picture is available", () => {
+    render(<Item item={mockPicture} />);
 
-  it('renders image with correct alt text', () => {
-    render(<Item item={mockPicture} />)
-    
-    const image = screen.getByRole('img')
-    expect(image).toHaveAttribute('alt', 
-      'Test Picture - Arte ciclístico de Miguel Soro, obra original 120x90cm en acrílico y collage disponible para compra'
-    )
-  })
+    expect(screen.getByText("Disponible")).toBeInTheDocument();
+  });
 
-  it('has proper structured data attributes', () => {
-    render(<Item item={mockPicture} />)
-    
-    const article = screen.getByRole('article')
-    expect(article).toHaveAttribute('itemScope')
-    expect(article).toHaveAttribute('itemType', 'https://schema.org/VisualArtwork')
-  })
-})
+  it("shows not available status when picture has no stock", () => {
+    const soldPicture = { ...mockPicture, stock: 0 };
+    render(<Item item={soldPicture} />);
+
+    expect(screen.getByText("No disponible")).toBeInTheDocument();
+  });
+
+  it("renders image with correct alt text", () => {
+    render(<Item item={mockPicture} />);
+
+    const image = screen.getByRole("img");
+    expect(image).toHaveAttribute(
+      "alt",
+      "Test Picture - Arte ciclístico de Miguel Soro, obra original 120x90cm en acrílico y collage disponible para compra",
+    );
+  });
+
+  it("has proper structured data attributes", () => {
+    render(<Item item={mockPicture} />);
+
+    const article = screen.getByRole("article");
+    expect(article).toHaveAttribute("itemScope");
+    expect(article).toHaveAttribute(
+      "itemType",
+      "https://schema.org/VisualArtwork",
+    );
+  });
+});

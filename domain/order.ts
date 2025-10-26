@@ -46,19 +46,19 @@ export interface ProductVariant {
 }
 
 export enum OrderStatus {
-  PENDING = 'PENDING',
-  PAID = 'PAID',
-  PROCESSING = 'PROCESSING',
-  SHIPPED = 'SHIPPED',
-  DELIVERED = 'DELIVERED',
-  CANCELLED = 'CANCELLED',
-  REFUNDED = 'REFUNDED',
+  PENDING = "PENDING",
+  PAID = "PAID",
+  PROCESSING = "PROCESSING",
+  SHIPPED = "SHIPPED",
+  DELIVERED = "DELIVERED",
+  CANCELLED = "CANCELLED",
+  REFUNDED = "REFUNDED",
 }
 
 export enum VariantStatus {
-  AVAILABLE = 'AVAILABLE',
-  OUT_OF_STOCK = 'OUT_OF_STOCK',
-  DISCONTINUED = 'DISCONTINUED',
+  AVAILABLE = "AVAILABLE",
+  OUT_OF_STOCK = "OUT_OF_STOCK",
+  DISCONTINUED = "DISCONTINUED",
 }
 
 export interface CreateOrderRequest {
@@ -92,7 +92,11 @@ export function formatEuros(euros: number): string {
   return `€${euros.toFixed(2)}`;
 }
 
-export function calculateOrderTotal(items: OrderItem[], shippingRate?: number, freeShippingThreshold?: number): {
+export function calculateOrderTotal(
+  items: OrderItem[],
+  shippingRate?: number,
+  freeShippingThreshold?: number,
+): {
   subtotal: number;
   tax: number;
   shipping: number;
@@ -100,12 +104,12 @@ export function calculateOrderTotal(items: OrderItem[], shippingRate?: number, f
 } {
   const subtotal = items.reduce((sum, item) => sum + item.total, 0);
   const tax = Math.round(subtotal * 0.21); // 21% IVA in Spain
-  
+
   // Use provided shipping settings or fallback to 0
   const standardRate = shippingRate ?? 0; // Default 0 (no shipping)
   const threshold = freeShippingThreshold ?? 0; // Default 0 (no free shipping)
   const shipping = standardRate > 0 && subtotal >= threshold ? 0 : standardRate;
-  
+
   const total = subtotal + tax + shipping;
 
   return { subtotal, tax, shipping, total };

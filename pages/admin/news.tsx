@@ -1,55 +1,62 @@
-import { useState } from 'react';
-import { AdminLayout } from '@/components/admin/AdminLayout';
-import { useNewsAdmin } from '@/hooks/useNewsAdmin';
-import { News, CreateNewsData, NewsType, getNewsTypeInfo, formatNewsDate } from '@/domain/news';
-import { Toaster, toast } from 'react-hot-toast';
-import { 
-  PencilIcon, 
-  TrashIcon, 
+import { useState } from "react";
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import { useNewsAdmin } from "@/hooks/useNewsAdmin";
+import {
+  News,
+  CreateNewsData,
+  NewsType,
+  getNewsTypeInfo,
+  formatNewsDate,
+} from "@/domain/news";
+import { Toaster, toast } from "react-hot-toast";
+import {
+  PencilIcon,
+  TrashIcon,
   PlusIcon,
   EyeIcon,
-  EyeSlashIcon
-} from '@heroicons/react/24/outline';
+  EyeSlashIcon,
+} from "@heroicons/react/24/outline";
 
 type NewsFormData = CreateNewsData;
 
 export default function AdminNews() {
-  const { news, loading, error, createNews, updateNews, deleteNews } = useNewsAdmin();
+  const { news, loading, error, createNews, updateNews, deleteNews } =
+    useNewsAdmin();
   const [showForm, setShowForm] = useState(false);
   const [editingNews, setEditingNews] = useState<News | null>(null);
   const [formData, setFormData] = useState<NewsFormData>({
-    title: '',
-    description: '',
-    type: 'exposicion',
-    date: new Date().toISOString().split('T')[0],
-    location: '',
-    externalUrl: '',
-    published: true
+    title: "",
+    description: "",
+    type: "exposicion",
+    date: new Date().toISOString().split("T")[0],
+    location: "",
+    externalUrl: "",
+    published: true,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       if (editingNews) {
         const updated = await updateNews(editingNews.id, formData);
         if (updated) {
-          toast.success('Noticia actualizada correctamente');
+          toast.success("Noticia actualizada correctamente");
           resetForm();
         } else {
-          toast.error('Error al actualizar la noticia');
+          toast.error("Error al actualizar la noticia");
         }
       } else {
         const created = await createNews(formData);
         if (created) {
-          toast.success('Noticia creada correctamente');
+          toast.success("Noticia creada correctamente");
           resetForm();
         } else {
-          toast.error('Error al crear la noticia');
+          toast.error("Error al crear la noticia");
         }
       }
     } catch (error) {
-      toast.error('Error al procesar la solicitud');
+      toast.error("Error al procesar la solicitud");
     }
   };
 
@@ -59,21 +66,25 @@ export default function AdminNews() {
       title: newsItem.title,
       description: newsItem.description,
       type: newsItem.type,
-      date: newsItem.date.split('T')[0],
-      location: newsItem.location || '',
-      externalUrl: newsItem.externalUrl || '',
-      published: newsItem.published
+      date: newsItem.date.split("T")[0],
+      location: newsItem.location || "",
+      externalUrl: newsItem.externalUrl || "",
+      published: newsItem.published,
     });
     setShowForm(true);
   };
 
   const handleDelete = async (newsItem: News) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar "${newsItem.title}"?`)) {
+    if (
+      window.confirm(
+        `¿Estás seguro de que quieres eliminar "${newsItem.title}"?`,
+      )
+    ) {
       const success = await deleteNews(newsItem.id);
       if (success) {
-        toast.success('Noticia eliminada correctamente');
+        toast.success("Noticia eliminada correctamente");
       } else {
-        toast.error('Error al eliminar la noticia');
+        toast.error("Error al eliminar la noticia");
       }
     }
   };
@@ -81,13 +92,13 @@ export default function AdminNews() {
   const resetForm = () => {
     setEditingNews(null);
     setFormData({
-      title: '',
-      description: '',
-      type: 'exposicion',
-      date: new Date().toISOString().split('T')[0],
-      location: '',
-      externalUrl: '',
-      published: true
+      title: "",
+      description: "",
+      type: "exposicion",
+      date: new Date().toISOString().split("T")[0],
+      location: "",
+      externalUrl: "",
+      published: true,
     });
     setShowForm(false);
   };
@@ -106,7 +117,9 @@ export default function AdminNews() {
     return (
       <AdminLayout title="Gestión de Noticias">
         <div className="flex justify-center items-center py-12">
-          <div className="text-red-500">Error al cargar las noticias: {error}</div>
+          <div className="text-red-500">
+            Error al cargar las noticias: {error}
+          </div>
         </div>
       </AdminLayout>
     );
@@ -137,7 +150,7 @@ export default function AdminNews() {
               <form onSubmit={handleSubmit} className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold">
-                    {editingNews ? 'Editar Noticia' : 'Nueva Noticia'}
+                    {editingNews ? "Editar Noticia" : "Nueva Noticia"}
                   </h2>
                   <button
                     type="button"
@@ -156,7 +169,9 @@ export default function AdminNews() {
                     <input
                       type="text"
                       value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, title: e.target.value })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                       required
                     />
@@ -168,7 +183,12 @@ export default function AdminNews() {
                     </label>
                     <textarea
                       value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          description: e.target.value,
+                        })
+                      }
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                       required
@@ -182,7 +202,12 @@ export default function AdminNews() {
                       </label>
                       <select
                         value={formData.type}
-                        onChange={(e) => setFormData({ ...formData, type: e.target.value as NewsType })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            type: e.target.value as NewsType,
+                          })
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                       >
                         <option value="premio">Premio</option>
@@ -200,7 +225,9 @@ export default function AdminNews() {
                       <input
                         type="date"
                         value={formData.date}
-                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, date: e.target.value })
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                         required
                       />
@@ -214,7 +241,9 @@ export default function AdminNews() {
                     <input
                       type="text"
                       value={formData.location}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, location: e.target.value })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                     />
                   </div>
@@ -226,7 +255,12 @@ export default function AdminNews() {
                     <input
                       type="url"
                       value={formData.externalUrl}
-                      onChange={(e) => setFormData({ ...formData, externalUrl: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          externalUrl: e.target.value,
+                        })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
                       placeholder="https://..."
                     />
@@ -237,10 +271,18 @@ export default function AdminNews() {
                       type="checkbox"
                       id="published"
                       checked={formData.published}
-                      onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          published: e.target.checked,
+                        })
+                      }
                       className="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
                     />
-                    <label htmlFor="published" className="ml-2 text-sm text-gray-700">
+                    <label
+                      htmlFor="published"
+                      className="ml-2 text-sm text-gray-700"
+                    >
                       Publicado
                     </label>
                   </div>
@@ -258,7 +300,7 @@ export default function AdminNews() {
                     type="submit"
                     className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors"
                   >
-                    {editingNews ? 'Actualizar' : 'Crear'} Noticia
+                    {editingNews ? "Actualizar" : "Crear"} Noticia
                   </button>
                 </div>
               </form>
@@ -281,7 +323,10 @@ export default function AdminNews() {
             {news.map((newsItem, index) => {
               const typeInfo = getNewsTypeInfo(newsItem.type);
               return (
-                <div key={newsItem.id} className={`p-4 ${index !== news.length - 1 ? 'border-b border-gray-200' : ''}`}>
+                <div
+                  key={newsItem.id}
+                  className={`p-4 ${index !== news.length - 1 ? "border-b border-gray-200" : ""}`}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0 mr-4">
                       <div className="text-sm font-medium text-gray-900 truncate mb-1">
@@ -292,7 +337,9 @@ export default function AdminNews() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.textColor}`}>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${typeInfo.bgColor} ${typeInfo.textColor}`}
+                      >
                         {typeInfo.label}
                       </span>
                       <button
@@ -311,15 +358,17 @@ export default function AdminNews() {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Status and Date */}
                   <div className="flex items-center justify-between mt-3">
                     <div className="flex items-center space-x-3">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        newsItem.published 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          newsItem.published
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
                         {newsItem.published ? (
                           <>
                             <EyeIcon className="h-3 w-3 mr-1" />

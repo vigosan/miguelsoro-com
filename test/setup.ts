@@ -1,47 +1,47 @@
-import { expect, afterEach, vi } from 'vitest'
-import { cleanup } from '@testing-library/react'
-import * as matchers from '@testing-library/jest-dom/matchers'
+import { expect, afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import * as matchers from "@testing-library/jest-dom/matchers";
 
 // extends Vitest's expect method with methods from react-testing-library
-expect.extend(matchers)
+expect.extend(matchers);
 
 // runs a cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {
-  cleanup()
-})
+  cleanup();
+});
 
 // Mock Next.js router
-vi.mock('next/router', () => ({
+vi.mock("next/router", () => ({
   useRouter: () => ({
-    route: '/',
-    pathname: '/',
+    route: "/",
+    pathname: "/",
     query: {},
-    asPath: '/',
+    asPath: "/",
     push: vi.fn(),
     replace: vi.fn(),
     prefetch: vi.fn().mockResolvedValue(undefined),
   }),
-}))
+}));
 
 // Mock Next.js image
-vi.mock('next/image', () => ({
+vi.mock("next/image", () => ({
   default: (props: any) => {
-    const React = require('react')
-    return React.createElement('img', props)
+    const React = require("react");
+    return React.createElement("img", props);
   },
-}))
+}));
 
 // Mock NextAuth
-vi.mock('next-auth/react', () => ({
-  useSession: vi.fn(() => ({ data: null, status: 'unauthenticated' })),
+vi.mock("next-auth/react", () => ({
+  useSession: vi.fn(() => ({ data: null, status: "unauthenticated" })),
   signIn: vi.fn(),
   signOut: vi.fn(),
-}))
+}));
 
 // Set up global test environment
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -51,11 +51,11 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+}));
