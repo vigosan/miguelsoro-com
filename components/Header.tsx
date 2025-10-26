@@ -23,7 +23,7 @@ export function Header() {
 
   return (
     <header
-      className="pt-4 absolute top-0 left-0 right-0 z-50"
+      className="pt-4 pb-4 absolute top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm"
       data-testid="main-header"
     >
       <nav
@@ -44,15 +44,15 @@ export function Header() {
             priority
             aria-hidden
             data-testid="logo-image"
-            className="invert brightness-0 invert"
+            className="brightness-0"
           />
         </IndexPageLink>
 
         <div className="flex items-center gap-4 lg:hidden">
-          <CartButton className="text-white hover:text-gray-300" />
+          <CartButton className="text-black hover:text-gray-600" />
           <button
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white cursor-pointer"
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-black cursor-pointer"
             onClick={() => setMobileMenuOpen(true)}
             data-testid="mobile-menu-button"
           >
@@ -68,13 +68,13 @@ export function Header() {
           {navigation.map(({ name, Link }) => (
             <Link
               key={name}
-              className="text-sm leading-6 text-white hover:text-gray-300 transition-colors cursor-pointer"
+              className="text-sm leading-6 text-black hover:text-gray-600 transition-colors cursor-pointer"
               data-testid={`nav-link-${name.toLowerCase().replace(/\s+/g, "-")}`}
             >
               {name}
             </Link>
           ))}
-          <CartButton className="text-white hover:text-gray-300" />
+          <CartButton className="text-black hover:text-gray-600" />
         </div>
       </nav>
 

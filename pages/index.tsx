@@ -20,8 +20,8 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
         url="https://www.miguelsoro.com"
       >
         {/* Hero Section - Simple */}
-        <section className="relative bg-black -mx-6 lg:-mx-24">
-          <div className="relative min-h-[70vh] lg:min-h-[80vh]">
+        <section className="relative bg-black -mx-6 lg:-mx-24 pt-20">
+          <div className="relative min-h-[60vh] lg:min-h-[70vh]">
             <div className="absolute inset-0 bg-black/70"></div>
             <Image
               src="/estudio.webp"
@@ -30,8 +30,8 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
               className="object-cover grayscale"
               priority
             />
-            <div className="relative z-10 flex items-center min-h-[70vh] lg:min-h-[80vh]">
-              <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-20">
+            <div className="relative z-10 flex items-center min-h-[60vh] lg:min-h-[70vh]">
+              <div className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-16">
                 <div className="mb-12">
                   <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-white leading-[0.9] tracking-tight uppercase">
                     Miguel
