@@ -18,17 +18,17 @@ const fadeInUp = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const }
   }
-};
+} as const;
 
 const fadeIn = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as any }
+    transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as const }
   }
-};
+} as const;
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -39,16 +39,16 @@ const staggerContainer = {
       delayChildren: 0.2
     }
   }
-};
+} as const;
 
 const staggerItem = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }
   }
-};
+} as const;
 
 export default function IndexPage({ featuredPictures }: IndexPageProps) {
   const { scrollYProgress } = useScroll();
