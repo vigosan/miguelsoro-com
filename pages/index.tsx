@@ -26,7 +26,7 @@ const fadeIn = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 1, ease: "easeOut" }
+    transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as any }
   }
 };
 
