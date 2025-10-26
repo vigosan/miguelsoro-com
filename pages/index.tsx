@@ -71,7 +71,7 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
             className="fixed inset-0 w-full h-screen"
             style={{ opacity: heroOpacity }}
           >
-            <div className="absolute inset-0 bg-black/60 z-10"></div>
+            <div className="absolute inset-0 bg-black/70 z-10"></div>
             <Image
               src="/estudio.webp"
               alt="Miguel Soro en su estudio"
@@ -178,7 +178,7 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
         </section>
 
         {/* About Section - Minimalist */}
-        <section id="about" className="py-32 bg-white">
+        <section id="about" className="relative z-30 py-32 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <div className="grid lg:grid-cols-2 gap-20">
               <motion.div
@@ -231,7 +231,7 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
         </section>
 
         {/* Technique Section - Minimalist */}
-        <section className="py-32 bg-black text-white -mx-6 lg:-mx-24 px-6 lg:px-24 overflow-hidden">
+        <section className="relative z-30 py-32 bg-black text-white -mx-6 lg:-mx-24 px-6 lg:px-24 overflow-hidden">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
               <motion.div
@@ -277,7 +277,7 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
         </section>
 
         {/* Featured Works Section - Minimalist Grid */}
-        <section className="py-32 bg-white">
+        <section className="relative z-30 py-32 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <motion.div
               className="mb-20"
@@ -349,7 +349,7 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
         </section>
 
         {/* Call to Action Final - Minimalist */}
-        <section className="py-32 bg-black text-white -mx-6 lg:-mx-24 px-6 lg:px-24">
+        <section className="relative z-30 py-32 bg-black text-white -mx-6 lg:-mx-24 px-6 lg:px-24">
           <motion.div
             className="max-w-4xl mx-auto text-center"
             initial="hidden"
