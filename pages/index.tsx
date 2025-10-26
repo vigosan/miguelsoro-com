@@ -64,14 +64,14 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
         description="Descubre la colección única de Miguel Soro: centenares de obras de leyendas del ciclismo. Ex-profesional (1998-2003) con exposiciones internacionales en 6 países. Técnicas mixtas acrílico y collage. Reconocido por Forbes y Giant Bicycles."
         url="https://www.miguelsoro.com"
       >
-      {/* Hero Section - Minimalist */}
-      <section className="relative min-h-screen bg-white -mx-6 lg:-mx-24 overflow-hidden">
+      {/* Hero Section - Bold & Dramatic */}
+      <section className="relative min-h-screen bg-black -mx-6 lg:-mx-24 overflow-hidden">
         {/* Background Image - Fixed */}
         <motion.div
           className="fixed inset-0 w-full h-screen"
           style={{ opacity: heroOpacity }}
         >
-          <div className="absolute inset-0 bg-black/40 z-10"></div>
+          <div className="absolute inset-0 bg-black/60 z-10"></div>
           <Image
             src="/estudio.webp"
             alt="Miguel Soro en su estudio"
@@ -82,48 +82,52 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
         </motion.div>
 
         {/* Content - Scrolls over background */}
-        <div className="relative z-20 min-h-screen flex items-center">
+        <div className="relative z-20 min-h-screen flex flex-col justify-center">
           <motion.div
             className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-20"
             initial="hidden"
             animate="visible"
             variants={fadeIn}
           >
-            <div className="max-w-4xl">
-              <motion.h1
-                className="text-[clamp(4rem,20vw,18rem)] font-light text-white leading-[0.9] tracking-tighter mb-12"
-                initial={{ opacity: 0, y: 100 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-              >
-                Miguel<br />Soro
-              </motion.h1>
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-16"
+            >
+              <h1 className="text-[clamp(3.5rem,16vw,14rem)] font-bold text-white leading-[0.85] tracking-tight uppercase">
+                Miguel<br />
+                Soro
+              </h1>
+            </motion.div>
+
+            <motion.div
+              className="max-w-3xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
+            >
+              <p className="text-2xl md:text-3xl text-white leading-relaxed mb-12">
+                Del pelotón profesional al lienzo.<br />
+                Arte ciclista con la autenticidad de quien vivió el deporte desde dentro.
+              </p>
 
               <motion.div
-                className="space-y-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.5 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
               >
-                <p className="text-2xl md:text-3xl text-white max-w-2xl leading-relaxed font-light">
-                  Del pelotón profesional al lienzo.
-                </p>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 0.8 }}
+                <Link
+                  href="/obra"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-medium hover:bg-gray-200 transition-colors duration-200 uppercase tracking-wider text-sm"
                 >
-                  <Link
-                    href="/obra"
-                    className="inline-flex items-center gap-3 text-xl text-white border-b-2 border-white hover:border-gray-300 transition-colors duration-200 pb-1"
-                  >
-                    <span>Ver obra</span>
-                    <span>→</span>
-                  </Link>
-                </motion.div>
+                  <span>Ver colección</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
               </motion.div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
 
@@ -134,17 +138,15 @@ export default function IndexPage({ featuredPictures }: IndexPageProps) {
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
         >
-          <div className="flex flex-col items-center gap-3 text-white/60">
-            <span className="text-xs uppercase tracking-[0.2em]">Scroll</span>
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </motion.div>
-          </div>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="text-white/60"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </motion.div>
         </motion.div>
       </section>
 

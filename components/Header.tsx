@@ -22,9 +22,9 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="pt-4" data-testid="main-header">
+    <header className="pt-4 absolute top-0 left-0 right-0 z-50" data-testid="main-header">
       <nav
-        className="mx-auto flex items-center justify-between"
+        className="max-w-5xl mx-auto flex items-center justify-between px-6 lg:px-12"
         aria-label="Global"
         data-testid="main-navigation"
       >
@@ -38,14 +38,15 @@ export function Header() {
             priority
             aria-hidden
             data-testid="logo-image"
+            className="invert brightness-0 invert"
           />
         </IndexPageLink>
 
         <div className="flex items-center gap-4 lg:hidden">
-          <CartButton />
+          <CartButton className="text-white hover:text-gray-300" />
           <button
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white cursor-pointer"
             onClick={() => setMobileMenuOpen(true)}
             data-testid="mobile-menu-button"
           >
@@ -56,11 +57,11 @@ export function Header() {
 
         <div className="hidden lg:flex lg:items-center lg:gap-x-8" data-testid="desktop-navigation">
           {navigation.map(({ name, Link }) => (
-            <Link key={name} className="text-sm leading-6 text-gray-900" data-testid={`nav-link-${name.toLowerCase().replace(/\s+/g, '-')}`}>
+            <Link key={name} className="text-sm leading-6 text-white hover:text-gray-300 transition-colors cursor-pointer" data-testid={`nav-link-${name.toLowerCase().replace(/\s+/g, '-')}`}>
               {name}
             </Link>
           ))}
-          <CartButton />
+          <CartButton className="text-white hover:text-gray-300" />
         </div>
       </nav>
 
@@ -76,7 +77,7 @@ export function Header() {
           <div className="flex items-center justify-end">
             <button
               type="button"
-              className="-m-2.5 rounded-md p-2.5 text-gray-700"
+              className="-m-2.5 rounded-md p-2.5 text-gray-700 cursor-pointer"
               onClick={() => setMobileMenuOpen(false)}
               data-testid="mobile-menu-close-button"
             >
@@ -90,7 +91,7 @@ export function Header() {
                 {navigation.map(({ name, Link }) => (
                   <Link
                     key={name}
-                    className="-mx-3 block rounded-lg py-2 px-3 text-base leading-7 text-gray-900 hover:bg-gray-50"
+                    className="-mx-3 block rounded-lg py-2 px-3 text-base leading-7 text-gray-900 hover:bg-gray-50 cursor-pointer"
                     data-testid={`mobile-nav-link-${name.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     {name}
