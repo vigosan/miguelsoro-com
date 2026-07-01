@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useNewsAdmin } from "@/hooks/useNewsAdmin";
 import {
@@ -19,9 +19,12 @@ import {
 
 type NewsFormData = CreateNewsData;
 
+const PAGE_SIZE = 15;
+
 export default function AdminNews() {
   const { news, loading, error, createNews, updateNews, deleteNews } =
     useNewsAdmin();
+  const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingNews, setEditingNews] = useState<News | null>(null);
   const [formData, setFormData] = useState<NewsFormData>({
@@ -103,6 +106,18 @@ export default function AdminNews() {
     setShowForm(false);
   };
 
+  const totalPages = Math.max(1, Math.ceil(news.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pagedNews = news.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
+  // Keep the current page in range as items are added/removed.
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
   if (loading) {
     return (
       <AdminLayout title="Gestión de Noticias">
@@ -145,17 +160,23 @@ export default function AdminNews() {
 
         {/* Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="news-modal-title"
+          >
             <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <form onSubmit={handleSubmit} className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">
+                  <h2 id="news-modal-title" className="text-xl font-semibold">
                     {editingNews ? "Editar Noticia" : "Nueva Noticia"}
                   </h2>
                   <button
                     type="button"
                     onClick={resetForm}
                     className="text-gray-400 hover:text-gray-600"
+                    aria-label="Cerrar"
                   >
                     ✕
                   </button>
@@ -320,12 +341,12 @@ export default function AdminNews() {
 
           {/* News Items */}
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            {news.map((newsItem, index) => {
+            {pagedNews.map((newsItem, index) => {
               const typeInfo = getNewsTypeInfo(newsItem.type);
               return (
                 <div
                   key={newsItem.id}
-                  className={`p-4 ${index !== news.length - 1 ? "border-b border-gray-200" : ""}`}
+                  className={`p-4 ${index !== pagedNews.length - 1 ? "border-b border-gray-200" : ""}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0 mr-4">
@@ -395,6 +416,32 @@ export default function AdminNews() {
         {news.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-500">No hay noticias creadas aún.</div>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Página {currentPage} de {totalPages} · {news.length} noticias
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Anterior
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Siguiente
+              </button>
+            </div>
           </div>
         )}
       </div>

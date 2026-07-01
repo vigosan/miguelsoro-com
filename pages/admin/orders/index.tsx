@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import { isAuthenticated } from "../../../lib/auth";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
@@ -46,9 +46,12 @@ const statusLabels = {
   REFUNDED: "Reembolsado",
 };
 
+const PAGE_SIZE = 20;
+
 export default function AdminOrdersPage({ orders }: Props) {
   const [filter, setFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
 
   const filteredOrders = orders.filter((order) => {
     const matchesFilter = filter === "all" || order.status === filter;
@@ -60,6 +63,18 @@ export default function AdminOrdersPage({ orders }: Props) {
 
     return matchesFilter && matchesSearch;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pagedOrders = filteredOrders.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
+  // Reset to first page when filters change.
+  useEffect(() => {
+    setPage(1);
+  }, [filter, searchTerm]);
 
   const orderStats = orders.reduce(
     (acc, order) => {
@@ -142,7 +157,7 @@ export default function AdminOrdersPage({ orders }: Props) {
         {/* Orders Grid - Minimalist Design */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <div className="grid grid-cols-1 gap-1 divide-y divide-gray-100">
-            {filteredOrders.map((order) => (
+            {pagedOrders.map((order) => (
               <div
                 key={order.id}
                 className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 transition-colors gap-3 sm:gap-0"
@@ -251,6 +266,34 @@ export default function AdminOrdersPage({ orders }: Props) {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Página {currentPage} de {totalPages} · {filteredOrders.length}{" "}
+              pedidos
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Anterior
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
