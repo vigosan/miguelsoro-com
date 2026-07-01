@@ -53,23 +53,21 @@ NEXT_PUBLIC_PAYPAL_CLIENT_ID=tu_client_id_de_produccion_aqui
 - [ ] Copiar Webhook ID generado
 - [ ] Añadir a variables de entorno: `PAYPAL_WEBHOOK_ID`
 
-## 4. Configurar Email SMTP (para confirmaciones)
+## 4. Configurar Email con Resend (para confirmaciones)
 
 ### 4.1 Variables de Email
 ```env
-# Email Configuration (ejemplo con Gmail)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=tu_email@gmail.com
-SMTP_PASS=tu_app_password_aqui
-SMTP_FROM_NAME=Miguel Soro Art
-SMTP_FROM_EMAIL=noreply@miguelsoro.com
+# Email Configuration (Resend)
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxx
+RESEND_FROM_EMAIL=noreply@miguelsoro.com
+ADMIN_EMAIL=admin@miguelsoro.com
 ```
 
-### 4.2 Configurar Gmail App Password (si usas Gmail)
-- [ ] Activar 2FA en Gmail
-- [ ] Generar App Password específica
-- [ ] Usar App Password en `SMTP_PASS`
+### 4.2 Configurar dominio en Resend
+- [ ] Crear cuenta en https://resend.com/
+- [ ] Añadir y verificar el dominio `miguelsoro.com` (registros DNS)
+- [ ] Generar una API Key y ponerla en `RESEND_API_KEY`
+- [ ] Usar una dirección del dominio verificado en `RESEND_FROM_EMAIL`
 
 ## 5. Configuración de Envíos
 
@@ -146,8 +144,9 @@ En `/lib/paypal.ts` puedes personalizar:
 - [ ] Todos los webhooks deben usar HTTPS
 
 ### 9.3 Validación de Webhooks
-- [x] Código ya implementa verificación de firma
-- [x] Protege contra webhooks falsos
+- [x] Código verifica la firma vía API REST de PayPal (`lib/paypalWebhook.ts`)
+- [x] Eventos sin firma válida se rechazan con 401
+- [ ] Requiere `PAYPAL_WEBHOOK_ID` configurado (si falta, se rechazan todos los eventos)
 - [ ] Monitorear logs de webhooks
 
 ## 10. Monitoreo y Logs
