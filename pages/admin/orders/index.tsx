@@ -257,7 +257,7 @@ export default function AdminOrdersPage({ orders }: Props) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const authenticated = isAuthenticated(context.req);
+  const authenticated = await isAuthenticated(context.req);
 
   if (!authenticated) {
     return {

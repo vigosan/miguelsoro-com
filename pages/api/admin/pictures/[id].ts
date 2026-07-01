@@ -1,10 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
+import { requireAuth } from "@/lib/auth";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
   if (typeof id !== "string") {
@@ -79,4 +77,6 @@ export default async function handler(
   }
 
   return res.status(405).json({ error: "Method not allowed" });
-}
+};
+
+export default requireAuth(handler);

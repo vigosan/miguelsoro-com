@@ -65,11 +65,30 @@ export const mockVariant = {
 };
 
 // Mock Next.js API request/response
-export const createMockRequest = (method: string, body?: any, query?: any) => ({
+export const createMockRequest = (
+  method: string,
+  body?: any,
+  query?: any,
+  headers?: Record<string, string>,
+) => ({
   method,
   body,
   query: query || {},
+  headers: headers || {},
 });
+
+// Build a request carrying a valid admin session cookie for protected endpoints.
+export const createAuthedRequest = async (
+  method: string,
+  body?: any,
+  query?: any,
+) => {
+  const { createSessionToken } = await import("@/lib/auth");
+  const token = await createSessionToken();
+  return createMockRequest(method, body, query, {
+    cookie: `admin-session=${token}`,
+  });
+};
 
 export const createMockResponse = () => {
   const res: any = {};

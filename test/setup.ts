@@ -6,6 +6,10 @@ import * as matchers from "@testing-library/jest-dom/matchers";
 // extends Vitest's expect method with methods from react-testing-library
 expect.extend(matchers);
 
+// Provide a stable secret so admin auth (JWT) works in tests.
+process.env.AUTH_SECRET =
+  process.env.AUTH_SECRET || "test-secret-not-for-production-use-0123456789";
+
 // runs a cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {
   cleanup();
@@ -36,20 +40,22 @@ vi.mock("next-auth/react", () => ({
   signOut: vi.fn(),
 }));
 
-// Set up global test environment
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: vi.fn().mockImplementation((query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
+// Set up global test environment (only in a browser-like environment)
+if (typeof window !== "undefined") {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(), // deprecated
+      removeListener: vi.fn(), // deprecated
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
 
 // Mock IntersectionObserver
 class MockIntersectionObserver {

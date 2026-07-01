@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // Mock the dependencies module
@@ -9,7 +10,11 @@ vi.mock("@/infra/dependencies", () => ({
 
 import handler from "@/pages/api/admin/orders/index";
 import { getAllOrders } from "@/infra/dependencies";
-import { createMockRequest, createMockResponse } from "../../simple-helpers";
+import {
+  createMockRequest,
+  createAuthedRequest,
+  createMockResponse,
+} from "../../simple-helpers";
 
 const mockGetAllOrders = vi.mocked(getAllOrders);
 
@@ -38,9 +43,21 @@ describe("/api/admin/orders", () => {
     vi.clearAllMocks();
   });
 
+  describe("auth", () => {
+    it("should return 401 without a valid session (protects customer PII)", async () => {
+      const req = createMockRequest("GET");
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(mockGetAllOrders.execute).not.toHaveBeenCalled();
+    });
+  });
+
   describe("GET", () => {
     it("should return orders list", async () => {
-      const req = createMockRequest("GET");
+      const req = await createAuthedRequest("GET");
       const res = createMockResponse();
 
       mockGetAllOrders.execute.mockResolvedValue(mockOrderSummaries);
@@ -53,7 +70,7 @@ describe("/api/admin/orders", () => {
     });
 
     it("should return empty array when no orders", async () => {
-      const req = createMockRequest("GET");
+      const req = await createAuthedRequest("GET");
       const res = createMockResponse();
 
       mockGetAllOrders.execute.mockResolvedValue([]);
@@ -65,7 +82,7 @@ describe("/api/admin/orders", () => {
     });
 
     it("should return 500 when error occurs", async () => {
-      const req = createMockRequest("GET");
+      const req = await createAuthedRequest("GET");
       const res = createMockResponse();
 
       mockGetAllOrders.execute.mockRejectedValue(new Error("Database error"));
@@ -81,7 +98,7 @@ describe("/api/admin/orders", () => {
 
   describe("non-GET methods", () => {
     it("should return 405 for POST method", async () => {
-      const req = createMockRequest("POST", {});
+      const req = await createAuthedRequest("POST", {});
       const res = createMockResponse();
 
       await handler(req, res);

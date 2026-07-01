@@ -4,11 +4,9 @@ import {
   createShippingSettings,
   updateShippingSettings,
 } from "@/services/databaseShippingSettings";
+import { requireAuth } from "@/lib/auth";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
     try {
       const settings = await getShippingSettings();
@@ -90,4 +88,6 @@ export default async function handler(
     res.setHeader("Allow", ["GET", "POST"]);
     res.status(405).json({ error: `Method ${req.method} not allowed` });
   }
-}
+};
+
+export default requireAuth(handler);

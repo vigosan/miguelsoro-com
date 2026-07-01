@@ -1,10 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getAllOrders } from "../../../../infra/dependencies";
+import { requireAuth } from "@/lib/auth";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
     try {
       const orders = await getAllOrders.execute();
@@ -16,4 +14,6 @@ export default async function handler(
   }
 
   return res.status(405).json({ error: "Method not allowed" });
-}
+};
+
+export default requireAuth(handler);

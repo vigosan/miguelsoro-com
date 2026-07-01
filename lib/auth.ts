@@ -1,37 +1,70 @@
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { GetServerSidePropsContext } from "next";
+import { SignJWT, jwtVerify } from "jose";
 
-export function isAuthenticated(
+const COOKIE_NAME = "admin-session";
+const MAX_AGE_SECONDS = 60 * 60 * 24; // 24h
+
+function getSecret(): Uint8Array {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) {
+    throw new Error("AUTH_SECRET is not configured");
+  }
+  return new TextEncoder().encode(secret);
+}
+
+export async function createSessionToken(): Promise<string> {
+  return new SignJWT({ role: "admin" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(`${MAX_AGE_SECONDS}s`)
+    .sign(getSecret());
+}
+
+export function sessionCookie(token: string): string {
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Max-Age=${MAX_AGE_SECONDS}; SameSite=Strict${secure}`;
+}
+
+export function clearSessionCookie(): string {
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0; SameSite=Strict${secure}`;
+}
+
+function readTokenFromCookies(cookieHeader?: string): string | null {
+  if (!cookieHeader) return null;
+  const match = cookieHeader
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith(`${COOKIE_NAME}=`));
+  if (!match) return null;
+  return match.slice(COOKIE_NAME.length + 1) || null;
+}
+
+export async function isAuthenticated(
   req: NextApiRequest | GetServerSidePropsContext["req"],
-): boolean {
-  const cookies = req.headers.cookie;
+): Promise<boolean> {
+  const token = readTokenFromCookies(req.headers.cookie);
+  if (!token) return false;
 
-  if (!cookies) {
+  try {
+    await jwtVerify(token, getSecret());
+    return true;
+  } catch {
     return false;
   }
-
-  // Parse cookies manually (simple approach)
-  const cookieArray = cookies.split(";").map((cookie) => cookie.trim());
-  const adminSessionCookie = cookieArray.find((cookie) =>
-    cookie.startsWith("admin-session="),
-  );
-
-  if (!adminSessionCookie) {
-    return false;
-  }
-
-  const sessionValue = adminSessionCookie.split("=")[1];
-  return sessionValue === "authenticated";
 }
 
 export function requireAuth(
-  handler: (req: NextApiRequest, res: any) => Promise<void> | void,
+  handler: (
+    req: NextApiRequest,
+    res: NextApiResponse,
+  ) => Promise<void | unknown> | void | unknown,
 ) {
-  return async (req: NextApiRequest, res: any) => {
-    if (!isAuthenticated(req)) {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
+    if (!(await isAuthenticated(req))) {
       return res.status(401).json({ error: "Authentication required" });
     }
-
     return handler(req, res);
   };
 }
