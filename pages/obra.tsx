@@ -54,7 +54,9 @@ export default function ObraPage({
       >
         <div className="space-y-8">
           <Reveal className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Obra</h1>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-6 tracking-tight">
+              Obra
+            </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto text-balance">
               Colección de obras de arte inspiradas en el mundo del ciclismo.
               Cada pieza captura la emoción y la pasión del deporte sobre

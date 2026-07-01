@@ -72,7 +72,9 @@ export default function BiographyPage() {
       >
         <div className="space-y-8">
           <Reveal className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Biografía</h1>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-6 tracking-tight">
+              Biografía
+            </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto text-balance">
               La historia de un ciclista profesional que encontró en el arte su
               nueva pasión. Descubre el viaje de Miguel Soro desde el pedal
@@ -99,7 +101,7 @@ export default function BiographyPage() {
           <div className="max-w-4xl mx-auto grid gap-8 lg:grid-cols-2">
             <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
               <div className="flex items-center mb-4">
-                <div className="w-2 h-8 bg-blue-600 rounded-full mr-4"></div>
+                <div className="w-1 h-6 bg-gray-900 mr-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   Los Inicios
                 </h2>
@@ -115,7 +117,7 @@ export default function BiographyPage() {
 
             <Reveal delay={100} className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
               <div className="flex items-center mb-4">
-                <div className="w-2 h-8 bg-green-600 rounded-full mr-4"></div>
+                <div className="w-1 h-6 bg-gray-900 mr-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   La Transición al Arte
                 </h2>
@@ -131,7 +133,7 @@ export default function BiographyPage() {
 
             <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
               <div className="flex items-center mb-4">
-                <div className="w-2 h-8 bg-yellow-600 rounded-full mr-4"></div>
+                <div className="w-1 h-6 bg-gray-900 mr-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   Reconocimiento Internacional
                 </h2>
@@ -147,7 +149,7 @@ export default function BiographyPage() {
 
             <Reveal delay={100} className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
               <div className="flex items-center mb-4">
-                <div className="w-2 h-8 bg-red-600 rounded-full mr-4"></div>
+                <div className="w-1 h-6 bg-gray-900 mr-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   Apoyo y Prestigio
                 </h2>

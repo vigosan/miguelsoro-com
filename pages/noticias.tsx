@@ -7,7 +7,9 @@ export default function NewsPage() {
     <Layout>
       <div className="space-y-8">
         <Reveal className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Noticias</h1>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-6 tracking-tight">
+            Noticias
+          </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto text-balance">
             Mantente al día con las últimas exposiciones, eventos y apariciones
             en medios. Descubre el impacto del arte ciclista en la comunidad.
@@ -23,7 +25,7 @@ export default function NewsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
                     &lsquo;L&rsquo;Art del Ciclocross&rsquo; en Benidorm
                   </h2>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-gray-600 ring-1 ring-gray-200 mb-3">
                     Enero 2025
                   </span>
                 </div>
@@ -68,7 +70,7 @@ export default function NewsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
                     Exposición en Bagnères de Luchon - Tour de Francia
                   </h2>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mb-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-gray-600 ring-1 ring-gray-200 mb-3">
                     Julio 2024
                   </span>
                 </div>
@@ -113,7 +115,7 @@ export default function NewsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
                     Exposición en Destilerías Nardini - Giro de Italia
                   </h2>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800 mb-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-gray-600 ring-1 ring-gray-200 mb-3">
                     Mayo 2024
                   </span>
                 </div>
@@ -157,7 +159,7 @@ export default function NewsPage() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
                     &ldquo;El Arte del Ciclismo&rdquo; en Canals
                   </h2>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 mb-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-gray-600 ring-1 ring-gray-200 mb-3">
                     Enero 2024
                   </span>
                 </div>

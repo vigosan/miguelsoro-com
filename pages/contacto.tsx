@@ -15,7 +15,9 @@ export default function ContactPage() {
       >
         <div className="py-20">
           <Reveal className="text-center mb-20">
-            <h1 className="text-4xl font-light text-gray-900 mb-6">Contacto</h1>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-6 tracking-tight">
+              Contacto
+            </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed text-balance">
               ¿Tienes preguntas sobre la obra de Miguel Soro o te gustaría más
               información sobre futuras exposiciones? Nos encantaría escucharte.
