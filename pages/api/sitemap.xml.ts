@@ -29,19 +29,25 @@ export default async function handler(
       lastmod: new Date().toISOString(),
     },
     {
-      url: `${baseUrl}/biography`,
+      url: `${baseUrl}/obra`,
+      changefreq: "weekly",
+      priority: "0.9",
+      lastmod: new Date().toISOString(),
+    },
+    {
+      url: `${baseUrl}/biografia`,
       changefreq: "monthly",
       priority: "0.8",
       lastmod: new Date().toISOString(),
     },
     {
-      url: `${baseUrl}/news`,
+      url: `${baseUrl}/noticias`,
       changefreq: "weekly",
       priority: "0.7",
       lastmod: new Date().toISOString(),
     },
     {
-      url: `${baseUrl}/contact`,
+      url: `${baseUrl}/contacto`,
       changefreq: "monthly",
       priority: "0.6",
       lastmod: new Date().toISOString(),

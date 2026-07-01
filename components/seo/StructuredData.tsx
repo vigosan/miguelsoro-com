@@ -27,7 +27,7 @@ export function ArtworkStructuredData({ artwork, url }: ArtworkSchemaProps) {
       name: "Miguel Soro",
       description:
         "Ex-ciclista profesional y artista contemporáneo especializado en arte ciclístico",
-      url: "https://www.miguelsoro.com/biography",
+      url: "https://www.miguelsoro.com/biografia",
       sameAs: ["https://www.miguelsoro.com"],
     },
     artform: "Painting",
@@ -108,10 +108,12 @@ export function ArtworkStructuredData({ artwork, url }: ArtworkSchemaProps) {
 
 interface WebsiteSchemaProps {
   url?: string;
+  numberOfItems?: number;
 }
 
 export function WebsiteStructuredData({
   url = "https://www.miguelsoro.com",
+  numberOfItems,
 }: WebsiteSchemaProps) {
   const websiteSchema = {
     "@context": "https://schema.org",
@@ -127,7 +129,7 @@ export function WebsiteStructuredData({
       name: "Miguel Soro",
       description:
         "Ex-ciclista profesional español convertido en artista. Especializado en arte contemporáneo inspirado en el ciclismo.",
-      url: `${url}/biography`,
+      url: `${url}/biografia`,
       birthDate: "1976-02-27",
       birthPlace: {
         "@type": "Place",
@@ -162,15 +164,7 @@ export function WebsiteStructuredData({
       name: "Colección de Arte Ciclístico",
       description:
         "Obras de arte originales inspiradas en el mundo del ciclismo profesional",
-      numberOfItems: "13+",
-    },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${url}/search?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
+      numberOfItems: numberOfItems ?? "13+",
     },
   };
 

@@ -10,14 +10,18 @@ import { Picture } from "@/domain/picture";
 
 interface IndexPageProps {
   featuredPictures: Picture[];
+  totalPictures: number;
 }
 
-export default function IndexPage({ featuredPictures }: IndexPageProps) {
+export default function IndexPage({
+  featuredPictures,
+  totalPictures,
+}: IndexPageProps) {
   const { ref: heroRef, offset: heroOffset } = useParallax<HTMLDivElement>(0.35);
 
   return (
     <>
-      <WebsiteStructuredData />
+      <WebsiteStructuredData numberOfItems={totalPictures} />
       <Layout
         title="Miguel Soro - Arte Ciclístico Original | Ex-Ciclista Profesional Reconocido por Forbes"
         description="Descubre la colección única de Miguel Soro: centenares de obras de leyendas del ciclismo. Ex-profesional (1998-2003) con exposiciones internacionales en 6 países. Técnicas mixtas acrílico y collage. Reconocido por Forbes y Giant Bicycles."
@@ -235,6 +239,7 @@ export const getStaticProps: GetStaticProps<IndexPageProps> = async () => {
     return {
       props: {
         featuredPictures,
+        totalPictures: allPictures.length,
       },
       // Revalidate every hour (3600 seconds)
       revalidate: 3600,
@@ -246,6 +251,7 @@ export const getStaticProps: GetStaticProps<IndexPageProps> = async () => {
     return {
       props: {
         featuredPictures: [],
+        totalPictures: 0,
       },
       // On error, retry after 5 minutes
       revalidate: 300,

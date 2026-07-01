@@ -6,9 +6,10 @@ Allow: /
 
 # High priority pages for crawling
 Allow: /pictures/
-Allow: /biography
-Allow: /contact
-Allow: /news
+Allow: /obra
+Allow: /biografia
+Allow: /contacto
+Allow: /noticias
 
 # Block admin and API routes
 Disallow: /admin/

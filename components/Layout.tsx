@@ -30,6 +30,7 @@ export function Layout({
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <meta name="description" content={description} />
+        <meta name="robots" content="index, follow" />
 
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
@@ -37,10 +38,8 @@ export function Layout({
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:image" content={`${url}${image}`} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
         <meta property="og:site_name" content="Miguel Soro" />
-        <meta property="og:locale" content="en_US" />
+        <meta property="og:locale" content="es_ES" />
 
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
@@ -53,9 +52,9 @@ export function Layout({
         <meta name="author" content="Miguel Soro" />
         <meta
           name="keywords"
-          content="Miguel Soro, cycling art, contemporary art, bicycle art, sports art, cycling culture"
+          content="Miguel Soro, arte ciclista, arte contemporáneo, arte del ciclismo, arte deportivo, ex-ciclista profesional, acrílico y collage"
         />
-        <link rel="canonical" content={url} />
+        <link rel="canonical" href={url} />
       </Head>
       <Header transparent={hero} />
       <div className={hero ? "flex-1" : "flex-1 pt-16 lg:pt-20"}>
