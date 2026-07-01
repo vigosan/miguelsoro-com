@@ -1,3 +1,4 @@
+import React from "react";
 import { expect, afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 import * as matchers from "@testing-library/jest-dom/matchers";
@@ -25,10 +26,7 @@ vi.mock("next/router", () => ({
 
 // Mock Next.js image
 vi.mock("next/image", () => ({
-  default: (props: any) => {
-    const React = require("react");
-    return React.createElement("img", props);
-  },
+  default: (props: any) => React.createElement("img", props),
 }));
 
 // Mock NextAuth
@@ -54,8 +52,14 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 // Mock IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+class MockIntersectionObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+  takeRecords = vi.fn(() => []);
+  root = null;
+  rootMargin = "";
+  thresholds = [];
+}
+global.IntersectionObserver =
+  MockIntersectionObserver as unknown as typeof IntersectionObserver;
