@@ -4,10 +4,7 @@ import {
   handleWebhookPaymentCaptured,
   handleWebhookPaymentDenied,
 } from "../../../infra/dependencies";
-import {
-  sendOrderConfirmationEmail,
-  sendAdminNotificationEmail,
-} from "../../../lib/email";
+import { verifyWebhookSignature } from "../../../lib/paypalWebhook";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,21 +15,43 @@ export default async function handler(
   }
 
   try {
+    const isVerified = await verifyWebhookSignature(req);
+    if (!isVerified) {
+      console.error("PayPal webhook signature verification failed");
+      return res.status(401).json({ error: "Invalid webhook signature" });
+    }
+
     const webhookEvent = req.body;
 
-    // Handle different webhook events
+    // Handle different webhook events. Each use case expects the PayPal order
+    // ID (the value stored as paypalOrderId). For order events it is the
+    // resource id; for capture events it lives in supplementary_data.
     switch (webhookEvent.event_type) {
-      case "CHECKOUT.ORDER.APPROVED":
-        await handleWebhookOrderApproved.execute(webhookEvent);
+      case "CHECKOUT.ORDER.APPROVED": {
+        const orderId = webhookEvent.resource?.id;
+        if (orderId) {
+          await handleWebhookOrderApproved.execute(orderId);
+        }
         break;
+      }
 
-      case "PAYMENT.CAPTURE.COMPLETED":
-        await handleWebhookPaymentCaptured.execute(webhookEvent);
+      case "PAYMENT.CAPTURE.COMPLETED": {
+        const orderId =
+          webhookEvent.resource?.supplementary_data?.related_ids?.order_id;
+        if (orderId) {
+          await handleWebhookPaymentCaptured.execute(orderId);
+        }
         break;
+      }
 
-      case "PAYMENT.CAPTURE.DENIED":
-        await handleWebhookPaymentDenied.execute(webhookEvent);
+      case "PAYMENT.CAPTURE.DENIED": {
+        const orderId =
+          webhookEvent.resource?.supplementary_data?.related_ids?.order_id;
+        if (orderId) {
+          await handleWebhookPaymentDenied.execute(orderId);
+        }
         break;
+      }
 
       default:
         console.log(`Unhandled webhook event: ${webhookEvent.event_type}`);
