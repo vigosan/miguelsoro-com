@@ -98,6 +98,35 @@ export default function ProductTypesAdmin() {
     setShowCreateForm(false);
   };
 
+  const handleDelete = async (productType: ProductType) => {
+    if (
+      !confirm(
+        `¿Estás seguro de que quieres eliminar el tipo "${productType.displayName}"?`,
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/admin/product-types/${productType.id}`,
+        { method: "DELETE" },
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error al eliminar el tipo de producto");
+      }
+
+      toast.success("Tipo de producto eliminado");
+      fetchProductTypes();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Error al eliminar el tipo",
+      );
+    }
+  };
+
   if (loading) {
     return (
       <AdminLayout title="Tipos de Producto - Admin">
@@ -240,19 +269,12 @@ export default function ProductTypesAdmin() {
                       <PencilIcon className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => {
-                        if (
-                          confirm(
-                            `¿Estás seguro de que quieres eliminar el tipo "${type.displayName}"?`,
-                          )
-                        ) {
-                          toast.error("Eliminación no implementada aún");
-                        }
-                      }}
+                      onClick={() => handleDelete(type)}
                       className="p-2 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
                       title="Eliminar"
+                      aria-label={`Eliminar "${type.displayName}"`}
                     >
-                      <TrashIcon className="h-4 w-4" />
+                      <TrashIcon className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>

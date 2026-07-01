@@ -153,11 +153,20 @@ export function ImageUpload({
         </div>
       ) : (
         <div
+          role="button"
+          tabIndex={0}
+          aria-label="Subir imagen: haz clic o arrastra un archivo"
           onClick={() => fileInputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
-          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 ${
             dragActive
               ? "border-gray-400 bg-gray-50"
               : "border-gray-300 hover:border-gray-400"
