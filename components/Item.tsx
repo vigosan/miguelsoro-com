@@ -18,81 +18,71 @@ export function Item({ item, className }: Props) {
     <Link
       href={`/pictures/${item.slug}`}
       data-testid={`picture-link-${item.slug}`}
+      className={cn("group block", className)}
     >
       <article
-        className={cn(
-          "group h-full overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 transition-[box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:shadow-xl flex flex-col",
-          className,
-        )}
         itemScope
         itemType="https://schema.org/VisualArtwork"
         data-testid={`picture-card-${item.slug}`}
       >
-        <div className="relative h-80 w-full overflow-hidden bg-gray-50">
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-gray-100">
           <Image
             src={item.imageUrl}
             alt={altText}
-            className="h-full w-full object-cover transition-transform duration-[600ms] ease-out group-hover:scale-105"
-            width={400}
-            height={320}
+            className="h-full w-full object-cover transition-transform duration-[700ms] ease-out group-hover:scale-[1.04]"
+            width={480}
+            height={600}
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             itemProp="image"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          {status === "NOT_AVAILABLE" && (
+            <span
+              className="absolute top-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-white/95 backdrop-blur-sm"
+              itemProp="availability"
+              itemType="https://schema.org/OutOfStock"
+              data-testid={`picture-status-not-available-${item.slug}`}
+            >
+              No disponible
+            </span>
+          )}
         </div>
-        <div className="p-4 flex-1 flex flex-col justify-between">
+        <div className="mt-4 flex items-baseline justify-between gap-4">
           <h3
-            className="font-medium text-gray-900 group-hover:text-gray-700 transition-colors duration-200 line-clamp-2 min-h-[2.5rem]"
+            className="text-base text-gray-900 group-hover:text-gray-500 transition-colors duration-200 text-balance"
             itemProp="name"
             data-testid={`picture-title-${item.slug}`}
           >
             {item.title}
           </h3>
-          <div className="mt-2 flex items-center justify-between">
-            <p
-              className="text-sm text-gray-500"
-              itemProp="size"
-              data-testid={`picture-size-${item.slug}`}
-            >
-              {item.size}cm
-            </p>
-            {status === "AVAILABLE" && (
-              <span
-                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200"
-                itemProp="availability"
-                itemType="https://schema.org/InStock"
-                data-testid={`picture-status-available-${item.slug}`}
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                Disponible
-              </span>
-            )}
-            {status === "NOT_AVAILABLE" && (
-              <span
-                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-gray-400 ring-1 ring-gray-200"
-                itemProp="availability"
-                itemType="https://schema.org/OutOfStock"
-                data-testid={`picture-status-not-available-${item.slug}`}
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-gray-300" />
-                No disponible
-              </span>
-            )}
-          </div>
-
-          {/* Hidden structured data */}
-          <meta itemProp="creator" content="Miguel Soro" />
-          <meta itemProp="artform" content="Painting" />
-          <meta
-            itemProp="artMedium"
-            content="Acrílico y collage sobre lienzo"
-          />
-          <meta itemProp="category" content="Cycling Art" />
-          <meta
-            itemProp="url"
-            content={`https://www.miguelsoro.com/pictures/${item.slug}`}
-          />
+          <p
+            className="shrink-0 text-sm text-gray-400 tabular-nums"
+            itemProp="size"
+            data-testid={`picture-size-${item.slug}`}
+          >
+            {item.size}cm
+          </p>
         </div>
+        {status === "AVAILABLE" && (
+          <span
+            className="mt-1 inline-flex items-center gap-1.5 text-xs text-gray-500"
+            itemProp="availability"
+            itemType="https://schema.org/InStock"
+            data-testid={`picture-status-available-${item.slug}`}
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+            Disponible
+          </span>
+        )}
+
+        {/* Hidden structured data */}
+        <meta itemProp="creator" content="Miguel Soro" />
+        <meta itemProp="artform" content="Painting" />
+        <meta itemProp="artMedium" content="Acrílico y collage sobre lienzo" />
+        <meta itemProp="category" content="Cycling Art" />
+        <meta
+          itemProp="url"
+          content={`https://www.miguelsoro.com/pictures/${item.slug}`}
+        />
       </article>
     </Link>
   );

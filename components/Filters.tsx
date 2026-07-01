@@ -38,12 +38,11 @@ export function Filters({
   const hasActiveFilters = filters.productType || filters.status;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border-b border-gray-200 pb-6">
       {/* Header Row */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600">
-          {resultCount} obra{resultCount !== 1 ? "s" : ""} encontrada
-          {resultCount !== 1 ? "s" : ""}
+        <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
+          {resultCount} obra{resultCount !== 1 ? "s" : ""}
         </p>
         <button
           onClick={() => setIsExpanded(!isExpanded)}

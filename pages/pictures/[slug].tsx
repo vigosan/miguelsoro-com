@@ -244,7 +244,7 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
           {/* Información de la Obra */}
           <Reveal delay={150} className="space-y-8">
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 mb-3">
+              <h1 className="font-[family-name:var(--font-display)] text-3xl lg:text-4xl tracking-tight text-gray-900 mb-3 text-balance">
                 {picture.title}
               </h1>
               <div className="flex items-center space-x-3 text-sm text-gray-500">

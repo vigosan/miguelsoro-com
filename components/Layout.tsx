@@ -61,7 +61,7 @@ export function Layout({
       <div className={hero ? "flex-1" : "flex-1 pt-16 lg:pt-20"}>
         {children}
       </div>
-      <Footer className="text-right" />
+      <Footer />
       <Analytics />
       <CartDrawer />
       <Toaster

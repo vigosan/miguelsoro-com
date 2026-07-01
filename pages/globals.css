@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: var(--font-display), sans-serif;
+  --font-poster: var(--font-poster), sans-serif;
+}
+
 @keyframes hero-rise {
   from {
     opacity: 0;

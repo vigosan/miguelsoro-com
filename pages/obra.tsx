@@ -52,15 +52,17 @@ export default function ObraPage({
         description="Explora la colección completa de arte ciclístico de Miguel Soro. Obras originales en acrílico y collage inspiradas en el mundo del ciclismo profesional."
         url="https://www.miguelsoro.com/obra"
       >
-        <div className="space-y-8">
-          <Reveal className="text-center">
+        <div className="py-16 lg:py-20 space-y-12">
+          <Reveal>
+            <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
+              Catálogo — Obra original
+            </p>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-6 tracking-tight">
               Obra
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto text-balance">
-              Colección de obras de arte inspiradas en el mundo del ciclismo.
-              Cada pieza captura la emoción y la pasión del deporte sobre
-              ruedas.
+            <p className="text-lg text-gray-600 max-w-2xl text-pretty">
+              Colección de obras inspiradas en el mundo del ciclismo. Cada pieza
+              captura la emoción y la pasión del deporte sobre ruedas.
             </p>
           </Reveal>
 

@@ -13,98 +13,73 @@ export default function ContactPage() {
         description="Contacta con Miguel Soro para consultas sobre adquisición de obras, exposiciones y colaboraciones. Galería de arte ciclístico con presencia internacional. Respuesta en menos de 24 horas."
         url="https://www.miguelsoro.com/contact"
       >
-        <div className="py-20">
-          <Reveal className="text-center mb-20">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-6 tracking-tight">
-              Contacto
+        <div className="py-20 lg:py-24">
+          <Reveal className="mb-20">
+            <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
+              Contacto — Estudio
+            </p>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 leading-none tracking-tight">
+              Hablemos de arte
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed text-balance">
-              ¿Tienes preguntas sobre la obra de Miguel Soro o te gustaría más
-              información sobre futuras exposiciones? Nos encantaría escucharte.
+            <p className="mt-8 max-w-xl text-lg text-gray-600 leading-relaxed text-pretty">
+              ¿Preguntas sobre una obra, una exposición o una colaboración?
+              Escribe directamente al estudio.
             </p>
           </Reveal>
 
-          <div className="max-w-3xl mx-auto space-y-20">
-            <div className="grid gap-16 lg:grid-cols-2">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Email
-                </h3>
-                <p className="text-gray-600 mb-6">Escríbenos directamente</p>
-                <a
-                  className="inline-flex items-center text-lg font-medium text-gray-900 hover:text-gray-600 transition-colors group"
-                  href="mailto:info@miguelsoro.com"
-                >
-                  info@miguelsoro.com
-                  <svg
-                    className="ml-2 h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
-                <p className="text-sm text-gray-500 mt-2">
-                  Consultas generales, adquisiciones y exposiciones
-                </p>
-              </div>
+          <div className="grid gap-12 md:grid-cols-2 max-w-4xl">
+            <Reveal>
+              <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
+                Escríbenos
+              </p>
+              <a
+                href="mailto:info@miguelsoro.com"
+                className="text-xl md:text-2xl font-medium text-gray-900 hover:text-gray-500 transition-colors"
+              >
+                info@miguelsoro.com
+              </a>
+              <p className="text-sm text-gray-500 mt-3">
+                Consultas generales, adquisiciones y exposiciones.
+              </p>
+            </Reveal>
 
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Redes Sociales
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Síguenos para más novedades
-                </p>
-                <div>
-                  <a
-                    className="inline-flex items-center text-lg font-medium text-gray-900 hover:text-gray-600 transition-colors group"
-                    href="https://www.instagram.com/miguelsoro/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    @miguelsoro
-                    <svg
-                      className="ml-2 h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                  </a>
-                  <p className="text-sm text-gray-500 mt-1">Instagram</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-20">
-              <div className="text-center max-w-xl mx-auto">
-                <h3 className="text-2xl font-light text-gray-900 mb-6">
-                  ¿Interesado en colaborar?
-                </h3>
-                <p className="text-gray-600 mb-8 leading-relaxed">
-                  Si representas una galería de arte, organizas eventos
-                  ciclistas, o buscas artista para pintura en directo durante
-                  competiciones, nos encantaría conocer tu propuesta.
-                </p>
-                <p className="text-sm text-gray-500">
-                  Respuesta en menos de 24 horas
-                </p>
-              </div>
-            </div>
+            <Reveal delay={120}>
+              <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
+                Síguelo
+              </p>
+              <a
+                href="https://www.instagram.com/miguelsoro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xl md:text-2xl font-medium text-gray-900 hover:text-gray-500 transition-colors"
+              >
+                @miguelsoro
+              </a>
+              <p className="text-sm text-gray-500 mt-3">
+                El estudio y las obras en Instagram.
+              </p>
+            </Reveal>
           </div>
+
+          <Reveal className="mt-20 border-t border-gray-200 pt-16 max-w-4xl">
+            <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-8">
+              (02) — Colaboraciones
+            </p>
+            <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">
+              <h2 className="text-3xl md:text-4xl font-light text-gray-900 leading-tight text-balance">
+                Galerías, eventos ciclistas y pintura en directo.
+              </h2>
+              <div>
+                <p className="text-gray-600 leading-relaxed text-pretty">
+                  Si organizas una exposición o buscas artista para pintar en
+                  directo durante competiciones, cuéntame tu propuesta.
+                </p>
+                <p className="mt-4 text-sm font-medium text-gray-900">
+                  Respuesta en menos de 24 horas.
+                </p>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </Layout>
     </>

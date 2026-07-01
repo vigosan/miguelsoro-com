@@ -13,7 +13,7 @@ export function List({ items, className }: Props) {
   return (
     <div
       className={cn(
-        "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3",
+        "grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-20",
         className,
       )}
       data-testid="pictures-list"
