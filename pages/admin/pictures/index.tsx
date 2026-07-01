@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Link from "next/link";
 import Image from "next/image";
 import { usePictures, useDeletePicture } from "@/hooks/usePictures";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { PictureStatus, getPictureStatus } from "@/domain/picture";
-import { formatCurrency } from "@/utils/formatCurrency";
 import { formatEuros } from "@/domain/order";
 import { Toaster, toast } from "react-hot-toast";
 import {
@@ -12,6 +12,9 @@ import {
   PencilIcon,
   EyeIcon,
   PhotoIcon,
+  TrashIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/cn";
 import { Input } from "@/components/ui/Input";
@@ -27,21 +30,31 @@ const statusLabels = {
   NOT_AVAILABLE: "No disponible",
 };
 
+const PAGE_SIZE = 20;
+
 export default function AdminPictures() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [page, setPage] = useState(1);
 
-  // Build filters for React Query
+  const debouncedSearch = useDebouncedValue(searchQuery, 300);
+
+  // Reset to first page whenever the filters change.
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter, debouncedSearch]);
+
   const filters = {
     ...(statusFilter !== "ALL" && { status: statusFilter as PictureStatus }),
-    ...(searchQuery && { search: searchQuery }),
+    ...(debouncedSearch && { search: debouncedSearch }),
+    page,
+    limit: PAGE_SIZE,
   };
 
-  const {
-    data: pictures = [],
-    isLoading: loading,
-    error,
-  } = usePictures(filters);
+  const { data, isLoading: loading, error } = usePictures(filters);
+  const pictures = data?.pictures ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
   const deletePictureMutation = useDeletePicture();
 
   const handleDelete = async (id: string, title: string) => {
@@ -106,8 +119,7 @@ export default function AdminPictures() {
           >
             <option value="ALL">Todos los estados</option>
             <option value="AVAILABLE">Disponible</option>
-            <option value="SOLD">Vendido</option>
-            <option value="RESERVED">Reservado</option>
+            <option value="NOT_AVAILABLE">No disponible</option>
           </Select>
           <Input
             type="search"
@@ -121,7 +133,9 @@ export default function AdminPictures() {
         {/* Pictures Grid - Minimalist Design */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <div className="grid grid-cols-1 gap-1 divide-y divide-gray-100">
-            {pictures.map((picture) => (
+            {pictures.map((picture) => {
+              const status = getPictureStatus(picture);
+              return (
               <div
                 key={picture.id}
                 className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 transition-colors gap-3 sm:gap-0"
@@ -154,10 +168,10 @@ export default function AdminPictures() {
                       <span
                         className={cn(
                           "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                          statusColors[getPictureStatus(picture)],
+                          statusColors[status],
                         )}
                       >
-                        {statusLabels[getPictureStatus(picture)]}
+                        {statusLabels[status]}
                       </span>
                       <span>·</span>
                       <span>Stock: {picture.stock || 0}</span>
@@ -171,19 +185,32 @@ export default function AdminPictures() {
                     href={`/pictures/${picture.slug}`}
                     className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
                     title="Ver en el sitio"
+                    aria-label={`Ver "${picture.title}" en el sitio`}
                   >
-                    <EyeIcon className="h-4 w-4" />
+                    <EyeIcon className="h-4 w-4" aria-hidden="true" />
                   </Link>
                   <Link
                     href={`/admin/pictures/${picture.id}/edit`}
                     className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
                     title="Editar"
+                    aria-label={`Editar "${picture.title}"`}
                   >
-                    <PencilIcon className="h-4 w-4" />
+                    <PencilIcon className="h-4 w-4" aria-hidden="true" />
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(picture.id, picture.title)}
+                    disabled={deletePictureMutation.isPending}
+                    className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    title="Eliminar"
+                    aria-label={`Eliminar "${picture.title}"`}
+                  >
+                    <TrashIcon className="h-4 w-4" aria-hidden="true" />
+                  </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {pictures.length === 0 && !loading && (
@@ -213,6 +240,36 @@ export default function AdminPictures() {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Página {page} de {totalPages} · {total} cuadros
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ChevronLeftIcon className="h-4 w-4" />
+                Anterior
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Siguiente
+                <ChevronRightIcon className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         <Toaster position="top-right" />
       </div>
     </AdminLayout>

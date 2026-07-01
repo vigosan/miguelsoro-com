@@ -19,24 +19,41 @@ export const pictureKeys = {
 };
 
 // Custom hooks
+export type PicturesPage = {
+  pictures: Picture[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
 export function usePictures(filters?: {
   status?: PictureStatus;
   search?: string;
+  page?: number;
+  limit?: number;
 }) {
   return useQuery({
     queryKey: pictureKeys.list(filters || {}),
-    queryFn: async (): Promise<Picture[]> => {
+    queryFn: async (): Promise<PicturesPage> => {
       const params = new URLSearchParams();
       if (filters?.status) params.append("status", filters.status);
       if (filters?.search) params.append("search", filters.search);
+      params.append("page", String(filters?.page ?? 1));
+      params.append("limit", String(filters?.limit ?? 20));
 
       const response = await fetch(`/api/admin/pictures?${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch pictures");
       }
       const data = await response.json();
-      return data.pictures || [];
+      return {
+        pictures: data.pictures || [],
+        total: data.total ?? 0,
+        page: data.page ?? 1,
+        totalPages: data.totalPages ?? 1,
+      };
     },
+    placeholderData: (prev) => prev,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }
