@@ -262,43 +262,47 @@ export class DatabaseOrderRepository implements OrderRepository {
     return completeOrder;
   }
 
-  async updateByPayPalId(
-    paypalOrderId: string,
-    status: string,
-  ): Promise<OrderWithDetails> {
+  async markPaidByPayPalId(paypalOrderId: string): Promise<{
+    order: OrderWithDetails;
+    alreadyPaid: boolean;
+  }> {
     const supabase = this.getClient();
 
-    const { error } = await supabase
+    const { data: existing, error: findError } = await supabase
       .from("orders")
-      .update({
-        status,
-        updatedAt: new Date().toISOString(),
-      })
-      .eq("paypalOrderId", paypalOrderId);
-
-    if (error) {
-      console.error("Error updating order by PayPal ID:", error);
-      throw new Error(`Failed to update order: ${error.message}`);
-    }
-
-    // Find the updated order
-    const { data: order, error: findError } = await supabase
-      .from("orders")
-      .select("id")
+      .select("id, status")
       .eq("paypalOrderId", paypalOrderId)
       .single();
 
     if (findError) {
-      console.error("Error finding updated order:", findError);
-      throw new Error(`Failed to find updated order: ${findError.message}`);
+      console.error("Error finding order by PayPal ID:", findError);
+      throw new Error(`Failed to find order: ${findError.message}`);
     }
 
-    const updatedOrder = await this.findById(order.id);
-    if (!updatedOrder) {
-      throw new Error("Order not found after PayPal update");
+    const alreadyPaid = existing.status === "PAID";
+
+    if (!alreadyPaid) {
+      const { error } = await supabase
+        .from("orders")
+        .update({
+          status: "PAID",
+          updatedAt: new Date().toISOString(),
+        })
+        .eq("paypalOrderId", paypalOrderId)
+        .neq("status", "PAID");
+
+      if (error) {
+        console.error("Error marking order as paid:", error);
+        throw new Error(`Failed to mark order as paid: ${error.message}`);
+      }
     }
 
-    return updatedOrder;
+    const order = await this.findById(existing.id);
+    if (!order) {
+      throw new Error("Order not found after marking as paid");
+    }
+
+    return { order, alreadyPaid };
   }
 
   async updateManyByPayPalId(

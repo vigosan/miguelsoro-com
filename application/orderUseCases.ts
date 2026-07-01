@@ -144,19 +144,20 @@ export class CapturePayPalOrder {
       throw new Error("PayPal Order ID is required");
     }
 
-    // Update order status
-    const order = await this.orderRepository.updateByPayPalId(
-      paypalOrderId,
-      "PAID",
-    );
+    // Mark the order as paid idempotently. Both this capture flow and the
+    // PAYMENT.CAPTURE.COMPLETED webhook can run for the same payment, so stock
+    // is only decremented when this call is the one that transitions to PAID.
+    const { order, alreadyPaid } =
+      await this.orderRepository.markPaidByPayPalId(paypalOrderId);
 
-    // Update stock for each item
-    for (const item of order.items) {
-      await this.variantRepository.decrementStock(
-        item.variantId,
-        item.quantity,
-      );
-      await this.variantRepository.markOutOfStockIfNeeded(item.variantId);
+    if (!alreadyPaid) {
+      for (const item of order.items) {
+        await this.variantRepository.decrementStock(
+          item.variantId,
+          item.quantity,
+        );
+        await this.variantRepository.markOutOfStockIfNeeded(item.variantId);
+      }
     }
 
     return order;
@@ -181,18 +182,20 @@ export class HandleWebhookPaymentCaptured {
   ) {}
 
   async execute(paypalOrderId: string) {
-    const order = await this.orderRepository.updateByPayPalId(
-      paypalOrderId,
-      "PAID",
-    );
+    // Mark the order as paid idempotently. The capture-order endpoint may have
+    // already processed this payment, so stock is only decremented when this
+    // call is the one that transitions the order to PAID.
+    const { order, alreadyPaid } =
+      await this.orderRepository.markPaidByPayPalId(paypalOrderId);
 
-    // Update stock for all items
-    for (const item of order.items) {
-      await this.variantRepository.decrementStock(
-        item.variantId,
-        item.quantity,
-      );
-      await this.variantRepository.markOutOfStockIfNeeded(item.variantId);
+    if (!alreadyPaid) {
+      for (const item of order.items) {
+        await this.variantRepository.decrementStock(
+          item.variantId,
+          item.quantity,
+        );
+        await this.variantRepository.markOutOfStockIfNeeded(item.variantId);
+      }
     }
 
     return order;

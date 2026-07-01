@@ -103,11 +103,13 @@ export interface OrderRepository {
   // From /api/paypal/create-order - POST create new order
   create(data: CreateOrderData): Promise<OrderWithDetails>;
 
-  // From /api/paypal/capture-order, webhook - UPDATE order status by PayPal ID
-  updateByPayPalId(
-    paypalOrderId: string,
-    status: string,
-  ): Promise<OrderWithDetails>;
+  // From /api/paypal/capture-order, webhook - Mark order PAID idempotently.
+  // Returns alreadyPaid=true when the order was already PAID, so callers can
+  // skip decrementing stock a second time.
+  markPaidByPayPalId(paypalOrderId: string): Promise<{
+    order: OrderWithDetails;
+    alreadyPaid: boolean;
+  }>;
 
   // From webhook - UPDATE multiple orders (updateMany)
   updateManyByPayPalId(paypalOrderId: string, status: string): Promise<void>;
