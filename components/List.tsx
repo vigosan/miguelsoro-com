@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Item } from "./Item";
+import { Reveal } from "./Reveal";
 import { Picture } from "@/domain/picture";
 import { cn } from "@/utils/cn";
 
@@ -17,8 +18,10 @@ export function List({ items, className }: Props) {
       )}
       data-testid="pictures-list"
     >
-      {items.map((item) => (
-        <Item item={item} key={item.id} />
+      {items.map((item, index) => (
+        <Reveal key={item.id} delay={(index % 3) * 100}>
+          <Item item={item} />
+        </Reveal>
       ))}
     </div>
   );

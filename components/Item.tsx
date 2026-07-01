@@ -21,24 +21,24 @@ export function Item({ item, className }: Props) {
     >
       <article
         className={cn(
-          "h-full overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 hover:shadow-lg transition-shadow duration-200 flex flex-col",
+          "group h-full overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200 transition-[box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:shadow-xl flex flex-col",
           className,
         )}
         itemScope
         itemType="https://schema.org/VisualArtwork"
         data-testid={`picture-card-${item.slug}`}
       >
-        <div className="group relative h-80 w-full bg-gray-50">
+        <div className="relative h-80 w-full overflow-hidden bg-gray-50">
           <Image
             src={item.imageUrl}
             alt={altText}
-            className="h-full w-full object-cover group-hover:opacity-90 transition-opacity duration-200"
+            className="h-full w-full object-cover transition-transform duration-[600ms] ease-out group-hover:scale-105"
             width={400}
             height={320}
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             itemProp="image"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
         <div className="p-4 flex-1 flex flex-col justify-between">
           <h3
@@ -58,21 +58,23 @@ export function Item({ item, className }: Props) {
             </p>
             {status === "AVAILABLE" && (
               <span
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200"
                 itemProp="availability"
                 itemType="https://schema.org/InStock"
                 data-testid={`picture-status-available-${item.slug}`}
               >
+                <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                 Disponible
               </span>
             )}
             {status === "NOT_AVAILABLE" && (
               <span
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-gray-400 ring-1 ring-gray-200"
                 itemProp="availability"
                 itemType="https://schema.org/OutOfStock"
                 data-testid={`picture-status-not-available-${item.slug}`}
               >
+                <span className="h-1.5 w-1.5 rounded-full bg-gray-300" />
                 No disponible
               </span>
             )}

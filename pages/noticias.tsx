@@ -1,21 +1,22 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
+import { Reveal } from "@/components/Reveal";
 
 export default function NewsPage() {
   return (
     <Layout>
       <div className="space-y-8">
-        <div className="text-center">
+        <Reveal className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Noticias</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto text-balance">
             Mantente al día con las últimas exposiciones, eventos y apariciones
             en medios. Descubre el impacto del arte ciclista en la comunidad.
           </p>
-        </div>
+        </Reveal>
 
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Exposición Copa del Mundo de Ciclocross 2025 - Benidorm */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
+          <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -57,10 +58,10 @@ export default function NewsPage() {
                 Benidorm, España
               </div>
             </div>
-          </div>
+          </Reveal>
 
           {/* Tour de Francia en Pirineos 2024 */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
+          <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -102,10 +103,10 @@ export default function NewsPage() {
                 Bagnères de Luchon, Francia
               </div>
             </div>
-          </div>
+          </Reveal>
 
           {/* Giro de Italia 2024 - Destilerías Nardini */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
+          <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -146,10 +147,10 @@ export default function NewsPage() {
                 Italia
               </div>
             </div>
-          </div>
+          </Reveal>
 
           {/* Exposición en Canals 2024 */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
+          <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -191,10 +192,10 @@ export default function NewsPage() {
                 Canals, Valencia
               </div>
             </div>
-          </div>
+          </Reveal>
 
           {/* Video RTVE existente */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
+          <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 Exposición en RTVE - Telediario 1
@@ -229,7 +230,7 @@ export default function NewsPage() {
                 </a>
               </div>
             </div>
-          </div>
+          </Reveal>
         </div>
 
         <div className="text-center">

@@ -10,6 +10,7 @@ import {
   BreadcrumbStructuredData,
 } from "@/components/seo/StructuredData";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { Reveal } from "@/components/Reveal";
 import { useCart } from "../../contexts/CartContext";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
@@ -42,13 +43,13 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
 
   const breadcrumbItems = [
     { name: "Inicio", href: "/", current: false },
-    { name: "Obra", href: "/", current: false },
+    { name: "Obra", href: "/obra", current: false },
     { name: picture.title, href: `/pictures/${slug}`, current: true },
   ];
 
   const structuredBreadcrumbItems = [
     { name: "Inicio", url: "https://www.miguelsoro.com" },
-    { name: "Obra", url: "https://www.miguelsoro.com" },
+    { name: "Obra", url: "https://www.miguelsoro.com/obra" },
     { name: picture.title, url: pictureUrl },
   ];
 
@@ -122,26 +123,28 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
 
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           {/* Imagen Principal */}
-          <div className="space-y-6">
+          <Reveal className="space-y-6">
             <div className="relative">
-              <div className="aspect-square relative bg-gray-900 p-6">
+              <div className="group aspect-square relative overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-200 p-6 lg:p-8">
                 <Image
                   src={picture.imageUrl}
                   alt={`${picture.title} - Arte ciclístico original de Miguel Soro. Obra única ${picture.size}cm, acrílico y collage sobre lienzo${getPictureStatus(picture) === "NOT_AVAILABLE" ? " [NO DISPONIBLE]" : getPictureStatus(picture) === "AVAILABLE" ? " disponible para compra" : ""}`}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
                   width={600}
                   height={600}
                   priority
                   sizes="(min-width: 1024px) 50vw, 100vw"
                 />
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-4 right-4">
                   {getPictureStatus(picture) === "AVAILABLE" && (
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-500 text-white">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 backdrop-blur-sm">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                       Disponible
                     </span>
                   )}
                   {getPictureStatus(picture) === "NOT_AVAILABLE" && (
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-500 text-white">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-gray-500 shadow-sm ring-1 ring-gray-200 backdrop-blur-sm">
+                      <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
                       No disponible
                     </span>
                   )}
@@ -152,14 +155,14 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
             {/* Compartir */}
             <div>
               <h3 className="text-sm font-medium text-gray-900 mb-3">
-                Compartir:
+                Compartir
               </h3>
               <div className="flex items-center space-x-3">
                 <a
                   href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white transition-colors"
                 >
                   <span className="sr-only">Compartir en Facebook</span>
                   <svg
@@ -178,7 +181,7 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
                   href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`${shareTitle} - ${shareText.substring(0, 100)}...`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white transition-colors"
                 >
                   <span className="sr-only">Compartir en Twitter</span>
                   <svg
@@ -193,7 +196,7 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
                   href={`https://wa.me/?text=${encodeURIComponent(`${shareTitle} - ${shareUrl}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white transition-colors"
                 >
                   <span className="sr-only">Compartir en WhatsApp</span>
                   <svg
@@ -217,7 +220,7 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
                       alert("¡Enlace copiado al portapapeles!");
                     }
                   }}
-                  className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white transition-colors"
                 >
                   <span className="sr-only">Copiar enlace</span>
                   <svg
@@ -236,23 +239,23 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
                 </button>
               </div>
             </div>
-          </div>
+          </Reveal>
 
           {/* Información de la Obra */}
-          <div className="space-y-8">
+          <Reveal delay={150} className="space-y-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 mb-3">
                 {picture.title}
               </h1>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-3 text-sm text-gray-500">
                 <span>{picture.size}</span>
-                <span>•</span>
+                <span aria-hidden>•</span>
                 <span>Obra original</span>
               </div>
             </div>
 
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
                 Descripción
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -262,19 +265,24 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
 
             {/* Precio y Acciones */}
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
-              <div className="mb-6">
-                <div className="text-3xl font-bold text-gray-900 mb-2">
-                  {picture.price > 0
-                    ? formatEuros(picture.price)
-                    : "Consultar precio"}
+              {getPictureStatus(picture) === "AVAILABLE" &&
+              picture.price > 0 ? (
+                <div className="mb-6">
+                  <div className="text-3xl font-bold text-gray-900">
+                    {formatEuros(picture.price)}
+                  </div>
                 </div>
-                {picture.price === 0 && (
-                  <p className="text-sm text-gray-600">
-                    Precio disponible bajo consulta. Contacta para más
-                    información.
+              ) : (
+                <div className="mb-6">
+                  <div className="text-lg font-semibold text-gray-900 mb-1">
+                    Consultar precio
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    Esta obra no está disponible para compra online. Contacta
+                    para más información.
                   </p>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="space-y-3">
                 {getPictureStatus(picture) === "AVAILABLE" &&
@@ -352,16 +360,23 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
             </div>
 
             {/* Información Adicional */}
-            <div className="pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Técnica:</span> Acrílico y collage
-                sobre lienzo
-                <br />
-                <span className="font-medium">Estado:</span> Obra única y
-                original firmada por el artista
-              </p>
+            <div className="pt-6 border-t border-gray-200">
+              <dl className="space-y-2 text-sm">
+                <div className="flex gap-2">
+                  <dt className="font-medium text-gray-900">Técnica:</dt>
+                  <dd className="text-gray-600">
+                    Acrílico y collage sobre lienzo
+                  </dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-medium text-gray-900">Estado:</dt>
+                  <dd className="text-gray-600">
+                    Obra única y original firmada por el artista
+                  </dd>
+                </div>
+              </dl>
             </div>
-          </div>
+          </Reveal>
         </div>
       </Layout>
     </>

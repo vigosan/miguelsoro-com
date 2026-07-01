@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
+import { Reveal } from "@/components/Reveal";
 import { LocalBusinessStructuredData } from "@/components/seo/StructuredData";
 import Head from "next/head";
 
@@ -13,13 +14,13 @@ export default function ContactPage() {
         url="https://www.miguelsoro.com/contact"
       >
         <div className="py-20">
-          <div className="text-center mb-20">
+          <Reveal className="text-center mb-20">
             <h1 className="text-4xl font-light text-gray-900 mb-6">Contacto</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed text-balance">
               ¿Tienes preguntas sobre la obra de Miguel Soro o te gustaría más
               información sobre futuras exposiciones? Nos encantaría escucharte.
             </p>
-          </div>
+          </Reveal>
 
           <div className="max-w-3xl mx-auto space-y-20">
             <div className="grid gap-16 lg:grid-cols-2">

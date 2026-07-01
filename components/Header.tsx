@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
@@ -11,7 +11,11 @@ import {
 } from "@/components/navigation/PageLinks";
 import CartButton from "./cart/CartButton";
 
-export function Header() {
+interface HeaderProps {
+  transparent?: boolean;
+}
+
+export function Header({ transparent = false }: HeaderProps) {
   const navigation = [
     { name: "Obra", Link: ObraPageLink },
     { name: "Noticias", Link: NewsPageLink },
@@ -20,10 +24,25 @@ export function Header() {
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!transparent) return;
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [transparent]);
+
+  const overlay = transparent && !scrolled;
 
   return (
     <header
-      className="pt-4 pb-4 absolute top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm"
+      className={`fixed top-0 left-0 right-0 z-50 pt-4 pb-4 transition-colors duration-300 ${
+        overlay
+          ? "bg-transparent"
+          : "bg-white/95 backdrop-blur-sm shadow-sm"
+      }`}
       data-testid="main-header"
     >
       <nav
@@ -44,15 +63,25 @@ export function Header() {
             priority
             aria-hidden
             data-testid="logo-image"
-            className="brightness-0"
+            className={`transition-[filter] duration-300 ${
+              overlay ? "brightness-0 invert" : "brightness-0"
+            }`}
           />
         </IndexPageLink>
 
         <div className="flex items-center gap-4 lg:hidden">
-          <CartButton className="text-black hover:text-gray-600" />
+          <CartButton
+            className={
+              overlay
+                ? "text-white hover:text-white/70"
+                : "text-black hover:text-gray-600"
+            }
+          />
           <button
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-black cursor-pointer"
+            className={`-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 cursor-pointer transition-colors ${
+              overlay ? "text-white" : "text-black"
+            }`}
             onClick={() => setMobileMenuOpen(true)}
             data-testid="mobile-menu-button"
           >
@@ -62,19 +91,29 @@ export function Header() {
         </div>
 
         <div
-          className="hidden lg:flex lg:items-center lg:gap-x-8"
+          className="hidden lg:flex lg:items-center lg:gap-x-10"
           data-testid="desktop-navigation"
         >
           {navigation.map(({ name, Link }) => (
             <Link
               key={name}
-              className="text-sm leading-6 text-black hover:text-gray-600 transition-colors cursor-pointer"
+              className={`group relative text-xs font-medium uppercase tracking-[0.18em] transition-colors cursor-pointer after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:transition-transform after:duration-300 after:ease-out group-hover:after:scale-x-100 hover:after:scale-x-100 ${
+                overlay
+                  ? "text-white/90 hover:text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.5)] after:bg-white"
+                  : "text-gray-700 hover:text-black after:bg-black"
+              }`}
               data-testid={`nav-link-${name.toLowerCase().replace(/\s+/g, "-")}`}
             >
               {name}
             </Link>
           ))}
-          <CartButton className="text-black hover:text-gray-600" />
+          <CartButton
+            className={
+              overlay
+                ? "text-white hover:text-white/70 [filter:drop-shadow(0_1px_8px_rgba(0,0,0,0.5))]"
+                : "text-black hover:text-gray-600"
+            }
+          />
         </div>
       </nav>
 

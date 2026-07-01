@@ -2,6 +2,7 @@ import { useState } from "react";
 import { GetServerSideProps } from "next";
 import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
+import { Reveal } from "@/components/Reveal";
 import { Filters } from "@/components/Filters";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
@@ -52,14 +53,14 @@ export default function ObraPage({
         url="https://www.miguelsoro.com/obra"
       >
         <div className="space-y-8">
-          <div className="text-center">
+          <Reveal className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Obra</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto text-balance">
               Colección de obras de arte inspiradas en el mundo del ciclismo.
               Cada pieza captura la emoción y la pasión del deporte sobre
               ruedas.
             </p>
-          </div>
+          </Reveal>
 
           <Filters
             filters={filters}

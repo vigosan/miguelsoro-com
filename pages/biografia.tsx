@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Layout } from "@/components/Layout";
+import { Reveal } from "@/components/Reveal";
 import Head from "next/head";
 
 export default function BiographyPage() {
@@ -70,16 +71,16 @@ export default function BiographyPage() {
         url="https://www.miguelsoro.com/biography"
       >
         <div className="space-y-8">
-          <div className="text-center">
+          <Reveal className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Biografía</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto text-balance">
               La historia de un ciclista profesional que encontró en el arte su
               nueva pasión. Descubre el viaje de Miguel Soro desde el pedal
               hasta el pincel.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="max-w-4xl mx-auto">
+          <Reveal delay={100} className="max-w-4xl mx-auto">
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 overflow-hidden">
               <div className="aspect-[2/1] relative">
                 <Image
@@ -93,10 +94,10 @@ export default function BiographyPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
               </div>
             </div>
-          </div>
+          </Reveal>
 
           <div className="max-w-4xl mx-auto grid gap-8 lg:grid-cols-2">
-            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
+            <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
               <div className="flex items-center mb-4">
                 <div className="w-2 h-8 bg-blue-600 rounded-full mr-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -110,9 +111,9 @@ export default function BiographyPage() {
                 etapas del ciclismo desde principiante hasta convertirse en un
                 profesional destacado en Portugal e Italia.
               </p>
-            </div>
+            </Reveal>
 
-            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
+            <Reveal delay={100} className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
               <div className="flex items-center mb-4">
                 <div className="w-2 h-8 bg-green-600 rounded-full mr-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -126,9 +127,9 @@ export default function BiographyPage() {
                 arte, ha exhibido su obra en todo el mundo, desde España hasta
                 Italia, Francia, Estados Unidos, Canadá y Australia.
               </p>
-            </div>
+            </Reveal>
 
-            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
+            <Reveal className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
               <div className="flex items-center mb-4">
                 <div className="w-2 h-8 bg-yellow-600 rounded-full mr-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -142,9 +143,9 @@ export default function BiographyPage() {
                 ilustra la épica, la emoción y el esfuerzo requeridos en el
                 deporte del ciclismo.
               </p>
-            </div>
+            </Reveal>
 
-            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
+            <Reveal delay={100} className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
               <div className="flex items-center mb-4">
                 <div className="w-2 h-8 bg-red-600 rounded-full mr-4"></div>
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -157,7 +158,7 @@ export default function BiographyPage() {
                 consolidadas en el deporte, como la empresa Giant, y ha sido
                 resaltada por prestigiosas revistas como Forbes.
               </p>
-            </div>
+            </Reveal>
           </div>
 
           <div className="max-w-3xl mx-auto bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-8">
