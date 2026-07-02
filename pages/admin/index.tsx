@@ -9,8 +9,6 @@ import {
 import { usePictureStats } from "@/hooks/usePictures";
 import { useOrderStats } from "@/hooks/useOrders";
 
-const recentActivity: any[] = [];
-
 export default function AdminDashboard() {
   const { data: pictureStats, isLoading: pictureStatsLoading } =
     usePictureStats();
@@ -101,8 +99,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-          {/* Quick Actions */}
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
           <div className="rounded-lg bg-white p-4 sm:p-6 shadow">
             <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
               Acciones Rápidas
@@ -144,37 +141,6 @@ export default function AdminDashboard() {
                 </div>
                 <span className="text-gray-400 ml-2">→</span>
               </Link>
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="rounded-lg bg-white p-4 sm:p-6 shadow">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
-              Actividad Reciente
-            </h2>
-            <div className="space-y-4">
-              {recentActivity.length > 0 ? (
-                recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3">
-                    <div className="h-2 w-2 bg-gray-900 rounded-full mt-2 flex-shrink-0"></div>
-                    <div>
-                      <p className="text-sm text-gray-900">
-                        {activity.message}
-                      </p>
-                      <p className="text-xs text-gray-500">{activity.time}</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-sm text-gray-500">
-                    No hay actividad reciente
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Los eventos aparecerán aquí cuando ocurran
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
