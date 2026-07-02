@@ -12,6 +12,7 @@ export interface OrderWithDetails {
   shipping: number;
   total: number;
   paypalOrderId?: string | null;
+  captureId?: string | null;
   createdAt: Date;
   updatedAt: Date;
   items: Array<{
@@ -113,6 +114,8 @@ export interface OrderRepository {
 
   // From webhook - UPDATE multiple orders (updateMany)
   updateManyByPayPalId(paypalOrderId: string, status: string): Promise<void>;
+
+  setCaptureId(paypalOrderId: string, captureId: string): Promise<void>;
 }
 
 export interface ProductVariant {

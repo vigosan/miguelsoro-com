@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ordersController } from "../../../lib/paypal";
 import { Order } from "@paypal/paypal-server-sdk";
-import { capturePayPalOrder } from "../../../infra/dependencies";
+import { capturePayPalOrder, orderRepository } from "../../../infra/dependencies";
 import {
   sendOrderConfirmationEmail,
   sendAdminNotificationEmail,
@@ -66,6 +66,19 @@ export default async function handler(
 
     // Use the capture PayPal order use case
     const order = await capturePayPalOrder.execute(paypalOrderId);
+
+    // Persist the real capture id (needed to refund later). It lives inside the
+    // purchase unit's payments, not at the order level. Best-effort: a failure
+    // here must not break a successful payment.
+    try {
+      const captureId =
+        paypalOrder.purchaseUnits?.[0]?.payments?.captures?.[0]?.id;
+      if (captureId) {
+        await orderRepository.setCaptureId(paypalOrderId, captureId);
+      }
+    } catch (captureIdError) {
+      console.error("Error persisting capture id:", captureIdError);
+    }
 
     // Send confirmation emails
     try {

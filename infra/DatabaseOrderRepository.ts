@@ -325,6 +325,24 @@ export class DatabaseOrderRepository implements OrderRepository {
     }
   }
 
+  async setCaptureId(
+    paypalOrderId: string,
+    captureId: string,
+  ): Promise<void> {
+    const supabase = this.getClient();
+
+    const { error } = await supabase
+      .from("orders")
+      .update({ captureId, updatedAt: new Date().toISOString() })
+      .eq("paypalOrderId", paypalOrderId);
+
+    if (error) {
+      console.error("Error saving capture id:", error);
+      // Non-fatal: the payment already succeeded. Refunds for this order will
+      // just be unavailable until the id is backfilled.
+    }
+  }
+
   private mapToOrderWithDetails(dbOrder: any): OrderWithDetails {
     return {
       id: dbOrder.id,
@@ -338,6 +356,7 @@ export class DatabaseOrderRepository implements OrderRepository {
       shipping: dbOrder.shipping,
       total: dbOrder.total,
       paypalOrderId: dbOrder.paypalOrderId,
+      captureId: dbOrder.captureId,
       createdAt: new Date(dbOrder.createdAt),
       updatedAt: new Date(dbOrder.updatedAt),
       items: (dbOrder.order_items || []).map((item: any) => ({
