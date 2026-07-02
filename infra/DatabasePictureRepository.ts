@@ -188,6 +188,7 @@ export class DatabasePictureRepository implements PictureRepository {
 
     const priceInCents = Math.round(price * 100);
     const productId = uuidv4();
+    const now = new Date().toISOString();
 
     // 1) Create the product row.
     const { error: productError } = await supabase.from("products").insert({
@@ -198,6 +199,8 @@ export class DatabasePictureRepository implements PictureRepository {
       slug,
       productTypeId,
       isActive: true,
+      createdAt: now,
+      updatedAt: now,
     });
 
     if (productError) {
@@ -212,6 +215,8 @@ export class DatabasePictureRepository implements PictureRepository {
       url: imageUrl,
       isPrimary: true,
       sortOrder: 0,
+      createdAt: now,
+      updatedAt: now,
     });
 
     if (imageError) {
@@ -230,6 +235,8 @@ export class DatabasePictureRepository implements PictureRepository {
         price: priceInCents,
         stock,
         status: stock > 0 ? "AVAILABLE" : "OUT_OF_STOCK",
+        createdAt: now,
+        updatedAt: now,
       });
 
     if (variantError) {
