@@ -282,7 +282,7 @@ export default function IndexPage({
                       100 €
                     </span>
                     <Link
-                      href="/reproducciones/indurain"
+                      href="/reproducciones/indurain-contrarreloj"
                       className="group inline-flex items-center gap-2 bg-black px-8 py-4 text-sm font-medium uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
                     >
                       <span>Ver la litografía</span>

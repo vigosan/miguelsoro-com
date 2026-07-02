@@ -10,7 +10,7 @@ import { getPictureStatus, Picture } from "@/domain/picture";
 import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
 import { useCart } from "../../contexts/CartContext";
 
-const SLUG = "indurain";
+const SLUG = "indurain-contrarreloj";
 
 interface IndurainPageProps {
   picture: Picture | null;
@@ -60,7 +60,7 @@ export default function IndurainPage({ picture }: IndurainPageProps) {
       title="Litografía Miguel Indurain — Edición firmada | Miguel Soro"
       description="Litografía original de Miguel Soro sobre Miguel Indurain. Edición limitada, numerada y firmada a mano. Reproducción de arte ciclista."
       image="/reproducciones/indurain-firmada.webp"
-      url="https://www.miguelsoro.com/reproducciones/indurain"
+      url="https://www.miguelsoro.com/reproducciones/indurain-contrarreloj"
     >
       <div className="py-12 lg:py-16">
         {/* Hero */}
