@@ -42,7 +42,7 @@ export function Item({ item, className }: Props) {
               itemType="https://schema.org/OutOfStock"
               data-testid={`picture-status-not-available-${item.slug}`}
             >
-              No disponible
+              Colección privada
             </span>
           )}
         </div>

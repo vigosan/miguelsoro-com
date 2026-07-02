@@ -34,11 +34,12 @@ describe("Item Component", () => {
     expect(screen.getByText("Disponible")).toBeInTheDocument();
   });
 
-  it("shows not available status when picture has no stock", () => {
+  it("frames sold artwork as private collection rather than unavailable", () => {
     const soldPicture = { ...mockPicture, stock: 0 };
     render(<Item item={soldPicture} />);
 
-    expect(screen.getByText("No disponible")).toBeInTheDocument();
+    expect(screen.getByText("Colección privada")).toBeInTheDocument();
+    expect(screen.queryByText("No disponible")).not.toBeInTheDocument();
   });
 
   it("does not shout availability inside the image alt text when sold", () => {

@@ -145,7 +145,7 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
                   {getPictureStatus(picture) === "NOT_AVAILABLE" && (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-gray-500 shadow-sm ring-1 ring-gray-200 backdrop-blur-sm">
                       <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-                      No disponible
+                      Colección privada
                     </span>
                   )}
                 </div>
@@ -275,11 +275,11 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
               ) : (
                 <div className="mb-6">
                   <div className="text-lg font-semibold text-gray-900 mb-1">
-                    Consultar precio
+                    Colección privada
                   </div>
                   <p className="text-sm text-gray-500">
-                    Esta obra no está disponible para compra online. Contacta
-                    para más información.
+                    Esta obra ya forma parte de una colección. Escríbeme para
+                    encargar una pieza o consultar obra similar disponible.
                   </p>
                 </div>
               )}
