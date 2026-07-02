@@ -9,15 +9,20 @@ import { useParallax } from "@/hooks/useParallax";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
 import { Picture } from "@/domain/picture";
+import { formatEuros } from "@/domain/order";
+
+const LITOGRAFIA_SLUG = "indurain-contrarreloj";
 
 interface IndexPageProps {
   featuredPictures: Picture[];
   totalPictures: number;
+  litografiaPrice: number | null;
 }
 
 export default function IndexPage({
   featuredPictures,
   totalPictures,
+  litografiaPrice,
 }: IndexPageProps) {
   const { ref: heroRef, offset: heroOffset } = useParallax<HTMLDivElement>(0.35);
 
@@ -137,11 +142,15 @@ export default function IndexPage({
                   <div className="mt-8 flex items-center gap-6">
                     <span className="flex flex-col leading-none">
                       <span className="font-[family-name:var(--font-poster)] text-3xl text-black">
-                        100 €
+                        {litografiaPrice != null
+                          ? formatEuros(litografiaPrice)
+                          : "Consultar"}
                       </span>
-                      <span className="mt-1 text-xs font-sans text-gray-500">
-                        IVA no incluido
-                      </span>
+                      {litografiaPrice != null && (
+                        <span className="mt-1 text-xs font-sans text-gray-500">
+                          IVA no incluido
+                        </span>
+                      )}
                     </span>
                     <Link
                       href="/reproducciones/indurain-contrarreloj"
@@ -315,10 +324,14 @@ export const getStaticProps: GetStaticProps<IndexPageProps> = async () => {
     // Get first 6 pictures as featured works for the landing page
     const featuredPictures = allPictures.slice(0, 6);
 
+    const litografia =
+      await pictureRepository.getPictureBySlug(LITOGRAFIA_SLUG);
+
     return {
       props: {
         featuredPictures,
         totalPictures: allPictures.length,
+        litografiaPrice: litografia?.price ?? null,
       },
       // Revalidate every hour (3600 seconds)
       revalidate: 3600,
@@ -331,6 +344,7 @@ export const getStaticProps: GetStaticProps<IndexPageProps> = async () => {
       props: {
         featuredPictures: [],
         totalPictures: 0,
+        litografiaPrice: null,
       },
       // On error, retry after 5 minutes
       revalidate: 300,
