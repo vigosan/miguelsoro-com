@@ -2,6 +2,7 @@ import {
   Client,
   Environment,
   OrdersController,
+  PaymentsController,
 } from "@paypal/paypal-server-sdk";
 
 const environment =
@@ -18,6 +19,8 @@ export const paypalClient = new Client({
 });
 
 export const ordersController = new OrdersController(paypalClient);
+
+export const paymentsController = new PaymentsController(paypalClient);
 
 export const getPayPalClientConfig = () => {
   const config = {

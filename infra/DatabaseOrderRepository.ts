@@ -524,6 +524,36 @@ export class DatabaseProductVariantRepository
     }
   }
 
+  async incrementStock(id: string, quantity: number): Promise<void> {
+    const supabase = this.getClient();
+
+    const { data: variant, error: getError } = await supabase
+      .from("product_variants")
+      .select("stock")
+      .eq("id", id)
+      .single();
+
+    if (getError) {
+      console.error("Error getting variant stock:", getError);
+      throw new Error(`Failed to get variant: ${getError.message}`);
+    }
+
+    const newStock = variant.stock + quantity;
+
+    const { error } = await supabase
+      .from("product_variants")
+      .update({
+        stock: newStock,
+        ...(newStock > 0 ? { status: "AVAILABLE" } : {}),
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error incrementing stock:", error);
+      throw new Error(`Failed to update stock: ${error.message}`);
+    }
+  }
+
   async markOutOfStockIfNeeded(id: string): Promise<void> {
     const supabase = this.getClient();
 

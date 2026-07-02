@@ -143,5 +143,6 @@ export interface ProductVariantRepository {
 
   // From /api/paypal/capture-order, webhook - Update stock and status
   decrementStock(id: string, quantity: number): Promise<void>;
+  incrementStock(id: string, quantity: number): Promise<void>;
   markOutOfStockIfNeeded(id: string): Promise<void>;
 }
