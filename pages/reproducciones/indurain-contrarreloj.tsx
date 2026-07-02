@@ -106,6 +106,7 @@ export default function IndurainPage({ picture }: IndurainPageProps) {
           <p className="mt-2 text-sm text-gray-500">
             Litografía numerada y firmada a mano por el artista.
           </p>
+          <p className="mt-1 text-xs text-gray-500">IVA no incluido</p>
           <div className="mt-6">
             {available ? (
               <button

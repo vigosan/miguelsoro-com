@@ -271,6 +271,7 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
                   <div className="text-3xl font-bold text-gray-900">
                     {formatEuros(picture.price)}
                   </div>
+                  <p className="mt-1 text-xs text-gray-500">IVA no incluido</p>
                 </div>
               ) : (
                 <div className="mb-6">

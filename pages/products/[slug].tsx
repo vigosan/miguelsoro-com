@@ -91,9 +91,12 @@ export default function ProductPage() {
                 {product.title}
               </h1>
               <div className="flex items-center justify-between mb-6">
-                <p className="text-3xl font-bold text-gray-900">
-                  {formatPrice(product.basePrice)}
-                </p>
+                <div>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {formatPrice(product.basePrice)}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">IVA no incluido</p>
+                </div>
                 <button
                   onClick={() => setIsFavorite(!isFavorite)}
                   className="p-2 rounded-full hover:bg-gray-100 transition-colors"

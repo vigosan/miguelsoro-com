@@ -135,8 +135,13 @@ export default function IndexPage({
                     vídeo del proceso en el estudio.
                   </p>
                   <div className="mt-8 flex items-center gap-6">
-                    <span className="font-[family-name:var(--font-poster)] text-3xl text-black">
-                      100 €
+                    <span className="flex flex-col leading-none">
+                      <span className="font-[family-name:var(--font-poster)] text-3xl text-black">
+                        100 €
+                      </span>
+                      <span className="mt-1 text-xs font-sans text-gray-500">
+                        IVA no incluido
+                      </span>
                     </span>
                     <Link
                       href="/reproducciones/indurain-contrarreloj"
