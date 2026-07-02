@@ -109,7 +109,7 @@ export function AdminLayout({
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
 
-      <div className="flex h-screen">
+      <div className="flex h-screen overflow-hidden">
         {/* Mobile menu button - positioned right */}
         {!isMobileMenuOpen && (
           <div className="lg:hidden fixed top-4 right-4 z-50">
