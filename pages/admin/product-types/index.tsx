@@ -17,6 +17,7 @@ export default function ProductTypesAdmin() {
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [editingType, setEditingType] = useState<ProductType | null>(null);
   const [formData, setFormData] = useState({
     displayName: "",
@@ -53,7 +54,9 @@ export default function ProductTypesAdmin() {
       toast.error("El nombre es obligatorio");
       return;
     }
+    if (submitting) return;
 
+    setSubmitting(true);
     try {
       const response = await fetch("/api/admin/product-types", {
         method: "POST",
@@ -80,6 +83,8 @@ export default function ProductTypesAdmin() {
           ? error.message
           : "Error al crear el tipo de producto",
       );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -209,9 +214,12 @@ export default function ProductTypesAdmin() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-900 transition-colors order-1 sm:order-2 cursor-pointer"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors order-1 sm:order-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editingType ? "Actualizar" : "Crear"} Tipo
+                  {submitting
+                    ? "Guardando…"
+                    : `${editingType ? "Actualizar" : "Crear"} Tipo`}
                 </button>
               </div>
             </form>

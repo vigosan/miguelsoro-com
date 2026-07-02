@@ -26,6 +26,7 @@ export default function AdminNews() {
     useNewsAdmin();
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [editingNews, setEditingNews] = useState<News | null>(null);
   const [formData, setFormData] = useState<NewsFormData>({
     title: "",
@@ -39,7 +40,9 @@ export default function AdminNews() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
 
+    setSubmitting(true);
     try {
       if (editingNews) {
         const updated = await updateNews(editingNews.id, formData);
@@ -60,6 +63,8 @@ export default function AdminNews() {
       }
     } catch (error) {
       toast.error("Error al procesar la solicitud");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -319,9 +324,12 @@ export default function AdminNews() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors"
+                    disabled={submitting}
+                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {editingNews ? "Actualizar" : "Crear"} Noticia
+                    {submitting
+                      ? "Guardando…"
+                      : `${editingNews ? "Actualizar" : "Crear"} Noticia`}
                   </button>
                 </div>
               </form>
