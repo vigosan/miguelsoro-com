@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Layout } from "@/components/Layout";
 import { Reveal } from "@/components/Reveal";
 import { SectionLabel } from "@/components/SectionLabel";
+import { LineReveal } from "@/components/LineReveal";
 import { useParallax } from "@/hooks/useParallax";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
@@ -158,11 +159,16 @@ export default function IndexPage({
                     La técnica
                   </SectionLabel>
                 </Reveal>
+                <LineReveal
+                  className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl mb-8 leading-[0.85]"
+                  lines={[
+                    "Acrílico",
+                    <>
+                      & <span className="text-accent">collage</span>
+                    </>,
+                  ]}
+                />
                 <Reveal from="left" delay={120}>
-                  <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl mb-8 leading-[0.85]">
-                    Acrílico
-                    <br />& <span className="text-accent">collage</span>
-                  </h2>
                   <p className="text-lg md:text-xl text-white/70 leading-relaxed text-pretty">
                     Cada obra combina pintura acrílica con recortes de
                     periódicos. Los gestos atléticos se transforman en
