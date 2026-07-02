@@ -108,7 +108,7 @@ export default function IndexPage({
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
               <Reveal>
                 <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
-                  (01) — El artista
+                  (<span className="text-accent-ink">01</span>) — El artista
                 </p>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-black mb-8 leading-tight text-balance">
                   La autenticidad de quien vivió el ciclismo desde dentro
@@ -148,11 +148,11 @@ export default function IndexPage({
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
               <Reveal>
                 <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-6">
-                  (02) — La técnica
+                  (<span className="text-accent">02</span>) — La técnica
                 </p>
                 <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl mb-8 leading-[0.85]">
                   Acrílico
-                  <br />& collage
+                  <br />& <span className="text-accent">collage</span>
                 </h2>
                 <p className="text-lg md:text-xl text-white/70 leading-relaxed text-pretty">
                   Cada obra combina pintura acrílica con recortes de periódicos.
@@ -177,12 +177,12 @@ export default function IndexPage({
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <Reveal className="mb-16">
               <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
-                (03) — La colección
+                (<span className="text-accent-ink">03</span>) — La colección
               </p>
               <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl text-black mb-4 leading-none">
                 Obras destacadas
               </h2>
-              <div className="w-24 h-px bg-black"></div>
+              <div className="w-24 h-0.5 bg-accent"></div>
             </Reveal>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-200">
