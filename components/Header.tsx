@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import Image from "next/image";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog } from "@headlessui/react";
@@ -16,11 +17,12 @@ interface HeaderProps {
 }
 
 export function Header({ transparent = false }: HeaderProps) {
+  const router = useRouter();
   const navigation = [
-    { name: "Obra", Link: ObraPageLink },
-    { name: "Noticias", Link: NewsPageLink },
-    { name: "Biografía", Link: BiographyPageLink },
-    { name: "Contacto", Link: ContactPageLink },
+    { name: "Obra", Link: ObraPageLink, href: "/obra" },
+    { name: "Noticias", Link: NewsPageLink, href: "/noticias" },
+    { name: "Biografía", Link: BiographyPageLink, href: "/biografia" },
+    { name: "Contacto", Link: ContactPageLink, href: "/contacto" },
   ];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -94,19 +96,26 @@ export function Header({ transparent = false }: HeaderProps) {
           className="hidden lg:flex lg:items-center lg:gap-x-10"
           data-testid="desktop-navigation"
         >
-          {navigation.map(({ name, Link }) => (
-            <Link
-              key={name}
-              className={`group relative text-xs font-medium uppercase tracking-[0.18em] transition-colors cursor-pointer after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:transition-transform after:duration-300 after:ease-out group-hover:after:scale-x-100 hover:after:scale-x-100 ${
-                overlay
-                  ? "text-white/90 hover:text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.5)] after:bg-white"
-                  : "text-gray-700 hover:text-black after:bg-black"
-              }`}
-              data-testid={`nav-link-${name.toLowerCase().replace(/\s+/g, "-")}`}
-            >
-              {name}
-            </Link>
-          ))}
+          {navigation.map(({ name, Link, href }) => {
+            const active = router.pathname === href;
+            return (
+              <Link
+                key={name}
+                className={`group relative text-xs font-medium uppercase tracking-[0.18em] transition-colors cursor-pointer after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-full after:origin-left after:transition-transform after:duration-300 after:ease-out after:bg-accent group-hover:after:scale-x-100 hover:after:scale-x-100 ${
+                  active ? "after:scale-x-100" : "after:scale-x-0"
+                } ${
+                  overlay
+                    ? "text-white/90 hover:text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]"
+                    : active
+                      ? "text-black"
+                      : "text-gray-700 hover:text-black"
+                }`}
+                data-testid={`nav-link-${name.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                {name}
+              </Link>
+            );
+          })}
           <CartButton
             className={
               overlay
@@ -145,14 +154,21 @@ export function Header({ transparent = false }: HeaderProps) {
             className="mt-auto flex flex-col gap-1 motion-safe:animate-[hero-rise_0.6s_cubic-bezier(0.16,1,0.3,1)_both]"
             data-testid="mobile-navigation"
           >
-            {navigation.map(({ name, Link }) => (
-              <Link
-                key={name}
-                className="font-[family-name:var(--font-poster)] block py-2 text-5xl uppercase leading-none tracking-tight text-gray-900 transition-colors active:text-gray-400"
-              >
-                {name}
-              </Link>
-            ))}
+            {navigation.map(({ name, Link, href }) => {
+              const active = router.pathname === href;
+              return (
+                <Link
+                  key={name}
+                  className={`font-[family-name:var(--font-poster)] block py-2 text-5xl uppercase leading-none tracking-tight transition-colors active:text-gray-400 ${
+                    active
+                      ? "text-gray-900 border-l-4 border-accent pl-4"
+                      : "text-gray-900"
+                  }`}
+                >
+                  {name}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="mt-12 border-t border-gray-200 pt-8">
