@@ -124,36 +124,47 @@ export function Header({ transparent = false }: HeaderProps) {
         onClose={setMobileMenuOpen}
         data-testid="mobile-menu-dialog"
       >
-        <div className="fixed inset-0 z-10" />
+        <div className="fixed inset-0 z-10 bg-black/20" aria-hidden />
         <Dialog.Panel
-          className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white py-6 px-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
+          className="fixed inset-0 z-10 flex flex-col overflow-y-auto bg-white px-6 pb-10 pt-4"
           data-testid="mobile-menu-panel"
         >
           <div className="flex items-center justify-end">
             <button
               type="button"
-              className="-m-2.5 rounded-md p-2.5 text-gray-700 cursor-pointer"
+              className="-m-2.5 rounded-md p-2.5 text-gray-900 cursor-pointer"
               onClick={() => setMobileMenuOpen(false)}
               data-testid="mobile-menu-close-button"
             >
               <span className="sr-only">Close menu</span>
-              <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+              <XMarkIcon className="h-7 w-7" aria-hidden="true" />
             </button>
           </div>
-          <div className="mt-6 flow-root">
-            <div className="-my-6 divide-y divide-gray-500/10">
-              <div className="space-y-2 py-6" data-testid="mobile-navigation">
-                {navigation.map(({ name, Link }) => (
-                  <Link
-                    key={name}
-                    className="-mx-3 block rounded-lg py-2 px-3 text-base leading-7 text-gray-900 hover:bg-gray-50 cursor-pointer"
-                    data-testid={`mobile-nav-link-${name.toLowerCase().replace(/\s+/g, "-")}`}
-                  >
-                    {name}
-                  </Link>
-                ))}
-              </div>
-            </div>
+
+          <nav
+            className="mt-auto flex flex-col gap-1 motion-safe:animate-[hero-rise_0.6s_cubic-bezier(0.16,1,0.3,1)_both]"
+            data-testid="mobile-navigation"
+          >
+            {navigation.map(({ name, Link }) => (
+              <Link
+                key={name}
+                className="font-[family-name:var(--font-poster)] block py-2 text-5xl uppercase leading-none tracking-tight text-gray-900 transition-colors active:text-gray-400"
+              >
+                {name}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="mt-12 border-t border-gray-200 pt-8">
+            <a
+              href="https://www.instagram.com/miguelsoro/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm uppercase tracking-[0.2em] text-gray-500 transition-colors active:text-gray-900"
+              data-testid="mobile-nav-instagram"
+            >
+              Instagram — @miguelsoro
+            </a>
           </div>
         </Dialog.Panel>
       </Dialog>
