@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { Toaster, toast } from "react-hot-toast";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
 import { OrderWithDetails } from "../../../infra/OrderRepository";
+
+const STATUS_FLOW = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] as const;
 
 interface OrderDetailsProps {
   order: OrderWithDetails | null;
@@ -17,6 +20,7 @@ function OrderDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refunding, setRefunding] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const handleRefund = async () => {
     if (!order) return;
@@ -35,11 +39,35 @@ function OrderDetails() {
         throw new Error(data.error || "No se pudo reembolsar");
       }
       setOrder((prev) => (prev ? { ...prev, status: "REFUNDED" } : prev));
-      alert("Reembolso completado correctamente.");
+      toast.success("Reembolso completado correctamente");
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Error al reembolsar");
+      toast.error(err instanceof Error ? err.message : "Error al reembolsar");
     } finally {
       setRefunding(false);
+    }
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!order) return;
+    setUpdatingStatus(true);
+    try {
+      const response = await fetch(`/api/admin/orders/${order.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo actualizar el estado");
+      }
+      setOrder((prev) => (prev ? { ...prev, status: newStatus } : prev));
+      toast.success("Estado actualizado");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Error al actualizar el estado",
+      );
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -131,10 +159,14 @@ function OrderDetails() {
         return "bg-green-100 text-green-800";
       case "PENDING":
         return "bg-yellow-100 text-yellow-800";
+      case "PROCESSING":
+        return "bg-blue-100 text-blue-800";
       case "SHIPPED":
         return "bg-blue-100 text-blue-800";
       case "DELIVERED":
         return "bg-purple-100 text-purple-800";
+      case "CANCELLED":
+        return "bg-red-100 text-red-800";
       case "REFUNDED":
         return "bg-red-100 text-red-800";
       default:
@@ -148,10 +180,14 @@ function OrderDetails() {
         return "Pagado";
       case "PENDING":
         return "Pendiente";
+      case "PROCESSING":
+        return "Procesando";
       case "SHIPPED":
         return "Enviado";
       case "DELIVERED":
         return "Entregado";
+      case "CANCELLED":
+        return "Cancelado";
       case "REFUNDED":
         return "Reembolsado";
       default:
@@ -204,6 +240,50 @@ function OrderDetails() {
               </button>
             )}
           </div>
+
+          {(() => {
+            const currentIndex = STATUS_FLOW.indexOf(order.status as never);
+            const nextStatus =
+              currentIndex >= 0 && currentIndex < STATUS_FLOW.length - 1
+                ? STATUS_FLOW[currentIndex + 1]
+                : null;
+            const canCancel =
+              order.status === "PAID" || order.status === "PROCESSING";
+            if (!nextStatus && !canCancel) return null;
+            return (
+              <div className="mt-6 flex flex-wrap gap-3 border-t border-gray-100 pt-4">
+                {nextStatus && (
+                  <button
+                    onClick={() => handleStatusChange(nextStatus)}
+                    disabled={updatingStatus}
+                    className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    data-testid="advance-status-button"
+                  >
+                    {updatingStatus
+                      ? "Actualizando…"
+                      : `Marcar como ${getStatusText(nextStatus)}`}
+                  </button>
+                )}
+                {canCancel && (
+                  <button
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "¿Cancelar este pedido? El cliente no será reembolsado automáticamente.",
+                        )
+                      ) {
+                        handleStatusChange("CANCELLED");
+                      }
+                    }}
+                    disabled={updatingStatus}
+                    className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Cancelar pedido
+                  </button>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Customer Info */}
@@ -342,6 +422,7 @@ function OrderDetails() {
           </div>
         )}
       </div>
+      <Toaster position="top-right" />
     </AdminLayout>
   );
 }
