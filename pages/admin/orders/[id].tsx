@@ -16,6 +16,32 @@ function OrderDetails() {
   const [order, setOrder] = useState<OrderWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refunding, setRefunding] = useState(false);
+
+  const handleRefund = async () => {
+    if (!order) return;
+    const confirmed = window.confirm(
+      `¿Reembolsar ${(order.total / 100).toFixed(2)} € al cliente vía PayPal? Esta acción no se puede deshacer.`,
+    );
+    if (!confirmed) return;
+
+    setRefunding(true);
+    try {
+      const response = await fetch(`/api/admin/orders/${order.id}/refund`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo reembolsar");
+      }
+      setOrder((prev) => (prev ? { ...prev, status: "REFUNDED" } : prev));
+      alert("Reembolso completado correctamente.");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Error al reembolsar");
+    } finally {
+      setRefunding(false);
+    }
+  };
 
   useEffect(() => {
     if (!id || typeof id !== "string") return;
@@ -109,6 +135,8 @@ function OrderDetails() {
         return "bg-blue-100 text-blue-800";
       case "DELIVERED":
         return "bg-purple-100 text-purple-800";
+      case "REFUNDED":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -124,6 +152,8 @@ function OrderDetails() {
         return "Enviado";
       case "DELIVERED":
         return "Entregado";
+      case "REFUNDED":
+        return "Reembolsado";
       default:
         return status;
     }
@@ -152,14 +182,28 @@ function OrderDetails() {
 
         {/* Status */}
         <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">
-            Estado del Pedido
-          </h2>
-          <span
-            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}
-          >
-            {getStatusText(order.status)}
-          </span>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                Estado del Pedido
+              </h2>
+              <span
+                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}
+              >
+                {getStatusText(order.status)}
+              </span>
+            </div>
+            {order.status === "PAID" && (
+              <button
+                onClick={handleRefund}
+                disabled={refunding}
+                className="rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="refund-button"
+              >
+                {refunding ? "Reembolsando…" : "Reembolsar pedido"}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Customer Info */}
