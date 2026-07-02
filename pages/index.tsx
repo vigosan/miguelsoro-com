@@ -248,6 +248,55 @@ export default function IndexPage({
           </div>
         </section>
 
+        {/* Litografía destacada */}
+        <section className="py-24 lg:py-32 bg-white [content-visibility:auto] [contain-intrinsic-size:auto_700px]">
+          <div className="max-w-7xl mx-auto px-6 lg:px-12">
+            <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+              <Reveal clip className="order-1 overflow-hidden rounded-lg bg-gray-100 lg:order-2">
+                <Image
+                  src="/reproducciones/indurain-firmada.webp"
+                  alt="Litografía de Miguel Indurain firmada por Miguel Soro"
+                  width={1200}
+                  height={890}
+                  className="h-auto w-full object-cover"
+                />
+              </Reveal>
+              <div className="order-2 lg:order-1">
+                <Reveal from="left">
+                  <SectionLabel prefix="Nueva reproducción">
+                    Edición limitada
+                  </SectionLabel>
+                </Reveal>
+                <Reveal from="left" delay={120}>
+                  <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl leading-[0.85] text-black">
+                    Litografía
+                    <br />
+                    <span className="text-accent-ink">Indurain</span>
+                  </h2>
+                  <p className="mt-6 max-w-md text-lg text-gray-600">
+                    La contrarreloj perfecta, numerada y firmada a mano. Con el
+                    vídeo del proceso en el estudio.
+                  </p>
+                  <div className="mt-8 flex items-center gap-6">
+                    <span className="font-[family-name:var(--font-poster)] text-3xl text-black">
+                      100 €
+                    </span>
+                    <Link
+                      href="/reproducciones/indurain"
+                      className="group inline-flex items-center gap-2 bg-black px-8 py-4 text-sm font-medium uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
+                    >
+                      <span>Ver la litografía</span>
+                      <span className="transition-transform duration-300 group-hover:translate-x-1">
+                        →
+                      </span>
+                    </Link>
+                  </div>
+                </Reveal>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </Layout>
     </>
   );
