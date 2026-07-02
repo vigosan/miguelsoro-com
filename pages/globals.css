@@ -3,6 +3,12 @@
 @theme {
   --font-display: var(--font-display), sans-serif;
   --font-poster: var(--font-poster), sans-serif;
+
+  /* Acento robado del maillot de la obra (Olano, ONCE).
+     --color-accent: amarillo vivo para marcas gráficas (líneas, puntos).
+     --color-accent-ink: ámbar profundo con contraste suficiente para texto sobre papel. */
+  --color-accent: #f2b705;
+  --color-accent-ink: #b8770a;
 }
 
 @keyframes hero-rise {
