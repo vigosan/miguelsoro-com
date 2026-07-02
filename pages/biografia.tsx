@@ -74,7 +74,7 @@ export default function BiographyPage() {
           <Reveal className="mb-12">
             <SectionLabel prefix="Xàtiva, 1976">Perfil</SectionLabel>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 leading-[1.05] tracking-tight text-balance">
-              Del pelotón al lienzo
+              Del pelotón al <span className="text-accent-ink">lienzo</span>
             </h1>
           </Reveal>
 
@@ -119,7 +119,7 @@ export default function BiographyPage() {
                 delay={i * 60}
                 className="grid grid-cols-[auto_1fr] gap-6 md:gap-10"
               >
-                <span className="text-2xl md:text-3xl font-light text-gray-300 leading-none pt-1 tabular-nums">
+                <span className="text-2xl md:text-3xl font-light text-accent leading-none pt-1 tabular-nums">
                   {section.n}
                 </span>
                 <div>

@@ -56,9 +56,10 @@ export default function ObraPage({
         <div className="py-16 lg:py-20 space-y-12">
           <Reveal>
             <SectionLabel prefix="Catálogo">Obra original</SectionLabel>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-6 tracking-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-4 tracking-tight">
               Obra
             </h1>
+            <div className="mb-6 h-1 w-16 bg-accent"></div>
             <p className="text-lg text-gray-600 max-w-2xl text-pretty">
               Colección de obras inspiradas en el mundo del ciclismo. Cada pieza
               captura la emoción y la pasión del deporte sobre ruedas.

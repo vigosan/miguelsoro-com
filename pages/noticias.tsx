@@ -38,6 +38,7 @@ export default function NewsPage() {
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 leading-none tracking-tight">
             Noticias
           </h1>
+          <div className="mt-6 h-1 w-16 bg-accent"></div>
         </Reveal>
 
         <div className="max-w-3xl divide-y divide-gray-200">

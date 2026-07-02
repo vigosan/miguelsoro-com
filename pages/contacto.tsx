@@ -18,7 +18,7 @@ export default function ContactPage() {
           <Reveal className="mb-20">
             <SectionLabel prefix="Contacto">Estudio</SectionLabel>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 leading-none tracking-tight">
-              Hablemos de arte
+              Hablemos de <span className="text-accent-ink">arte</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg text-gray-600 leading-relaxed text-pretty">
               ¿Preguntas sobre una obra, una exposición o una colaboración?
