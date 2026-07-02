@@ -108,14 +108,18 @@ export default function IndexPage({
         <section className="py-24 lg:py-32 bg-white [content-visibility:auto] [contain-intrinsic-size:auto_800px]">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
-              <Reveal from="left">
-                <SectionLabel prefix="01" paren>
-                  El artista
-                </SectionLabel>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-black mb-8 leading-tight text-balance">
-                  La autenticidad de quien vivió el ciclismo desde dentro
-                </h2>
-              </Reveal>
+              <div>
+                <Reveal from="left">
+                  <SectionLabel prefix="01" paren>
+                    El artista
+                  </SectionLabel>
+                </Reveal>
+                <Reveal from="left" delay={120}>
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-black mb-8 leading-tight text-balance">
+                    La autenticidad de quien vivió el ciclismo desde dentro
+                  </h2>
+                </Reveal>
+              </div>
               <Reveal from="right" delay={150} className="space-y-6">
                 <p className="text-lg text-gray-700 leading-relaxed">
                   Miguel Soro corrió profesionalmente durante cinco años
@@ -148,20 +152,25 @@ export default function IndexPage({
         <section className="py-24 lg:py-32 bg-black text-white -mx-6 lg:-mx-24 px-6 lg:px-24 [content-visibility:auto] [contain-intrinsic-size:auto_800px]">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-              <Reveal from="left">
-                <SectionLabel prefix="02" paren onDark>
-                  La técnica
-                </SectionLabel>
-                <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl mb-8 leading-[0.85]">
-                  Acrílico
-                  <br />& <span className="text-accent">collage</span>
-                </h2>
-                <p className="text-lg md:text-xl text-white/70 leading-relaxed text-pretty">
-                  Cada obra combina pintura acrílica con recortes de periódicos.
-                  Los gestos atléticos se transforman en composiciones que
-                  capturan la velocidad y emoción del pelotón profesional.
-                </p>
-              </Reveal>
+              <div>
+                <Reveal from="left">
+                  <SectionLabel prefix="02" paren onDark>
+                    La técnica
+                  </SectionLabel>
+                </Reveal>
+                <Reveal from="left" delay={120}>
+                  <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl mb-8 leading-[0.85]">
+                    Acrílico
+                    <br />& <span className="text-accent">collage</span>
+                  </h2>
+                  <p className="text-lg md:text-xl text-white/70 leading-relaxed text-pretty">
+                    Cada obra combina pintura acrílica con recortes de
+                    periódicos. Los gestos atléticos se transforman en
+                    composiciones que capturan la velocidad y emoción del
+                    pelotón profesional.
+                  </p>
+                </Reveal>
+              </div>
               <Reveal
                 clip
                 delay={150}
@@ -181,15 +190,19 @@ export default function IndexPage({
         {/* Featured Works Section */}
         <section className="py-24 lg:py-32 bg-white [content-visibility:auto] [contain-intrinsic-size:auto_1000px]">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
-            <Reveal className="mb-16">
-              <SectionLabel prefix="03" paren>
-                La colección
-              </SectionLabel>
-              <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl text-black mb-4 leading-none">
-                Obras destacadas
-              </h2>
-              <div className="w-24 h-0.5 bg-accent"></div>
-            </Reveal>
+            <div className="mb-16">
+              <Reveal>
+                <SectionLabel prefix="03" paren>
+                  La colección
+                </SectionLabel>
+              </Reveal>
+              <Reveal delay={120}>
+                <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl text-black mb-4 leading-none">
+                  Obras destacadas
+                </h2>
+                <div className="w-24 h-0.5 bg-accent"></div>
+              </Reveal>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-200">
               {featuredPictures.slice(0, 6).map((picture, index) => (
