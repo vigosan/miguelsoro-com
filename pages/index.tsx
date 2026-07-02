@@ -65,13 +65,14 @@ export default function IndexPage({
                 </div>
                 <div className="max-w-2xl">
                   <p className="text-xl md:text-2xl text-white/90 leading-relaxed mb-8 animate-[hero-rise_1s_cubic-bezier(0.16,1,0.3,1)_0.45s_both]">
-                    Del pelotón profesional al lienzo. Arte ciclista con la
-                    autenticidad de quien vivió el deporte desde dentro.
+                    Del pelotón profesional al{" "}
+                    <span className="text-accent">lienzo</span>. Arte ciclista
+                    con la autenticidad de quien vivió el deporte desde dentro.
                   </p>
                   <div className="animate-[hero-rise_1s_cubic-bezier(0.16,1,0.3,1)_0.6s_both]">
                     <Link
                       href="/obra"
-                      className="group inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-medium hover:bg-gray-200 transition-colors uppercase tracking-wider text-sm"
+                      className="group inline-flex items-center gap-3 px-8 py-4 bg-accent text-black font-medium hover:bg-accent-ink transition-colors uppercase tracking-wider text-sm"
                     >
                       <span>Ver colección</span>
                       <svg
