@@ -138,7 +138,7 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
                 <div className="absolute top-4 right-4">
                   {getPictureStatus(picture) === "AVAILABLE" && (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 backdrop-blur-sm">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                       Disponible
                     </span>
                   )}

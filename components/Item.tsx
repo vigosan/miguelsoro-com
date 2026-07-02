@@ -69,7 +69,7 @@ export function Item({ item, className }: Props) {
             itemType="https://schema.org/InStock"
             data-testid={`picture-status-available-${item.slug}`}
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             Disponible
           </span>
         )}
