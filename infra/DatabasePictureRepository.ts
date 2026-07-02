@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { Picture, getPictureStatus } from "@/domain/picture";
 import { PictureRepository } from "./PictureRepository";
 import { createAdminClient } from "@/utils/supabase/server";
@@ -186,32 +187,27 @@ export class DatabasePictureRepository implements PictureRepository {
       pictureData as Picture & { price: number };
 
     const priceInCents = Math.round(price * 100);
+    const productId = uuidv4();
 
     // 1) Create the product row.
-    const { data: product, error: productError } = await supabase
-      .from("products")
-      .insert({
-        title,
-        description: description ?? "",
-        basePrice: priceInCents,
-        slug,
-        productTypeId,
-        isActive: true,
-      })
-      .select("id")
-      .single();
+    const { error: productError } = await supabase.from("products").insert({
+      id: productId,
+      title,
+      description: description ?? "",
+      basePrice: priceInCents,
+      slug,
+      productTypeId,
+      isActive: true,
+    });
 
-    if (productError || !product) {
+    if (productError) {
       console.error("Error creating product:", productError);
-      throw new Error(
-        `Failed to create product: ${productError?.message ?? "unknown error"}`,
-      );
+      throw new Error(`Failed to create product: ${productError.message}`);
     }
-
-    const productId = product.id as string;
 
     // 2) Create the primary image.
     const { error: imageError } = await supabase.from("product_images").insert({
+      id: uuidv4(),
       productId,
       url: imageUrl,
       isPrimary: true,
@@ -229,6 +225,7 @@ export class DatabasePictureRepository implements PictureRepository {
     const { error: variantError } = await supabase
       .from("product_variants")
       .insert({
+        id: uuidv4(),
         productId,
         price: priceInCents,
         stock,
