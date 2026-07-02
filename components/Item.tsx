@@ -12,7 +12,7 @@ export function Item({ item, className }: Props) {
   const status = getPictureStatus(item);
 
   // SEO-optimized alt text for images
-  const altText = `${item.title} - Arte ciclístico de Miguel Soro, obra original ${item.size}cm en acrílico y collage${status === "NOT_AVAILABLE" ? " [NO DISPONIBLE]" : status === "AVAILABLE" ? " disponible para compra" : ""}`;
+  const altText = `${item.title} - Arte ciclístico de Miguel Soro, obra original ${item.size}cm en acrílico y collage${status === "AVAILABLE" ? " disponible para compra" : ""}`;
 
   return (
     <Link

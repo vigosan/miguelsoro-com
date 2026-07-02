@@ -41,6 +41,14 @@ describe("Item Component", () => {
     expect(screen.getByText("No disponible")).toBeInTheDocument();
   });
 
+  it("does not shout availability inside the image alt text when sold", () => {
+    const soldPicture = { ...mockPicture, stock: 0 };
+    render(<Item item={soldPicture} />);
+
+    const image = screen.getByRole("img");
+    expect(image.getAttribute("alt")).not.toContain("[NO DISPONIBLE]");
+  });
+
   it("renders image with correct alt text", () => {
     render(<Item item={mockPicture} />);
 

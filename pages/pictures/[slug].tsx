@@ -128,7 +128,7 @@ const PictureDetail = ({ picture, slug }: PictureDetailProps) => {
               <div className="group aspect-square relative overflow-hidden rounded-xl bg-gray-50 ring-1 ring-gray-200 p-6 lg:p-8">
                 <Image
                   src={picture.imageUrl}
-                  alt={`${picture.title} - Arte ciclístico original de Miguel Soro. Obra única ${picture.size}cm, acrílico y collage sobre lienzo${getPictureStatus(picture) === "NOT_AVAILABLE" ? " [NO DISPONIBLE]" : getPictureStatus(picture) === "AVAILABLE" ? " disponible para compra" : ""}`}
+                  alt={`${picture.title} - Arte ciclístico original de Miguel Soro. Obra única ${picture.size}cm, acrílico y collage sobre lienzo${getPictureStatus(picture) === "AVAILABLE" ? " disponible para compra" : ""}`}
                   className="h-full w-full object-contain transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
                   width={600}
                   height={600}
