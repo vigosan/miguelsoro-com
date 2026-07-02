@@ -52,7 +52,10 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
   });
 }
 
-export async function sendAdminNotificationEmail(data: OrderEmailData) {
+export async function sendAdminNotificationEmail(
+  data: OrderEmailData,
+  toEmail?: string,
+) {
   const {
     customerName,
     customerEmail,
@@ -78,7 +81,7 @@ export async function sendAdminNotificationEmail(data: OrderEmailData) {
     <p>Accede al panel de administración para gestionar este pedido.</p>
   `;
 
-  const adminEmail = process.env.ADMIN_EMAIL || fromAddress;
+  const adminEmail = toEmail || process.env.ADMIN_EMAIL || fromAddress;
 
   await resend.emails.send({
     from: `Miguel Soro Web <${fromAddress}>`,

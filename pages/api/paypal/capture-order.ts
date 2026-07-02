@@ -6,6 +6,7 @@ import {
   sendOrderConfirmationEmail,
   sendAdminNotificationEmail,
 } from "../../../lib/email";
+import { getGeneralSettings } from "../../../services/databaseGeneralSettings";
 
 export default async function handler(
   req: NextApiRequest,
@@ -78,8 +79,11 @@ export default async function handler(
         paypalOrderId: order.paypalOrderId || undefined,
       };
 
+      const generalSettings = await getGeneralSettings();
+      const adminEmail = generalSettings?.contactEmail;
+
       await sendOrderConfirmationEmail(emailData);
-      await sendAdminNotificationEmail(emailData);
+      await sendAdminNotificationEmail(emailData, adminEmail);
     } catch (emailError) {
       console.error("Error sending emails:", emailError);
       // Don't fail the request if emails fail
