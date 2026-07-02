@@ -37,6 +37,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await res.revalidate("/");
         if (updatedPicture.slug) {
           await res.revalidate(`/pictures/${updatedPicture.slug}`);
+          await res.revalidate(`/reproducciones/${updatedPicture.slug}`);
         }
       } catch (err) {
         console.warn("Failed to revalidate pages:", err);
@@ -64,6 +65,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await res.revalidate("/");
         if (picture.slug) {
           await res.revalidate(`/pictures/${picture.slug}`);
+          await res.revalidate(`/reproducciones/${picture.slug}`);
         }
       } catch (err) {
         console.warn("Failed to revalidate pages:", err);
