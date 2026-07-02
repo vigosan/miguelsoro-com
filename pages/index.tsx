@@ -161,7 +161,11 @@ export default function IndexPage({
                   capturan la velocidad y emoción del pelotón profesional.
                 </p>
               </Reveal>
-              <Reveal delay={150} className="relative aspect-[4/3] overflow-hidden rounded-lg">
+              <Reveal
+                clip
+                delay={150}
+                className="relative aspect-[4/3] overflow-hidden rounded-lg"
+              >
                 <Image
                   src="/process.webp"
                   alt="Proceso artístico de Miguel Soro"

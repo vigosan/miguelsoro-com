@@ -8,6 +8,7 @@ type Props = {
   className?: string;
   delay?: number;
   from?: Direction;
+  clip?: boolean;
   as?: ElementType;
 };
 
@@ -22,10 +23,26 @@ export function Reveal({
   className = "",
   delay = 0,
   from = "up",
+  clip = false,
   as,
 }: Props) {
   const { ref, visible } = useReveal();
   const Tag = as ?? "div";
+
+  if (clip) {
+    return (
+      <Tag
+        ref={ref}
+        className={`transition-[clip-path] duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[clip-path] motion-reduce:transition-none ${className}`}
+        style={{
+          clipPath: visible ? "inset(0 0 0 0)" : "inset(0 100% 0 0)",
+          transitionDelay: visible ? `${delay}ms` : "0ms",
+        }}
+      >
+        {children}
+      </Tag>
+    );
+  }
 
   return (
     <Tag
