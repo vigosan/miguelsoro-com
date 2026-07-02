@@ -33,13 +33,6 @@ vi.mock("next/image", () => ({
   default: (props: any) => React.createElement("img", props),
 }));
 
-// Mock NextAuth
-vi.mock("next-auth/react", () => ({
-  useSession: vi.fn(() => ({ data: null, status: "unauthenticated" })),
-  signIn: vi.fn(),
-  signOut: vi.fn(),
-}));
-
 // Set up global test environment (only in a browser-like environment)
 if (typeof window !== "undefined") {
   Object.defineProperty(window, "matchMedia", {
