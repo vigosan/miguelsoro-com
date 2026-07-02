@@ -309,7 +309,7 @@ export default function EditPicture() {
                   required
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  URL: /products/{formData.slug}
+                  URL: /pictures/{formData.slug}
                 </p>
               </div>
 

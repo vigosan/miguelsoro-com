@@ -36,7 +36,7 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
         </span>
         <div
           className={cn(
-            "group relative inline-flex w-11 shrink-0 rounded-full bg-gray-200 p-0.5 transition-colors duration-200 ease-in-out has-checked:bg-gray-900",
+            "group relative inline-flex w-11 shrink-0 rounded-full bg-gray-200 p-0.5 transition-colors duration-200 ease-in-out has-checked:bg-gray-900 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gray-900 has-[:focus-visible]:ring-offset-2",
             className,
           )}
         >
