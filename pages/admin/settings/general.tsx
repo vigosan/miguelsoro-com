@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { Toaster, toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
@@ -21,13 +21,48 @@ export default function GeneralSettings() {
   const [settings, setSettings] = useState<GeneralSettings>(defaultSettings);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await fetch("/api/admin/general-settings");
+        if (response.ok) {
+          const data = await response.json();
+          setSettings({
+            siteName: data.siteName ?? defaultSettings.siteName,
+            siteDescription:
+              data.siteDescription ?? defaultSettings.siteDescription,
+            contactEmail: data.contactEmail ?? defaultSettings.contactEmail,
+          });
+        }
+      } catch (error) {
+        console.error("Error loading general settings:", error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/admin/general-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to save settings");
+      }
+
       toast.success("Configuración guardada correctamente");
     } catch (error) {
-      toast.error("Error al guardar la configuración");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Error al guardar la configuración",
+      );
     } finally {
       setSaving(false);
     }
