@@ -107,7 +107,7 @@ export default function IndexPage({
         <section className="py-24 lg:py-32 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
-              <Reveal>
+              <Reveal from="left">
                 <SectionLabel prefix="01" paren>
                   El artista
                 </SectionLabel>
@@ -115,7 +115,7 @@ export default function IndexPage({
                   La autenticidad de quien vivió el ciclismo desde dentro
                 </h2>
               </Reveal>
-              <Reveal delay={150} className="space-y-6">
+              <Reveal from="right" delay={150} className="space-y-6">
                 <p className="text-lg text-gray-700 leading-relaxed">
                   Miguel Soro corrió profesionalmente durante cinco años
                   (1998-2003) con equipos portugueses e italianos, participó en
@@ -147,7 +147,7 @@ export default function IndexPage({
         <section className="py-24 lg:py-32 bg-black text-white -mx-6 lg:-mx-24 px-6 lg:px-24">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-              <Reveal>
+              <Reveal from="left">
                 <SectionLabel prefix="02" paren onDark>
                   La técnica
                 </SectionLabel>
