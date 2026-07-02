@@ -2,18 +2,13 @@ import { useState, useEffect } from "react";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { Toaster, toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 
 type PaymentSettings = {
-  currency: string;
-  taxRate: number;
   shippingCost: number;
   freeShippingThreshold: number;
 };
 
 const defaultSettings: PaymentSettings = {
-  currency: "EUR",
-  taxRate: 21,
   shippingCost: 0,
   freeShippingThreshold: 0,
 };
@@ -91,31 +86,28 @@ export default function PaymentSettings() {
           Configuración de Pagos
         </h3>
         <div className="space-y-4 sm:space-y-6">
-          <Select
-            label="Moneda"
-            value={settings.currency}
-            onChange={(e) =>
-              setSettings({ ...settings, currency: e.target.value })
-            }
-          >
-            <option value="EUR">Euro (€)</option>
-            <option value="USD">Dólar ($)</option>
-            <option value="GBP">Libra (£)</option>
-          </Select>
-          <Input
-            label="IVA (%)"
-            type="number"
-            min="0"
-            max="50"
-            step="0.01"
-            value={settings.taxRate}
-            onChange={(e) =>
-              setSettings({
-                ...settings,
-                taxRate: parseFloat(e.target.value) || 0,
-              })
-            }
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="block text-sm font-medium text-gray-700 mb-1">
+                Moneda
+              </p>
+              <p className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900">
+                Euro (€)
+              </p>
+            </div>
+            <div>
+              <p className="block text-sm font-medium text-gray-700 mb-1">
+                IVA
+              </p>
+              <p className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900">
+                21 %
+              </p>
+            </div>
+          </div>
+          <p className="-mt-2 text-xs text-gray-500">
+            Moneda e IVA son fijos del sistema. Contacta con soporte para
+            cambiarlos.
+          </p>
           <div>
             <Input
               label="Coste de envío (€)"
