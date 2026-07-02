@@ -13,6 +13,7 @@ import {
   HandleWebhookOrderApproved,
   HandleWebhookPaymentCaptured,
   HandleWebhookPaymentDenied,
+  HandleWebhookPaymentRefunded,
 } from "../application/orderUseCases";
 
 // Repository instances
@@ -42,4 +43,8 @@ export const handleWebhookPaymentCaptured = new HandleWebhookPaymentCaptured(
 );
 export const handleWebhookPaymentDenied = new HandleWebhookPaymentDenied(
   orderRepository,
+);
+export const handleWebhookPaymentRefunded = new HandleWebhookPaymentRefunded(
+  orderRepository,
+  productVariantRepository,
 );

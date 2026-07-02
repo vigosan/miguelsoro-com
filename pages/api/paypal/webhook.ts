@@ -3,6 +3,7 @@ import {
   handleWebhookOrderApproved,
   handleWebhookPaymentCaptured,
   handleWebhookPaymentDenied,
+  handleWebhookPaymentRefunded,
 } from "../../../infra/dependencies";
 import { verifyWebhookSignature } from "../../../lib/paypalWebhook";
 
@@ -49,6 +50,15 @@ export default async function handler(
           webhookEvent.resource?.supplementary_data?.related_ids?.order_id;
         if (orderId) {
           await handleWebhookPaymentDenied.execute(orderId);
+        }
+        break;
+      }
+
+      case "PAYMENT.CAPTURE.REFUNDED": {
+        const orderId =
+          webhookEvent.resource?.supplementary_data?.related_ids?.order_id;
+        if (orderId) {
+          await handleWebhookPaymentRefunded.execute(orderId);
         }
         break;
       }

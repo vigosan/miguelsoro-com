@@ -209,3 +209,33 @@ export class HandleWebhookPaymentDenied {
     await this.orderRepository.updateManyByPayPalId(paypalOrderId, "CANCELLED");
   }
 }
+
+export class HandleWebhookPaymentRefunded {
+  constructor(
+    private orderRepository: OrderRepository,
+    private variantRepository: ProductVariantRepository,
+  ) {}
+
+  async execute(paypalOrderId: string) {
+    // A refund can originate from our admin (already handled) or directly from
+    // the PayPal dashboard / a dispute. Only act when the order is not already
+    // refunded, so stock is restored exactly once.
+    const order = await this.orderRepository.findByPayPalId(paypalOrderId);
+    if (!order || order.status === "REFUNDED") {
+      return;
+    }
+
+    await this.orderRepository.updateManyByPayPalId(paypalOrderId, "REFUNDED");
+
+    for (const item of order.items) {
+      try {
+        await this.variantRepository.incrementStock(
+          item.variantId,
+          item.quantity,
+        );
+      } catch (stockError) {
+        console.error("Error restoring stock after refund webhook:", stockError);
+      }
+    }
+  }
+}

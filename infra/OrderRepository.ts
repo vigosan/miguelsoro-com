@@ -95,6 +95,9 @@ export interface OrderRepository {
   // From /api/admin/orders/[id] - GET order by ID with admin details
   findByIdForAdmin(id: string): Promise<OrderWithDetails | null>;
 
+  // Look up an order by its PayPal order id (used by refund webhook)
+  findByPayPalId(paypalOrderId: string): Promise<OrderWithDetails | null>;
+
   // From /api/admin/orders/[id] - PUT update order status
   updateStatus(id: string, status: string): Promise<OrderWithDetails>;
 

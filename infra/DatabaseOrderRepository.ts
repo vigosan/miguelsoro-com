@@ -343,6 +343,28 @@ export class DatabaseOrderRepository implements OrderRepository {
     }
   }
 
+  async findByPayPalId(
+    paypalOrderId: string,
+  ): Promise<OrderWithDetails | null> {
+    const supabase = this.getClient();
+
+    const { data, error } = await supabase
+      .from("orders")
+      .select("id")
+      .eq("paypalOrderId", paypalOrderId)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return null;
+      }
+      console.error("Error finding order by PayPal ID:", error);
+      return null;
+    }
+
+    return data ? this.findById(data.id) : null;
+  }
+
   private mapToOrderWithDetails(dbOrder: any): OrderWithDetails {
     return {
       id: dbOrder.id,
