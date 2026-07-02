@@ -109,7 +109,7 @@ export function AdminLayout({
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
 
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex min-h-screen">
         {/* Mobile menu button - positioned right */}
         {!isMobileMenuOpen && (
           <div className="lg:hidden fixed top-4 right-4 z-50">
@@ -225,7 +225,7 @@ export function AdminLayout({
         )}
 
         {/* Desktop Sidebar - hidden on mobile */}
-        <div className="hidden lg:flex lg:w-64 bg-white shadow-sm">
+        <div className="hidden lg:flex lg:w-64 bg-white shadow-sm sticky top-0 h-screen self-start">
           <div className="flex h-full w-full flex-col">
             {/* Logo */}
             <div className="flex h-16 items-center justify-start px-6 border-b border-gray-200">
@@ -293,15 +293,13 @@ export function AdminLayout({
         </div>
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <div className="flex-1 flex flex-col min-w-0">
           {/* Mobile header spacer */}
           <div className="lg:hidden h-16 flex items-center justify-center">
             <h1 className="text-lg font-semibold text-gray-900">Admin Panel</h1>
           </div>
 
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-            {children}
-          </main>
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
         </div>
       </div>
     </div>
