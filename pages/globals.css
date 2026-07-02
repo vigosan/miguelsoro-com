@@ -45,3 +45,19 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Interactive elements always show a pointer; disabled ones show not-allowed. */
+button,
+a[href],
+[role="button"],
+label[for],
+summary,
+select {
+  cursor: pointer;
+}
+
+button:disabled,
+button[aria-disabled="true"],
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
