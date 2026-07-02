@@ -18,7 +18,10 @@ export function Item({ item, className }: Props) {
     <Link
       href={`/pictures/${item.slug}`}
       data-testid={`picture-link-${item.slug}`}
-      className={cn("group block", className)}
+      className={cn(
+        "group block transition-transform duration-200 active:scale-[0.98]",
+        className,
+      )}
     >
       <article
         itemScope

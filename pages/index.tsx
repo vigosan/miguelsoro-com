@@ -195,13 +195,13 @@ export default function IndexPage({
                 <Reveal key={picture.id} delay={(index % 3) * 120}>
                   <Link
                     href={`/pictures/${picture.slug}`}
-                    className="group relative bg-white aspect-square overflow-hidden block"
+                    className="group relative bg-white aspect-square overflow-hidden block transition-transform duration-200 active:scale-[0.98]"
                   >
                     <Image
                       src={picture.imageUrl}
                       alt={picture.title}
                       fill
-                      className="object-cover grayscale transition-all duration-[600ms] ease-out group-hover:grayscale-0 group-hover:scale-105"
+                      className="object-cover transition-[transform,filter] duration-[600ms] ease-out lg:grayscale lg:group-hover:grayscale-0 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-[opacity,transform] duration-300">
