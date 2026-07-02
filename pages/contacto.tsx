@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
 import { Reveal } from "@/components/Reveal";
+import { SectionLabel } from "@/components/SectionLabel";
 import { LocalBusinessStructuredData } from "@/components/seo/StructuredData";
 import Head from "next/head";
 
@@ -15,9 +16,7 @@ export default function ContactPage() {
       >
         <div className="py-20 lg:py-24">
           <Reveal className="mb-20">
-            <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
-              Contacto — Estudio
-            </p>
+            <SectionLabel prefix="Contacto">Estudio</SectionLabel>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 leading-none tracking-tight">
               Hablemos de arte
             </h1>
@@ -62,9 +61,9 @@ export default function ContactPage() {
           </div>
 
           <Reveal className="mt-20 border-t border-gray-200 pt-16 max-w-4xl">
-            <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-8">
-              (02) — Colaboraciones
-            </p>
+            <SectionLabel prefix="02" paren className="mb-8">
+              Colaboraciones
+            </SectionLabel>
             <div className="grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-end">
               <h2 className="text-3xl md:text-4xl font-light text-gray-900 leading-tight text-balance">
                 Galerías, eventos ciclistas y pintura en directo.

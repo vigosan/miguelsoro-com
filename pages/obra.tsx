@@ -3,6 +3,7 @@ import { GetServerSideProps } from "next";
 import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
 import { Reveal } from "@/components/Reveal";
+import { SectionLabel } from "@/components/SectionLabel";
 import { Filters } from "@/components/Filters";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
@@ -54,9 +55,7 @@ export default function ObraPage({
       >
         <div className="py-16 lg:py-20 space-y-12">
           <Reveal>
-            <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
-              Catálogo — Obra original
-            </p>
+            <SectionLabel prefix="Catálogo">Obra original</SectionLabel>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-6 tracking-tight">
               Obra
             </h1>

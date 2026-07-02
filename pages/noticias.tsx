@@ -1,5 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { Reveal } from "@/components/Reveal";
+import { SectionLabel } from "@/components/SectionLabel";
 
 const news = [
   {
@@ -33,9 +34,7 @@ export default function NewsPage() {
     <Layout>
       <div className="py-16 lg:py-20">
         <Reveal className="mb-16">
-          <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
-            Archivo — Exposiciones y medios
-          </p>
+          <SectionLabel prefix="Archivo">Exposiciones y medios</SectionLabel>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 leading-none tracking-tight">
             Noticias
           </h1>

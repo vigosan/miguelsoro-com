@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Layout } from "@/components/Layout";
 import { Reveal } from "@/components/Reveal";
+import { SectionLabel } from "@/components/SectionLabel";
 import Head from "next/head";
 
 export default function BiographyPage() {
@@ -71,9 +72,7 @@ export default function BiographyPage() {
       >
         <div className="py-16 lg:py-20">
           <Reveal className="mb-12">
-            <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
-              Xàtiva, 1976 — Perfil
-            </p>
+            <SectionLabel prefix="Xàtiva, 1976">Perfil</SectionLabel>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 leading-[1.05] tracking-tight text-balance">
               Del pelotón al lienzo
             </h1>

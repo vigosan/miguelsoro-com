@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Layout } from "@/components/Layout";
 import { Reveal } from "@/components/Reveal";
+import { SectionLabel } from "@/components/SectionLabel";
 import { useParallax } from "@/hooks/useParallax";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 import { DatabasePictureRepository } from "@/infra/DatabasePictureRepository";
@@ -107,9 +108,9 @@ export default function IndexPage({
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
               <Reveal>
-                <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
-                  (<span className="text-accent-ink">01</span>) — El artista
-                </p>
+                <SectionLabel prefix="01" paren>
+                  El artista
+                </SectionLabel>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-light text-black mb-8 leading-tight text-balance">
                   La autenticidad de quien vivió el ciclismo desde dentro
                 </h2>
@@ -147,9 +148,9 @@ export default function IndexPage({
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
               <Reveal>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-6">
-                  (<span className="text-accent">02</span>) — La técnica
-                </p>
+                <SectionLabel prefix="02" paren onDark>
+                  La técnica
+                </SectionLabel>
                 <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl mb-8 leading-[0.85]">
                   Acrílico
                   <br />& <span className="text-accent">collage</span>
@@ -176,9 +177,9 @@ export default function IndexPage({
         <section className="py-24 lg:py-32 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <Reveal className="mb-16">
-              <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6">
-                (<span className="text-accent-ink">03</span>) — La colección
-              </p>
+              <SectionLabel prefix="03" paren>
+                La colección
+              </SectionLabel>
               <h2 className="font-[family-name:var(--font-poster)] uppercase text-5xl md:text-6xl lg:text-7xl text-black mb-4 leading-none">
                 Obras destacadas
               </h2>
