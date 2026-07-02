@@ -181,9 +181,72 @@ export class DatabasePictureRepository implements PictureRepository {
   async create(
     pictureData: Omit<Picture, "id" | "createdAt" | "updatedAt">,
   ): Promise<Picture> {
-    throw new Error(
-      "Picture creation not implemented yet - requires complex Product/Variant creation",
-    );
+    const supabase = this.getClient();
+    const { title, description, price, slug, stock, productTypeId, imageUrl } =
+      pictureData as Picture & { price: number };
+
+    const priceInCents = Math.round(price * 100);
+
+    // 1) Create the product row.
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .insert({
+        title,
+        description: description ?? "",
+        basePrice: priceInCents,
+        slug,
+        productTypeId,
+        isActive: true,
+      })
+      .select("id")
+      .single();
+
+    if (productError || !product) {
+      console.error("Error creating product:", productError);
+      throw new Error(
+        `Failed to create product: ${productError?.message ?? "unknown error"}`,
+      );
+    }
+
+    const productId = product.id as string;
+
+    // 2) Create the primary image.
+    const { error: imageError } = await supabase.from("product_images").insert({
+      productId,
+      url: imageUrl,
+      isPrimary: true,
+      sortOrder: 0,
+    });
+
+    if (imageError) {
+      // Roll back the orphaned product so we never leave a product with no image.
+      await supabase.from("products").delete().eq("id", productId);
+      console.error("Error creating product image:", imageError);
+      throw new Error(`Failed to create image: ${imageError.message}`);
+    }
+
+    // 3) Create the sellable variant (the cart resolves variants[0].id).
+    const { error: variantError } = await supabase
+      .from("product_variants")
+      .insert({
+        productId,
+        price: priceInCents,
+        stock,
+        status: stock > 0 ? "AVAILABLE" : "OUT_OF_STOCK",
+      });
+
+    if (variantError) {
+      await supabase.from("products").delete().eq("id", productId);
+      console.error("Error creating product variant:", variantError);
+      throw new Error(`Failed to create variant: ${variantError.message}`);
+    }
+
+    const created = await this.getPictureById(productId);
+    if (!created) {
+      throw new Error("Picture not found after creation");
+    }
+
+    return created;
   }
 
   async update(id: string, pictureData: any): Promise<Picture> {

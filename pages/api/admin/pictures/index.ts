@@ -68,14 +68,49 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (req.method === "POST") {
     try {
-      // For now, creating products is not implemented through the admin API
-      // This would require more complex logic for product types, variants, etc.
-      return res
-        .status(501)
-        .json({ error: "Creating products not yet implemented" });
+      const { title, description, price, slug, stock, productTypeId, imageUrl } =
+        req.body ?? {};
+
+      if (typeof title !== "string" || !title.trim()) {
+        return res.status(400).json({ error: "El título es obligatorio" });
+      }
+      if (typeof slug !== "string" || !slug.trim()) {
+        return res.status(400).json({ error: "El slug es obligatorio" });
+      }
+      if (typeof productTypeId !== "string" || !productTypeId) {
+        return res
+          .status(400)
+          .json({ error: "El tipo de producto es obligatorio" });
+      }
+      if (typeof imageUrl !== "string" || !imageUrl) {
+        return res.status(400).json({ error: "La imagen es obligatoria" });
+      }
+      if (typeof price !== "number" || !Number.isFinite(price) || price < 0) {
+        return res.status(400).json({ error: "El precio no es válido" });
+      }
+      const stockValue =
+        typeof stock === "number" && Number.isFinite(stock) && stock >= 0
+          ? Math.floor(stock)
+          : 1;
+
+      const pictureRepository = new DatabasePictureRepository();
+      const created = await pictureRepository.create({
+        title: title.trim(),
+        description: typeof description === "string" ? description : "",
+        price,
+        slug: slug.trim(),
+        stock: stockValue,
+        productTypeId,
+        imageUrl,
+      } as any);
+
+      return res.status(201).json({ picture: created });
     } catch (error) {
       console.error("Error creating product:", error);
-      return res.status(500).json({ error: "Failed to create product" });
+      return res.status(500).json({
+        error:
+          error instanceof Error ? error.message : "Failed to create product",
+      });
     }
   }
 
