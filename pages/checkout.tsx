@@ -29,6 +29,7 @@ export default function CheckoutPage() {
     shippingAddress: "",
   });
   const [isProcessing, setIsProcessing] = useState(false);
+  const [captureFailed, setCaptureFailed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shippingSettings, setShippingSettings] =
     useState<ShippingSettings | null>(null);
@@ -163,12 +164,16 @@ export default function CheckoutPage() {
 
       const result = await response.json();
 
-      // Clear cart and redirect to success page
+      // Redirect first so the "empty cart" screen never flashes
+      await router.push(`/order-confirmation?orderId=${result.orderId}`);
       clearCart();
-      router.push(`/order-confirmation?orderId=${result.orderId}`);
     } catch (error) {
+      // The charge may have gone through even though our confirmation failed
+      // (server error or dropped response after PayPal captured). Re-enabling
+      // the buttons here would invite paying twice, so payment stays blocked.
       console.error("Error capturing payment:", error);
-      setError("Error al procesar el pago. Por favor contacta con soporte.");
+      setCaptureFailed(true);
+      setError(null);
       setIsProcessing(false);
     }
   };
@@ -380,7 +385,24 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {isFormValid() ? (
+            {captureFailed ? (
+              <div
+                className="border border-amber-300 bg-amber-50 p-6 text-left"
+                data-testid="capture-failed"
+              >
+                <p className="text-amber-900 font-semibold mb-2">
+                  No hemos podido confirmar tu pago
+                </p>
+                <p className="text-amber-800 text-sm">
+                  Es posible que el cargo se haya realizado correctamente.{" "}
+                  <strong>No vuelvas a intentar pagar</strong>: revisa tu
+                  correo por si has recibido la confirmación del pedido y, si
+                  no llega en unos minutos, contacta con nosotros indicando tu
+                  email. Te confirmaremos el estado del pago antes de cobrar
+                  nada de nuevo.
+                </p>
+              </div>
+            ) : isFormValid() ? (
               <div>
                 <PayPalScriptProvider options={getPayPalClientConfig()}>
                   <PayPalButtons
