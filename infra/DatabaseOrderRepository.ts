@@ -188,6 +188,8 @@ export class DatabaseOrderRepository implements OrderRepository {
     return (orders || []).reduce(
       (stats, order) => {
         stats.totalOrders += 1;
+        stats.statusCounts[order.status] =
+          (stats.statusCounts[order.status] || 0) + 1;
         if (order.status === "DELIVERED") stats.completedOrders += 1;
         if (order.status === "PAID" || order.status === "PROCESSING") {
           stats.pendingOrders += 1;
@@ -202,6 +204,7 @@ export class DatabaseOrderRepository implements OrderRepository {
         completedOrders: 0,
         pendingOrders: 0,
         totalRevenue: 0,
+        statusCounts: {} as Record<string, number>,
       },
     );
   }

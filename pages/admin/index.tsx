@@ -57,10 +57,13 @@ export default function AdminDashboard() {
   const { data: pictureStats, isLoading: pictureStatsLoading } =
     usePictureStats();
   const { data: orderStats, isLoading: orderStatsLoading } = useOrderStats();
-  const { data: orders, isLoading: ordersLoading } = useOrders();
+  const { data: ordersPage, isLoading: ordersLoading } = useOrders({
+    page: 1,
+    limit: 5,
+  });
 
   const loading = pictureStatsLoading || orderStatsLoading;
-  const recentOrders = (orders || []).slice(0, 5);
+  const recentOrders = ordersPage?.orders ?? [];
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-ES", {

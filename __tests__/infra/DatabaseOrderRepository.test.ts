@@ -231,6 +231,14 @@ describe("DatabaseOrderRepository.getStats", () => {
       completedOrders: 1, // DELIVERED
       pendingOrders: 2, // PAID + PROCESSING
       totalRevenue: 14000, // paid-through statuses only; PENDING/CANCELLED excluded
+      statusCounts: {
+        PENDING: 1,
+        PAID: 1,
+        PROCESSING: 1,
+        SHIPPED: 1,
+        DELIVERED: 1,
+        CANCELLED: 1,
+      },
     });
     expect(supabaseMock.builder.select).toHaveBeenCalledTimes(1);
   });

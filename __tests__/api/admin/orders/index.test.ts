@@ -66,7 +66,10 @@ describe("/api/admin/orders", () => {
 
       expect(mockGetAllOrders.execute).toHaveBeenCalledWith();
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ orders: mockOrderSummaries });
+      expect(res.json).toHaveBeenCalledWith({
+        orders: mockOrderSummaries,
+        total: mockOrderSummaries.length,
+      });
     });
 
     it("should return empty array when no orders", async () => {
@@ -78,7 +81,7 @@ describe("/api/admin/orders", () => {
       await handler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ orders: [] });
+      expect(res.json).toHaveBeenCalledWith({ orders: [], total: 0 });
     });
 
     it("should return 500 when error occurs", async () => {
@@ -93,6 +96,64 @@ describe("/api/admin/orders", () => {
       expect(res.json).toHaveBeenCalledWith({
         error: "Failed to fetch orders",
       });
+    });
+  });
+
+  describe("filters and pagination", () => {
+    const orderAt = (n: number, status: string, name: string) => ({
+      ...mockOrderSummaries[0],
+      id: `order-${n}`,
+      orderNumber: `MS-ABC23${n}`,
+      customerName: name,
+      status,
+    });
+
+    beforeEach(() => {
+      mockGetAllOrders.execute.mockResolvedValue([
+        orderAt(1, "PAID", "Ana García"),
+        orderAt(2, "PENDING", "Bruno Pérez"),
+        orderAt(3, "PAID", "Carla Ruiz"),
+      ] as any);
+    });
+
+    it("filters by status server-side", async () => {
+      const req = await createAuthedRequest("GET", undefined, {
+        status: "PAID",
+      });
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      const payload = res.json.mock.calls[0][0];
+      expect(payload.orders).toHaveLength(2);
+      expect(payload.total).toBe(2);
+    });
+
+    it("searches across name, email, id, and order number", async () => {
+      const req = await createAuthedRequest("GET", undefined, {
+        search: "ms-abc232",
+      });
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      const payload = res.json.mock.calls[0][0];
+      expect(payload.orders).toHaveLength(1);
+      expect(payload.orders[0].customerName).toBe("Bruno Pérez");
+    });
+
+    it("paginates when a page param is present instead of shipping every order", async () => {
+      const req = await createAuthedRequest("GET", undefined, {
+        page: "2",
+        limit: "2",
+      });
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      const payload = res.json.mock.calls[0][0];
+      expect(payload.orders).toHaveLength(1);
+      expect(payload).toMatchObject({ total: 3, page: 2, totalPages: 2 });
     });
   });
 

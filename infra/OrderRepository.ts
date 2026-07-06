@@ -68,6 +68,7 @@ export interface OrderStats {
   completedOrders: number;
   pendingOrders: number;
   totalRevenue: number;
+  statusCounts: Record<string, number>;
 }
 
 export interface CreateOrderData {

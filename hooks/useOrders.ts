@@ -13,6 +13,7 @@ export type OrderStatus =
 
 export type Order = {
   id: string;
+  orderNumber?: string | null;
   customerName: string;
   customerEmail: string;
   totalAmount: number;
@@ -27,11 +28,19 @@ export type Order = {
   }>;
 };
 
+export type OrdersPage = {
+  orders: Order[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
 export type OrderStats = {
   totalOrders: number;
   completedOrders: number;
   pendingOrders: number;
   totalRevenue: number;
+  statusCounts: Record<string, number>;
 };
 
 // Query keys
@@ -46,21 +55,34 @@ export const orderKeys = {
 };
 
 // Custom hooks
-export function useOrders(filters?: { status?: OrderStatus; search?: string }) {
+export function useOrders(filters?: {
+  status?: OrderStatus;
+  search?: string;
+  page?: number;
+  limit?: number;
+}) {
   return useQuery({
     queryKey: orderKeys.list(filters || {}),
-    queryFn: async (): Promise<Order[]> => {
+    queryFn: async (): Promise<OrdersPage> => {
       const params = new URLSearchParams();
       if (filters?.status) params.append("status", filters.status);
       if (filters?.search) params.append("search", filters.search);
+      params.append("page", String(filters?.page ?? 1));
+      params.append("limit", String(filters?.limit ?? 20));
 
       const response = await fetch(`/api/admin/orders?${params}`);
       if (!response.ok) {
         throw new Error("Failed to fetch orders");
       }
       const data = await response.json();
-      return data.orders || [];
+      return {
+        orders: data.orders || [],
+        total: data.total ?? 0,
+        page: data.page ?? 1,
+        totalPages: data.totalPages ?? 1,
+      };
     },
+    placeholderData: (prev) => prev,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 }

@@ -1,52 +1,93 @@
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@/test/renderWithProviders";
+import OrdersAdmin from "@/pages/admin/orders/index";
 
-vi.mock("@/lib/auth", () => ({
-  isAuthenticated: vi.fn().mockResolvedValue(true),
-}));
+const fetchMock = vi.fn();
 
-vi.mock("@/infra/dependencies", () => ({
-  orderRepository: {
-    findAll: vi.fn(),
-  },
-}));
+const statsPayload = {
+  totalOrders: 1,
+  completedOrders: 0,
+  pendingOrders: 1,
+  totalRevenue: 2420,
+  statusCounts: { PAID: 1 },
+};
 
-import OrdersAdmin, { getServerSideProps } from "@/pages/admin/orders/index";
-import { orderRepository } from "@/infra/dependencies";
+const orderSummary = {
+  id: "order-1",
+  orderNumber: "MS-ABC234",
+  customerName: "Ana García",
+  customerEmail: "ana@example.com",
+  totalAmount: 2420,
+  status: "PAID",
+  createdAt: "2026-07-01T10:00:00.000Z",
+  items: [
+    {
+      id: "item-1",
+      productTitle: "Obra",
+      productType: "Cuadros",
+      quantity: 1,
+      unitPrice: 2000,
+    },
+  ],
+};
 
-const mockFindAll = vi.mocked(orderRepository.findAll);
+const mockRoutes = (ordersResponse: () => Promise<any>) => {
+  fetchMock.mockImplementation(async (url: string) => {
+    if (url.startsWith("/api/admin/orders/stats")) {
+      return { ok: true, json: async () => statsPayload };
+    }
+    if (url.startsWith("/api/admin/orders")) {
+      return ordersResponse();
+    }
+    throw new Error(`Unexpected fetch: ${url}`);
+  });
+};
 
-describe("admin orders when the database query fails", () => {
+describe("admin orders list", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal("fetch", fetchMock);
   });
 
-  it("getServerSideProps reports the failure instead of faking an empty shop", async () => {
-    // A DB outage rendered "No hay pedidos" — an actively misleading state
-    // for a live shop (it hid today's missing-column incident completely).
-    mockFindAll.mockRejectedValue(new Error("column does not exist"));
+  it("shows an explicit error state when the query fails, never a fake empty shop", async () => {
+    // A DB outage once rendered "No hay pedidos" — actively misleading for
+    // a live store (it completely hid a missing-column incident).
+    mockRoutes(async () => ({ ok: false, json: async () => ({}) }));
 
-    const result = (await getServerSideProps({
-      req: { headers: {} },
-    } as any)) as { props: { orders: unknown[]; loadError: boolean } };
+    render(<OrdersAdmin />);
 
-    expect(result.props.loadError).toBe(true);
-    expect(result.props.orders).toEqual([]);
-  });
-
-  it("shows an explicit error state, never the empty-shop message", () => {
-    render(<OrdersAdmin orders={[]} loadError />);
-
-    expect(
-      screen.getByText(/no se pudieron cargar los pedidos/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByTestId("orders-load-error")).toBeInTheDocument();
     expect(screen.queryByText(/no hay pedidos/i)).not.toBeInTheDocument();
   });
 
-  it("still shows the normal empty state when there are genuinely no orders", () => {
-    render(<OrdersAdmin orders={[]} loadError={false} />);
+  it("shows the genuine empty state when there are simply no orders", async () => {
+    mockRoutes(async () => ({
+      ok: true,
+      json: async () => ({ orders: [], total: 0, page: 1, totalPages: 1 }),
+    }));
 
-    expect(screen.getByText(/no hay pedidos/i)).toBeInTheDocument();
+    render(<OrdersAdmin />);
+
+    expect(await screen.findByText(/no hay pedidos/i)).toBeInTheDocument();
+  });
+
+  it("renders the orders returned by the paginated API with full-count stats", async () => {
+    mockRoutes(async () => ({
+      ok: true,
+      json: async () => ({
+        orders: [orderSummary],
+        total: 1,
+        page: 1,
+        totalPages: 1,
+      }),
+    }));
+
+    render(<OrdersAdmin />);
+
+    expect(
+      await screen.findByText(/MS-ABC234 - Ana García/),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("Total pedidos")).toBeInTheDocument();
   });
 });

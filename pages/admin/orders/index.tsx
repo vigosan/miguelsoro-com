@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactElement } from "react";
 import { GetServerSideProps } from "next";
 import { isAuthenticated } from "../../../lib/auth";
@@ -8,71 +8,45 @@ import {
   orderReference,
   orderStatusMeta,
 } from "../../../domain/order";
-import { orderRepository } from "../../../infra/dependencies";
 import Link from "next/link";
 import { Input } from "../../../components/ui/Input";
 import { Select } from "../../../components/ui/Select";
 import { PageHeader } from "../../../components/admin/PageHeader";
-
-interface Order {
-  id: string;
-  orderNumber?: string | null;
-  customerEmail: string;
-  customerName: string;
-  customerPhone?: string;
-  paypalOrderId?: string;
-  status: string;
-  total: number;
-  createdAt: string;
-  _count: {
-    items: number;
-  };
-}
-
-interface Props {
-  orders: Order[];
-  loadError?: boolean;
-}
+import { ListSkeleton } from "../../../components/ui/Skeleton";
+import {
+  useOrders,
+  useOrderStats,
+  OrderStatus,
+} from "../../../hooks/useOrders";
+import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 
 const PAGE_SIZE = 20;
 
-export default function AdminOrdersPage({ orders, loadError }: Props) {
+export default function AdminOrdersPage() {
   const [filter, setFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
+  const debouncedSearch = useDebouncedValue(searchTerm, 300);
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesFilter = filter === "all" || order.status === filter;
-    const matchesSearch =
-      searchTerm === "" ||
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id.includes(searchTerm);
-
-    return matchesFilter && matchesSearch;
+  const { data, isLoading, isError } = useOrders({
+    status: filter !== "all" ? (filter as OrderStatus) : undefined,
+    search: debouncedSearch || undefined,
+    page,
+    limit: PAGE_SIZE,
   });
-
-  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const pagedOrders = filteredOrders.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
+  const { data: stats } = useOrderStats();
 
   // Reset to first page when filters change.
   useEffect(() => {
     setPage(1);
-  }, [filter, searchTerm]);
+  }, [filter, debouncedSearch]);
 
-  const orderStats = orders.reduce(
-    (acc, order) => {
-      acc[order.status] = (acc[order.status] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
+  const orders = data?.orders ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
+  const currentPage = data?.page ?? 1;
 
-  if (loadError) {
+  if (isError) {
     return (
       <div className="space-y-6">
         <PageHeader
@@ -95,6 +69,18 @@ export default function AdminOrdersPage({ orders, loadError }: Props) {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Pedidos"
+          description="Gestiona todos los pedidos de la tienda"
+        />
+        <ListSkeleton />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="space-y-6">
@@ -107,25 +93,25 @@ export default function AdminOrdersPage({ orders, loadError }: Props) {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <div className="text-2xl font-bold text-gray-900">
-              {orders.length}
+              {stats?.totalOrders ?? 0}
             </div>
             <div className="text-sm text-gray-500">Total pedidos</div>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <div className="text-2xl font-bold text-green-600">
-              {orderStats.PAID || 0}
+              {stats?.statusCounts?.PAID ?? 0}
             </div>
             <div className="text-sm text-gray-500">Pagados</div>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <div className="text-2xl font-bold text-yellow-600">
-              {orderStats.PENDING || 0}
+              {stats?.statusCounts?.PENDING ?? 0}
             </div>
             <div className="text-sm text-gray-500">Pendientes</div>
           </div>
           <div className="bg-white p-6 rounded-lg border border-gray-200">
             <div className="text-2xl font-bold text-blue-600">
-              {orderStats.PROCESSING || 0}
+              {stats?.statusCounts?.PROCESSING ?? 0}
             </div>
             <div className="text-sm text-gray-500">Procesando</div>
           </div>
@@ -161,7 +147,7 @@ export default function AdminOrdersPage({ orders, loadError }: Props) {
         {/* Orders Grid - Minimalist Design */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <div className="grid grid-cols-1 gap-1 divide-y divide-gray-100">
-            {pagedOrders.map((order) => (
+            {orders.map((order) => (
               <div
                 key={order.id}
                 className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 transition-colors gap-3 sm:gap-0"
@@ -177,10 +163,10 @@ export default function AdminOrdersPage({ orders, loadError }: Props) {
                     <div className="flex items-center space-x-2 mt-1 text-xs text-gray-500">
                       <span>{order.customerEmail}</span>
                       <span>·</span>
-                      <span>{order._count.items} productos</span>
+                      <span>{order.items.length} productos</span>
                       <span>·</span>
                       <span className="text-sm font-semibold text-gray-900">
-                        {formatPrice(order.total)}
+                        {formatPrice(order.totalAmount)}
                       </span>
                       <span>·</span>
                       <span
@@ -199,11 +185,6 @@ export default function AdminOrdersPage({ orders, loadError }: Props) {
                         })}
                       </span>
                     </div>
-                    {order.paypalOrderId && (
-                      <div className="text-xs text-blue-600 mt-1">
-                        PayPal: {order.paypalOrderId.slice(-8)}
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -240,7 +221,7 @@ export default function AdminOrdersPage({ orders, loadError }: Props) {
             ))}
           </div>
 
-          {filteredOrders.length === 0 && (
+          {orders.length === 0 && (
             <div className="text-center py-12">
               <svg
                 className="mx-auto h-12 w-12 text-gray-400"
@@ -273,8 +254,7 @@ export default function AdminOrdersPage({ orders, loadError }: Props) {
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-500">
-              Página {currentPage} de {totalPages} · {filteredOrders.length}{" "}
-              pedidos
+              Página {currentPage} de {totalPages} · {total} pedidos
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -305,6 +285,7 @@ AdminOrdersPage.getLayout = (page: ReactElement) => (
   <AdminLayout title="Gestión de Pedidos">{page}</AdminLayout>
 );
 
+// Auth-only: order data now loads client-side through React Query.
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const authenticated = await isAuthenticated(context.req);
 
@@ -317,34 +298,5 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  try {
-    const orders = await orderRepository.findAll();
-
-    return {
-      props: {
-        orders: orders.map((order) => ({
-          id: order.id,
-          orderNumber: order.orderNumber ?? null,
-          customerEmail: order.customerEmail,
-          customerName: order.customerName,
-          customerPhone: null, // OrderSummary doesn't include phone
-          paypalOrderId: null, // OrderSummary doesn't include paypalOrderId
-          status: order.status,
-          total: order.totalAmount,
-          createdAt: order.createdAt,
-          _count: {
-            items: order.items.length,
-          },
-        })),
-      },
-    };
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    return {
-      props: {
-        orders: [],
-        loadError: true,
-      },
-    };
-  }
+  return { props: {} };
 };
