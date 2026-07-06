@@ -192,22 +192,22 @@ export class DatabaseOrderRepository implements OrderRepository {
       throw new Error(`Failed to get stats: ${completedError.message}`);
     }
 
-    // Get pending orders count
+    // Get pending orders count (paid but not yet shipped)
     const { count: pendingOrders, error: pendingError } = await supabase
       .from("orders")
       .select("*", { count: "exact", head: true })
-      .in("status", ["PENDING", "PAID", "SHIPPED"]);
+      .in("status", ["PAID", "PROCESSING"]);
 
     if (pendingError) {
       console.error("Error getting pending orders:", pendingError);
       throw new Error(`Failed to get stats: ${pendingError.message}`);
     }
 
-    // Get total revenue from paid and delivered orders
+    // Get total revenue from every order whose payment went through
     const { data: revenueData, error: revenueError } = await supabase
       .from("orders")
       .select("total")
-      .in("status", ["PAID", "DELIVERED"]);
+      .in("status", ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"]);
 
     if (revenueError) {
       console.error("Error getting revenue:", revenueError);
