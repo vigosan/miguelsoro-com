@@ -79,6 +79,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "PUT") {
     try {
       const { status } = req.body;
+      const previousOrder = await findOrderByIdForAdmin.execute(id as string);
       const updatedOrder = await updateOrderStatus.execute(
         id as string,
         status,
@@ -86,11 +87,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       let warning: string | undefined;
 
-      if (
+      // A cancelled PENDING order never had a payment, so there is no
+      // customer expectation to manage: skip the notification.
+      const shouldNotify =
         status === "PROCESSING" ||
         status === "SHIPPED" ||
-        status === "CANCELLED"
-      ) {
+        (status === "CANCELLED" && previousOrder.status !== "PENDING");
+
+      if (shouldNotify) {
         let invoice: InvoiceAttachment | undefined;
 
         if (status === "SHIPPED") {
@@ -158,6 +162,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
         if (error.message === "Invalid status") {
           return res.status(400).json({ error: "Invalid status" });
+        }
+        if (error.message === "Order not found") {
+          return res.status(404).json({ error: "Order not found" });
         }
       }
 

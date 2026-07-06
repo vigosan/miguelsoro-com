@@ -27,7 +27,11 @@ vi.mock("@/lib/invoice", async (importOriginal) => ({
 }));
 
 import handler from "@/pages/api/admin/orders/[id]";
-import { updateOrderStatus, getOrderInvoice } from "@/infra/dependencies";
+import {
+  updateOrderStatus,
+  getOrderInvoice,
+  findOrderByIdForAdmin,
+} from "@/infra/dependencies";
 import { sendOrderStatusEmail } from "@/lib/email";
 import { getGeneralSettings } from "@/services/databaseGeneralSettings";
 import { generateInvoicePdf } from "@/lib/invoice";
@@ -39,6 +43,7 @@ import {
 } from "../../simple-helpers";
 
 const mockUpdateOrderStatus = vi.mocked(updateOrderStatus);
+const mockFindOrderByIdForAdmin = vi.mocked(findOrderByIdForAdmin);
 const mockSendOrderStatusEmail = vi.mocked(sendOrderStatusEmail);
 const mockGetOrderInvoice = vi.mocked(getOrderInvoice);
 const mockGetGeneralSettings = vi.mocked(getGeneralSettings);
@@ -60,6 +65,10 @@ const settingsWithFiscalData = {
 describe("/api/admin/orders/[id] PUT", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockFindOrderByIdForAdmin.execute.mockResolvedValue({
+      ...mockOrder,
+      status: "PAID",
+    });
     mockUpdateOrderStatus.execute.mockResolvedValue({
       ...mockOrder,
       status: "PROCESSING",
@@ -211,6 +220,28 @@ describe("/api/admin/orders/[id] PUT", () => {
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ warning: expect.stringContaining("factura") }),
     );
+  });
+
+  it("does not email when cancelling a never-paid PENDING order", async () => {
+    mockFindOrderByIdForAdmin.execute.mockResolvedValue({
+      ...mockOrder,
+      status: "PENDING",
+    });
+    mockUpdateOrderStatus.execute.mockResolvedValue({
+      ...mockOrder,
+      status: "CANCELLED",
+    });
+    const req = await createAuthedRequest(
+      "PUT",
+      { status: "CANCELLED" },
+      { id: "order-123" },
+    );
+    const res = createMockResponse();
+
+    await handler(req, res);
+
+    expect(mockSendOrderStatusEmail).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("notifies the customer by email when the order is CANCELLED", async () => {
