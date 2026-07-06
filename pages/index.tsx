@@ -127,6 +127,7 @@ export default function IndexPage({
                   alt="Litografía de Miguel Indurain firmada por Miguel Soro"
                   width={1200}
                   height={890}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   className="h-auto w-full object-cover"
                 />
               </Reveal>
@@ -256,6 +257,7 @@ export default function IndexPage({
                   src="/process.webp"
                   alt="Proceso artístico de Miguel Soro"
                   fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   className="object-cover grayscale"
                 />
               </Reveal>
@@ -291,6 +293,7 @@ export default function IndexPage({
                       src={picture.imageUrl}
                       alt={picture.title}
                       fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                       className="object-cover transition-[transform,filter] duration-[600ms] ease-out lg:grayscale lg:group-hover:grayscale-0 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
