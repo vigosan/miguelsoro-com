@@ -3,7 +3,7 @@ export interface Picture {
   id: string;
   title: string;
   description: string;
-  price: number; // Price in cents
+  price: number; // Price in euros (the DB stores cents; repositories convert)
   size: string; // e.g., "120x90"
   slug: string;
   imageUrl: string;

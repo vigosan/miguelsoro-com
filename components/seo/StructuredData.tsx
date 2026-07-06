@@ -5,22 +5,28 @@ interface ArtworkSchemaProps {
     id: string;
     title: string;
     description: string;
-    price: number;
+    price: number; // euros
     size: string;
     imageUrl: string;
     slug: string;
+    status?: string;
   };
   url: string;
 }
 
 export function ArtworkStructuredData({ artwork, url }: ArtworkSchemaProps) {
+  const isAvailable = artwork.status !== "NOT_AVAILABLE";
+  const absoluteImageUrl = artwork.imageUrl.startsWith("http")
+    ? artwork.imageUrl
+    : `https://www.miguelsoro.com${artwork.imageUrl}`;
+
   const artworkSchema = {
     "@context": "https://schema.org",
     "@type": "VisualArtwork",
     "@id": `${url}#artwork`,
     name: artwork.title,
     description: artwork.description,
-    image: artwork.imageUrl,
+    image: absoluteImageUrl,
     url: url,
     creator: {
       "@type": "Person",
@@ -50,9 +56,11 @@ export function ArtworkStructuredData({ artwork, url }: ArtworkSchemaProps) {
       artwork.price > 0
         ? {
             "@type": "Offer",
-            price: (artwork.price / 100).toFixed(2),
+            price: artwork.price.toFixed(2),
             priceCurrency: "EUR",
-            availability: "https://schema.org/InStock",
+            availability: isAvailable
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
             url: url,
             seller: {
               "@type": "Person",
@@ -60,22 +68,7 @@ export function ArtworkStructuredData({ artwork, url }: ArtworkSchemaProps) {
             },
             itemCondition: "https://schema.org/NewCondition",
           }
-        : {
-            "@type": "Offer",
-            price: "0",
-            priceCurrency: "EUR",
-            availability: "https://schema.org/InStock",
-            url: url,
-            seller: {
-              "@type": "Person",
-              name: "Miguel Soro",
-            },
-            priceSpecification: {
-              "@type": "PriceSpecification",
-              price: "Consultar",
-              priceCurrency: "EUR",
-            },
-          },
+        : undefined,
     keywords: [
       "arte ciclístico",
       "cycling art",
