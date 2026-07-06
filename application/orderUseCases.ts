@@ -59,6 +59,7 @@ export class UpdateOrderStatus {
     const validStatuses = [
       "PENDING",
       "PAID",
+      "PROCESSING",
       "SHIPPED",
       "DELIVERED",
       "CANCELLED",
