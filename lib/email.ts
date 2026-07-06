@@ -109,6 +109,38 @@ export async function sendOrderStatusEmail(
   });
 }
 
+export async function sendInvoiceEmail(
+  data: OrderEmailData,
+  formattedInvoiceNumber: string,
+  pdf: Buffer,
+) {
+  const { customerName, customerEmail, orderId } = data;
+
+  const emailContent = `
+    <h2>Tu factura</h2>
+    <p>Hola ${customerName},</p>
+    <p>Adjuntamos la factura ${formattedInvoiceNumber} correspondiente a tu pedido ${orderId}.</p>
+
+    <p>¡Gracias por apoyar el arte de Miguel Soro!</p>
+
+    <p>Saludos,<br>
+    El equipo de Miguel Soro</p>
+  `;
+
+  await resend.emails.send({
+    from: `Miguel Soro Art <${fromAddress}>`,
+    to: customerEmail,
+    subject: `Factura ${formattedInvoiceNumber} - Miguel Soro Art`,
+    html: emailContent,
+    attachments: [
+      {
+        filename: `factura-${formattedInvoiceNumber}.pdf`,
+        content: pdf,
+      },
+    ],
+  });
+}
+
 export async function sendAdminNotificationEmail(
   data: OrderEmailData,
   toEmail?: string,

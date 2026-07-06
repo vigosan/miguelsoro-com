@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Toaster, toast } from "react-hot-toast";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
 import { OrderWithDetails } from "../../../infra/OrderRepository";
+import { formatInvoiceNumber } from "../../../domain/order";
 
 const STATUS_FLOW = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] as const;
 
@@ -21,6 +22,39 @@ function OrderDetails() {
   const [error, setError] = useState<string | null>(null);
   const [refunding, setRefunding] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [sendingInvoice, setSendingInvoice] = useState(false);
+
+  const handleSendInvoice = async () => {
+    if (!order) return;
+    const confirmed = window.confirm(
+      `¿Enviar la factura por email a ${order.customerEmail}?`,
+    );
+    if (!confirmed) return;
+
+    setSendingInvoice(true);
+    try {
+      const response = await fetch(
+        `/api/admin/orders/${order.id}/send-invoice`,
+        { method: "POST" },
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo enviar la factura");
+      }
+      toast.success(`Factura ${data.invoiceNumber} enviada a ${data.sentTo}`);
+      const refreshed = await fetch(`/api/admin/orders/${order.id}`);
+      if (refreshed.ok) {
+        const refreshedData = await refreshed.json();
+        setOrder(refreshedData.order);
+      }
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Error al enviar la factura",
+      );
+    } finally {
+      setSendingInvoice(false);
+    }
+  };
 
   const handleRefund = async () => {
     if (!order) return;
@@ -285,6 +319,42 @@ function OrderDetails() {
             );
           })()}
         </div>
+
+        {/* Invoice */}
+        {(["PAID", "PROCESSING", "SHIPPED", "DELIVERED"].includes(
+          order.status,
+        ) ||
+          order.invoiceNumber) && (
+          <div className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-1">Factura</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              {order.invoiceNumber
+                ? `Factura ${formatInvoiceNumber(order.invoiceNumber)} emitida el ${formatDate(order.invoicedAt!)}`
+                : "Al ver o enviar la factura se le asignará el siguiente número correlativo."}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href={`/api/admin/orders/${order.id}/invoice`}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                data-testid="view-invoice-button"
+              >
+                Ver factura
+              </a>
+              <button
+                onClick={handleSendInvoice}
+                disabled={sendingInvoice}
+                className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="send-invoice-button"
+              >
+                {sendingInvoice
+                  ? "Enviando…"
+                  : "Enviar factura al cliente"}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Customer Info */}
         <div className="bg-white shadow rounded-lg p-6">

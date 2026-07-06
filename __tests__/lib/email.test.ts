@@ -11,7 +11,7 @@ vi.mock("resend", () => ({
   },
 }));
 
-import { sendOrderStatusEmail } from "@/lib/email";
+import { sendOrderStatusEmail, sendInvoiceEmail } from "@/lib/email";
 
 const emailData = {
   customerName: "John Doe",
@@ -46,5 +46,26 @@ describe("sendOrderStatusEmail", () => {
     expect(email.to).toBe("john@example.com");
     expect(email.subject).toContain("order-123");
     expect(email.html).toContain("enviado");
+  });
+});
+
+describe("sendInvoiceEmail", () => {
+  beforeEach(() => {
+    mockSend.mockClear();
+  });
+
+  it("attaches the invoice PDF so the customer receives a self-contained document", async () => {
+    const pdf = Buffer.from("%PDF-fake");
+
+    await sendInvoiceEmail(emailData, "MS-0007", pdf);
+
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    const email = mockSend.mock.calls[0][0];
+    expect(email.to).toBe("john@example.com");
+    expect(email.subject).toContain("MS-0007");
+    expect(email.html).toContain("John Doe");
+    expect(email.attachments).toEqual([
+      { filename: "factura-MS-0007.pdf", content: pdf },
+    ]);
   });
 });

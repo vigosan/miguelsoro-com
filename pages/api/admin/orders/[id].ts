@@ -26,6 +26,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         shipping: order.shipping,
         total: order.total,
         paypalOrderId: order.paypalOrderId,
+        invoiceNumber: order.invoiceNumber,
+        invoicedAt: order.invoicedAt?.toISOString(),
         createdAt: order.createdAt.toISOString(),
         updatedAt: order.updatedAt.toISOString(),
         items: order.items.map((item) => ({
