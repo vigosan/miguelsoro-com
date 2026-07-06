@@ -6,16 +6,70 @@ import {
   ShoppingBagIcon,
   CurrencyEuroIcon,
   EyeIcon,
+  ClockIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { usePictureStats } from "@/hooks/usePictures";
-import { useOrderStats } from "@/hooks/useOrders";
+import { useOrderStats, useOrders } from "@/hooks/useOrders";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { Skeleton } from "@/components/ui/Skeleton";
+
+type StatCardData = {
+  name: string;
+  value: string | null;
+  icon: typeof PhotoIcon;
+  href: string;
+  color: string;
+};
+
+function StatCard({ stat }: { stat: StatCardData }) {
+  return (
+    <Link
+      href={stat.href}
+      className="group relative overflow-hidden rounded-lg bg-white p-4 sm:p-6 shadow hover:shadow-md transition-shadow"
+    >
+      <div className="flex items-center">
+        <div className={`p-2 sm:p-3 rounded-lg ${stat.color}`}>
+          <stat.icon
+            className="h-5 w-5 sm:h-6 sm:w-6 text-white"
+            aria-hidden="true"
+          />
+        </div>
+        <div className="ml-3 sm:ml-4 min-w-0 flex-1">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 group-hover:text-gray-900 truncate">
+            {stat.name}
+          </p>
+          {stat.value === null ? (
+            <Skeleton className="h-7 w-16 mt-1" />
+          ) : (
+            <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
+              {stat.value}
+            </p>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+const orderStatusStyles: Record<string, { label: string; classes: string }> = {
+  PENDING: { label: "Pendiente", classes: "bg-yellow-100 text-yellow-800" },
+  PAID: { label: "Pagado", classes: "bg-green-100 text-green-800" },
+  PROCESSING: { label: "Procesando", classes: "bg-blue-100 text-blue-800" },
+  SHIPPED: { label: "Enviado", classes: "bg-blue-100 text-blue-800" },
+  DELIVERED: { label: "Entregado", classes: "bg-purple-100 text-purple-800" },
+  CANCELLED: { label: "Cancelado", classes: "bg-red-100 text-red-800" },
+  REFUNDED: { label: "Reembolsado", classes: "bg-red-100 text-red-800" },
+};
 
 export default function AdminDashboard() {
   const { data: pictureStats, isLoading: pictureStatsLoading } =
     usePictureStats();
   const { data: orderStats, isLoading: orderStatsLoading } = useOrderStats();
+  const { data: orders, isLoading: ordersLoading } = useOrders();
 
   const loading = pictureStatsLoading || orderStatsLoading;
+  const recentOrders = (orders || []).slice(0, 5);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-ES", {
@@ -24,10 +78,41 @@ export default function AdminDashboard() {
     }).format(amount / 100);
   };
 
-  const dashboardStats = [
+  const salesStats = [
+    {
+      name: "Ingresos Totales",
+      value: loading ? null : formatCurrency(orderStats?.totalRevenue || 0),
+      icon: CurrencyEuroIcon,
+      href: "/admin/orders",
+      color: "bg-yellow-500",
+    },
+    {
+      name: "Pedidos Totales",
+      value: loading ? null : (orderStats?.totalOrders || 0).toString(),
+      icon: ShoppingBagIcon,
+      href: "/admin/orders",
+      color: "bg-gray-900",
+    },
+    {
+      name: "Pendientes de Enviar",
+      value: loading ? null : (orderStats?.pendingOrders || 0).toString(),
+      icon: ClockIcon,
+      href: "/admin/orders",
+      color: "bg-amber-600",
+    },
+    {
+      name: "Entregados",
+      value: loading ? null : (orderStats?.completedOrders || 0).toString(),
+      icon: CheckCircleIcon,
+      href: "/admin/orders",
+      color: "bg-green-500",
+    },
+  ];
+
+  const catalogStats = [
     {
       name: "Total Cuadros",
-      value: loading ? "..." : (pictureStats?.totalPictures || 0).toString(),
+      value: loading ? null : (pictureStats?.totalPictures || 0).toString(),
       icon: PhotoIcon,
       href: "/admin/pictures",
       color: "bg-gray-900",
@@ -35,7 +120,7 @@ export default function AdminDashboard() {
     {
       name: "Cuadros Disponibles",
       value: loading
-        ? "..."
+        ? null
         : (pictureStats?.availablePictures || 0).toString(),
       icon: EyeIcon,
       href: "/admin/pictures?status=available",
@@ -44,57 +129,94 @@ export default function AdminDashboard() {
     {
       name: "No Disponibles",
       value: loading
-        ? "..."
+        ? null
         : (pictureStats?.notAvailablePictures || 0).toString(),
       icon: ShoppingBagIcon,
       href: "/admin/pictures?status=not-available",
       color: "bg-gray-500",
     },
-    {
-      name: "Ingresos Totales",
-      value: loading ? "..." : formatCurrency(orderStats?.totalRevenue || 0),
-      icon: CurrencyEuroIcon,
-      href: "/admin/orders",
-      color: "bg-yellow-500",
-    },
   ];
   return (
     <div className="space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Dashboard
-          </h1>
-          <p className="mt-2 text-sm sm:text-base text-gray-600">
-            Resumen de la galería Miguel Soro
-          </p>
+        <PageHeader
+          title="Dashboard"
+          description="Resumen de la galería Miguel Soro"
+        />
+
+        {/* Sales stats */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {salesStats.map((stat) => (
+            <StatCard key={stat.name} stat={stat} />
+          ))}
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {dashboardStats.map((stat) => (
+        {/* Recent orders */}
+        <div className="rounded-lg bg-white shadow">
+          <div className="flex items-center justify-between p-4 sm:p-6 pb-0 sm:pb-0">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+              Últimos Pedidos
+            </h2>
             <Link
-              key={stat.name}
-              href={stat.href}
-              className="group relative overflow-hidden rounded-lg bg-white p-4 sm:p-6 shadow hover:shadow-md transition-shadow"
+              href="/admin/orders"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900"
             >
-              <div className="flex items-center">
-                <div className={`p-2 sm:p-3 rounded-lg ${stat.color}`}>
-                  <stat.icon
-                    className="h-5 w-5 sm:h-6 sm:w-6 text-white"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="ml-3 sm:ml-4 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600 group-hover:text-gray-900 truncate">
-                    {stat.name}
-                  </p>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
-                    {stat.value}
-                  </p>
-                </div>
-              </div>
+              Ver todos →
             </Link>
+          </div>
+          <div className="p-4 sm:p-6">
+            {ordersLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            ) : recentOrders.length === 0 ? (
+              <p className="text-sm text-gray-500">Aún no hay pedidos.</p>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {recentOrders.map((order) => {
+                  const status = orderStatusStyles[order.status] ?? {
+                    label: order.status,
+                    classes: "bg-gray-100 text-gray-800",
+                  };
+                  return (
+                    <Link
+                      key={order.id}
+                      href={`/admin/orders/${order.id}`}
+                      className="flex items-center justify-between gap-3 py-3 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {order.customerName}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "es-ES",
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status.classes}`}
+                        >
+                          {status.label}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {formatCurrency(order.totalAmount)}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Catalog stats */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {catalogStats.map((stat) => (
+            <StatCard key={stat.name} stat={stat} />
           ))}
         </div>
 

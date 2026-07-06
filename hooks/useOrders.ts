@@ -3,37 +3,26 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 // Types
 export type OrderStatus =
   | "PENDING"
-  | "CONFIRMED"
+  | "PAID"
+  | "PROCESSING"
   | "SHIPPED"
   | "DELIVERED"
-  | "CANCELLED";
+  | "CANCELLED"
+  | "REFUNDED";
 
 export type Order = {
   id: string;
   customerName: string;
   customerEmail: string;
-  customerPhone?: string;
-  shippingAddress: string;
+  totalAmount: number;
   status: OrderStatus;
-  total: number;
   createdAt: string;
-  updatedAt: string;
   items: Array<{
     id: string;
+    productTitle: string;
+    productType: string;
     quantity: number;
-    price: number;
-    variant: {
-      id: string;
-      sku: string;
-      price: number;
-      product: {
-        id: string;
-        title: string;
-        productType: {
-          displayName: string;
-        };
-      };
-    };
+    unitPrice: number;
   }>;
 };
 
