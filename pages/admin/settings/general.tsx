@@ -1,72 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
+import { Skeleton } from "@/components/ui/Skeleton";
+import {
+  GeneralSettingsForm,
+  useGeneralSettings,
+  useSaveGeneralSettings,
+} from "@/hooks/useAdminSettings";
 
-type GeneralSettings = {
-  siteName: string;
-  siteDescription: string;
-  contactEmail: string;
-  businessName: string;
-  businessNif: string;
-  businessAddress: string;
-};
-
-const defaultSettings: GeneralSettings = {
-  siteName: "Miguel Soro - Arte Ciclista",
-  siteDescription:
-    "Obras de arte originales inspiradas en el mundo del ciclismo",
-  contactEmail: "info@miguelsoro.com",
-  businessName: "",
-  businessNif: "",
-  businessAddress: "",
-};
-
-export default function GeneralSettings() {
-  const [settings, setSettings] = useState<GeneralSettings>(defaultSettings);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const response = await fetch("/api/admin/general-settings");
-        if (response.ok) {
-          const data = await response.json();
-          setSettings({
-            siteName: data.siteName ?? defaultSettings.siteName,
-            siteDescription:
-              data.siteDescription ?? defaultSettings.siteDescription,
-            contactEmail: data.contactEmail ?? defaultSettings.contactEmail,
-            businessName: data.businessName ?? "",
-            businessNif: data.businessNif ?? "",
-            businessAddress: data.businessAddress ?? "",
-          });
-        }
-      } catch (error) {
-        console.error("Error loading general settings:", error);
-      }
-    };
-
-    loadSettings();
-  }, []);
+function SettingsForm({ initial }: { initial: GeneralSettingsForm }) {
+  const [settings, setSettings] = useState<GeneralSettingsForm>(initial);
+  const saveMutation = useSaveGeneralSettings();
 
   const handleSave = async () => {
-    setSaving(true);
     try {
-      const response = await fetch("/api/admin/general-settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to save settings");
-      }
-
+      await saveMutation.mutateAsync(settings);
       toast.success("Configuración guardada correctamente");
     } catch (error) {
       toast.error(
@@ -74,8 +26,6 @@ export default function GeneralSettings() {
           ? error.message
           : "Error al guardar la configuración",
       );
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -151,16 +101,44 @@ export default function GeneralSettings() {
         <div className="flex justify-end">
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saveMutation.isPending}
             className="w-full sm:w-auto px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
           >
-            {saving ? "Guardando..." : "Guardar Cambios"}
+            {saveMutation.isPending ? "Guardando..." : "Guardar Cambios"}
           </button>
         </div>
       </div>
-
     </>
   );
+}
+
+export default function GeneralSettings() {
+  // The form only mounts once the stored settings arrive: rendering editable
+  // defaults first invited saving them over the real fiscal data.
+  const { data: settings, isLoading, isError } = useGeneralSettings();
+
+  if (isLoading) {
+    return (
+      <div className="p-4 sm:p-6 space-y-4">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  }
+
+  if (isError || !settings) {
+    return (
+      <div className="p-4 sm:p-6">
+        <p className="text-sm text-red-700">
+          No se pudo cargar la configuración. Recarga la página.
+        </p>
+      </div>
+    );
+  }
+
+  return <SettingsForm initial={settings} />;
 }
 
 GeneralSettings.getLayout = (page: ReactElement) => (

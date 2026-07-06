@@ -1,87 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
+import {
+  ShippingSettingsForm,
+  useShippingSettings,
+  useSaveShippingSettings,
+} from "@/hooks/useAdminSettings";
 
-type PaymentSettings = {
-  shippingCost: number;
-  freeShippingThreshold: number;
-};
-
-const defaultSettings: PaymentSettings = {
-  shippingCost: 0,
-  freeShippingThreshold: 0,
-};
-
-export default function PaymentSettings() {
-  const [settings, setSettings] = useState<PaymentSettings>(defaultSettings);
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Load shipping settings on component mount
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const response = await fetch("/api/admin/shipping-settings");
-        if (response.ok) {
-          const data = await response.json();
-          setSettings((prev) => ({
-            ...prev,
-            shippingCost: data.standardRate / 100, // Convert cents to euros
-            freeShippingThreshold: data.freeShippingThreshold / 100, // Convert cents to euros
-          }));
-        }
-      } catch (error) {
-        console.error("Error loading shipping settings:", error);
-        toast.error("Error al cargar la configuración");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadSettings();
-  }, []);
+function SettingsForm({ initial }: { initial: ShippingSettingsForm }) {
+  const [settings, setSettings] = useState<ShippingSettingsForm>(initial);
+  const saveMutation = useSaveShippingSettings();
 
   const handleSave = async () => {
-    setSaving(true);
     try {
-      const response = await fetch("/api/admin/shipping-settings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          standardRate: settings.shippingCost,
-          freeShippingThreshold: settings.freeShippingThreshold,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save settings");
-      }
-
+      await saveMutation.mutateAsync(settings);
       toast.success("Configuración guardada correctamente");
     } catch (error) {
       console.error("Error saving settings:", error);
       toast.error("Error al guardar la configuración");
-    } finally {
-      setSaving(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="p-4 sm:p-6 space-y-4">
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-    );
-  }
 
   return (
     <>
@@ -125,7 +67,6 @@ export default function PaymentSettings() {
                   shippingCost: parseFloat(e.target.value) || 0,
                 })
               }
-              disabled={loading}
             />
             <p className="text-xs text-gray-500 mt-1">
               Coste del envío estándar
@@ -144,7 +85,6 @@ export default function PaymentSettings() {
                   freeShippingThreshold: parseFloat(e.target.value) || 0,
                 })
               }
-              disabled={loading}
             />
             <p className="text-xs text-gray-500 mt-1">
               Pedidos superiores a esta cantidad tendrán envío gratuito. 0 para
@@ -158,16 +98,42 @@ export default function PaymentSettings() {
         <div className="flex justify-end">
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saveMutation.isPending}
             className="w-full sm:w-auto px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
           >
-            {saving ? "Guardando..." : "Guardar Cambios"}
+            {saveMutation.isPending ? "Guardando..." : "Guardar Cambios"}
           </button>
         </div>
       </div>
-
     </>
   );
+}
+
+export default function PaymentSettings() {
+  const { data: settings, isLoading, isError } = useShippingSettings();
+
+  if (isLoading) {
+    return (
+      <div className="p-4 sm:p-6 space-y-4">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  }
+
+  if (isError || !settings) {
+    return (
+      <div className="p-4 sm:p-6">
+        <p className="text-sm text-red-700">
+          No se pudo cargar la configuración. Recarga la página.
+        </p>
+      </div>
+    );
+  }
+
+  return <SettingsForm initial={settings} />;
 }
 
 PaymentSettings.getLayout = (page: ReactElement) => (
