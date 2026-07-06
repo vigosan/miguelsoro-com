@@ -43,7 +43,7 @@ if (typeof window !== "undefined" && !window.localStorage?.setItem) {
     setItem: (key: string, value: string) => storage.set(key, String(value)),
     removeItem: (key: string) => storage.delete(key),
     clear: () => storage.clear(),
-    key: (index: number) => [...storage.keys()][index] ?? null,
+    key: (index: number) => Array.from(storage.keys())[index] ?? null,
     get length() {
       return storage.size;
     },
@@ -81,8 +81,7 @@ class MockResizeObserver {
   unobserve = vi.fn();
   disconnect = vi.fn();
 }
-global.ResizeObserver =
-  MockResizeObserver as unknown as typeof ResizeObserver;
+global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
 // Mock IntersectionObserver
 class MockIntersectionObserver {
