@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import type { ReactElement } from "react";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { Toaster, toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
@@ -78,7 +80,7 @@ export default function GeneralSettings() {
   };
 
   return (
-    <SettingsLayout title="Configuración General - Admin">
+    <>
       <div className="p-4 sm:p-6">
         <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-4 sm:mb-6">
           Configuración General
@@ -158,6 +160,12 @@ export default function GeneralSettings() {
       </div>
 
       <Toaster position="top-right" />
-    </SettingsLayout>
+    </>
   );
 }
+
+GeneralSettings.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Configuración General - Admin">
+    <SettingsLayout>{page}</SettingsLayout>
+  </AdminLayout>
+);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import type { ReactElement } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -115,7 +116,7 @@ export default function NewPicture() {
   };
 
   return (
-    <AdminLayout title="Añadir Cuadro - Admin">
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -335,6 +336,10 @@ export default function NewPicture() {
 
         <Toaster position="top-right" />
       </div>
-    </AdminLayout>
+    </>
   );
 }
+
+NewPicture.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Añadir Cuadro - Admin">{page}</AdminLayout>
+);

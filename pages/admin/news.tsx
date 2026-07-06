@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useNewsAdmin } from "@/hooks/useNewsAdmin";
 import {
@@ -125,28 +126,28 @@ export default function AdminNews() {
 
   if (loading) {
     return (
-      <AdminLayout title="Gestión de Noticias">
+      <>
         <div className="flex justify-center items-center py-12">
           <div className="text-gray-500">Cargando noticias...</div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   if (error) {
     return (
-      <AdminLayout title="Gestión de Noticias">
+      <>
         <div className="flex justify-center items-center py-12">
           <div className="text-red-500">
             Error al cargar las noticias: {error}
           </div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="Gestión de Noticias">
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -455,6 +456,10 @@ export default function AdminNews() {
       </div>
 
       <Toaster position="top-right" />
-    </AdminLayout>
+    </>
   );
 }
+
+AdminNews.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Gestión de Noticias">{page}</AdminLayout>
+);

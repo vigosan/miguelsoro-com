@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { useRouter } from "next/router";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import {
   CogIcon,
   GlobeAltIcon,
@@ -11,7 +10,6 @@ import {
 
 type SettingsLayoutProps = {
   children: ReactNode;
-  title?: string;
 };
 
 const tabs = [
@@ -47,16 +45,12 @@ const tabs = [
   },
 ];
 
-export function SettingsLayout({
-  children,
-  title = "Configuración - Admin",
-}: SettingsLayoutProps) {
+export function SettingsLayout({ children }: SettingsLayoutProps) {
   const router = useRouter();
   const currentPath = router.pathname;
 
   return (
-    <AdminLayout title={title}>
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -128,6 +122,5 @@ export function SettingsLayout({
           </div>
         </div>
       </div>
-    </AdminLayout>
   );
 }

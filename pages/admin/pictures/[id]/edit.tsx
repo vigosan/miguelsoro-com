@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import type { ReactElement } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -165,17 +166,17 @@ export default function EditPicture() {
 
   if (loading) {
     return (
-      <AdminLayout title="Cargando... - Admin">
+      <>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   if (!picture) {
     return (
-      <AdminLayout title="Cuadro no encontrado - Admin">
+      <>
         <div className="text-center py-12">
           <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-semibold text-gray-900">
@@ -194,12 +195,12 @@ export default function EditPicture() {
             </Link>
           </div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title={`Editar ${picture.title} - Admin`}>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -438,6 +439,10 @@ export default function EditPicture() {
 
         <Toaster position="top-right" />
       </div>
-    </AdminLayout>
+    </>
   );
 }
+
+EditPicture.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Editar Cuadro - Admin">{page}</AdminLayout>
+);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Toaster, toast } from "react-hot-toast";
 import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -134,16 +135,16 @@ export default function ProductTypesAdmin() {
 
   if (loading) {
     return (
-      <AdminLayout title="Tipos de Producto - Admin">
+      <>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="Tipos de Producto - Admin">
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
@@ -313,6 +314,10 @@ export default function ProductTypesAdmin() {
 
         <Toaster position="top-right" />
       </div>
-    </AdminLayout>
+    </>
   );
 }
+
+ProductTypesAdmin.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Tipos de Producto - Admin">{page}</AdminLayout>
+);

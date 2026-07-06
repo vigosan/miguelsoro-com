@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Link from "next/link";
 import {
@@ -58,8 +59,7 @@ export default function AdminDashboard() {
     },
   ];
   return (
-    <AdminLayout>
-      <div className="space-y-8">
+    <div className="space-y-8">
         {/* Header */}
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -144,7 +144,10 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-      </div>
-    </AdminLayout>
+    </div>
   );
 }
+
+AdminDashboard.getLayout = (page: ReactElement) => (
+  <AdminLayout>{page}</AdminLayout>
+);

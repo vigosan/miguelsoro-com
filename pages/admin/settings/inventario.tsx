@@ -1,10 +1,12 @@
+import type { ReactElement } from "react";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { Toggle } from "@/components/ui/Toggle";
 import { Input } from "@/components/ui/Input";
 
 export default function InventorySettings() {
   return (
-    <SettingsLayout title="Configuración de Inventario - Admin">
+    <>
       <div className="p-4 sm:p-6">
         <div className="mb-6 flex items-center gap-2">
           <h3 className="text-base sm:text-lg font-medium text-gray-900">
@@ -40,6 +42,12 @@ export default function InventorySettings() {
           </div>
         </div>
       </div>
-    </SettingsLayout>
+    </>
   );
 }
+
+InventorySettings.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Configuración de Inventario - Admin">
+    <SettingsLayout>{page}</SettingsLayout>
+  </AdminLayout>
+);

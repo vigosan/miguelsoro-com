@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { ReactElement } from "react";
 import { GetServerSideProps } from "next";
 import { isAuthenticated } from "../../../lib/auth";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
@@ -85,7 +86,7 @@ export default function AdminOrdersPage({ orders }: Props) {
   );
 
   return (
-    <AdminLayout title="Gestión de Pedidos">
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
@@ -295,9 +296,13 @@ export default function AdminOrdersPage({ orders }: Props) {
           </div>
         )}
       </div>
-    </AdminLayout>
+    </>
   );
 }
+
+AdminOrdersPage.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Gestión de Pedidos">{page}</AdminLayout>
+);
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const authenticated = await isAuthenticated(context.req);

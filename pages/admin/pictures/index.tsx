@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Link from "next/link";
 import Image from "next/image";
@@ -70,26 +71,26 @@ export default function AdminPictures() {
 
   if (loading) {
     return (
-      <AdminLayout title="Cuadros - Admin">
+      <>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   if (error) {
     return (
-      <AdminLayout title="Cuadros - Admin">
+      <>
         <div className="text-center text-red-600 py-8">
           Error: {error.message}
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="Cuadros - Admin">
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
@@ -272,6 +273,10 @@ export default function AdminPictures() {
 
         <Toaster position="top-right" />
       </div>
-    </AdminLayout>
+    </>
   );
 }
+
+AdminPictures.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Cuadros - Admin">{page}</AdminLayout>
+);

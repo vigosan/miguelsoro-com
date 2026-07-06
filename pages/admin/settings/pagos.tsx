@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import type { ReactElement } from "react";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { Toaster, toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
@@ -71,16 +73,16 @@ export default function PaymentSettings() {
 
   if (loading) {
     return (
-      <SettingsLayout title="Configuración de Pagos - Admin">
+      <>
         <div className="p-4 sm:p-6 flex justify-center items-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
-      </SettingsLayout>
+      </>
     );
   }
 
   return (
-    <SettingsLayout title="Configuración de Pagos - Admin">
+    <>
       <div className="p-4 sm:p-6">
         <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-4 sm:mb-6">
           Configuración de Pagos
@@ -163,6 +165,12 @@ export default function PaymentSettings() {
       </div>
 
       <Toaster position="top-right" />
-    </SettingsLayout>
+    </>
   );
 }
+
+PaymentSettings.getLayout = (page: ReactElement) => (
+  <AdminLayout title="Configuración de Pagos - Admin">
+    <SettingsLayout>{page}</SettingsLayout>
+  </AdminLayout>
+);

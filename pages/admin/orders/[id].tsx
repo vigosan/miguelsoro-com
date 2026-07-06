@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import type { ReactElement } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { Toaster, toast } from "react-hot-toast";
@@ -142,17 +143,17 @@ function OrderDetails() {
 
   if (loading) {
     return (
-      <AdminLayout>
+      <>
         <div className="flex justify-center items-center h-64">
           <div className="text-lg">Cargando detalles del pedido...</div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   if (error) {
     return (
-      <AdminLayout>
+      <>
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <h3 className="text-lg font-medium text-red-800 mb-2">Error</h3>
           <p className="text-red-700">{error}</p>
@@ -163,13 +164,13 @@ function OrderDetails() {
             Volver
           </button>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   if (!order) {
     return (
-      <AdminLayout>
+      <>
         <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
           <h3 className="text-lg font-medium text-yellow-800 mb-2">
             Pedido no encontrado
@@ -184,7 +185,7 @@ function OrderDetails() {
             Volver
           </button>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
@@ -241,7 +242,7 @@ function OrderDetails() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -504,8 +505,12 @@ function OrderDetails() {
         )}
       </div>
       <Toaster position="top-right" />
-    </AdminLayout>
+    </>
   );
 }
+
+OrderDetails.getLayout = (page: ReactElement) => (
+  <AdminLayout>{page}</AdminLayout>
+);
 
 export default OrderDetails;
