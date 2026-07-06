@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { toast } from "react-hot-toast";
@@ -8,20 +8,20 @@ import { Textarea } from "@/components/ui/Textarea";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ListSkeleton } from "@/components/ui/Skeleton";
 import { ConfirmDialog, Confirmation } from "@/components/ui/ConfirmDialog";
-
-type ProductType = {
-  id: string;
-  name: string;
-  displayName: string;
-  description?: string;
-  isActive: boolean;
-};
+import {
+  ProductType,
+  useProductTypes,
+  useCreateProductType,
+  useUpdateProductType,
+  useDeleteProductType,
+} from "@/hooks/useProductTypesAdmin";
 
 export default function ProductTypesAdmin() {
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: productTypes = [], isLoading: loading } = useProductTypes();
+  const createMutation = useCreateProductType();
+  const updateMutation = useUpdateProductType();
+  const deleteMutation = useDeleteProductType();
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [editingType, setEditingType] = useState<ProductType | null>(null);
   const [formData, setFormData] = useState({
     displayName: "",
@@ -29,28 +29,7 @@ export default function ProductTypesAdmin() {
   });
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
-  const fetchProductTypes = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("/api/admin/product-types");
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch product types");
-      }
-
-      const data = await response.json();
-      setProductTypes(data.productTypes);
-    } catch (error) {
-      console.error("Error fetching product types:", error);
-      toast.error("Error al cargar los tipos de producto");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProductTypes();
-  }, []);
+  const submitting = createMutation.isPending || updateMutation.isPending;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,36 +40,21 @@ export default function ProductTypesAdmin() {
     }
     if (submitting) return;
 
-    setSubmitting(true);
     try {
-      const response = await fetch(
-        editingType
-          ? `/api/admin/product-types/${editingType.id}`
-          : "/api/admin/product-types",
-        {
-          method: editingType ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        },
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error al guardar el tipo de producto");
+      if (editingType) {
+        await updateMutation.mutateAsync({
+          id: editingType.id,
+          data: formData,
+        });
+        toast.success("Tipo de producto actualizado correctamente");
+      } else {
+        await createMutation.mutateAsync(formData);
+        toast.success("Tipo de producto creado correctamente");
       }
 
-      toast.success(
-        editingType
-          ? "Tipo de producto actualizado correctamente"
-          : "Tipo de producto creado correctamente",
-      );
       setEditingType(null);
       setFormData({ displayName: "", description: "" });
       setShowCreateForm(false);
-      fetchProductTypes();
     } catch (error) {
       console.error("Error saving product type:", error);
       toast.error(
@@ -98,8 +62,6 @@ export default function ProductTypesAdmin() {
           ? error.message
           : "Error al guardar el tipo de producto",
       );
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -120,18 +82,8 @@ export default function ProductTypesAdmin() {
 
   const handleDelete = async (productType: ProductType) => {
     try {
-      const response = await fetch(
-        `/api/admin/product-types/${productType.id}`,
-        { method: "DELETE" },
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error al eliminar el tipo de producto");
-      }
-
+      await deleteMutation.mutateAsync(productType.id);
       toast.success("Tipo de producto eliminado");
-      fetchProductTypes();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Error al eliminar el tipo",

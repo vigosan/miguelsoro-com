@@ -91,6 +91,7 @@ describe("PictureForm", () => {
       },
     });
 
+    await screen.findByRole("option", { name: "Cuadros" });
     await user.click(screen.getByRole("button", { name: "Crear Cuadro" }));
 
     expect(onSubmit).toHaveBeenCalledWith(

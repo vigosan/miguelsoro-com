@@ -10,6 +10,7 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
+import { useProductTypes } from "@/hooks/useProductTypesAdmin";
 
 export interface PictureFormValues {
   title: string;
@@ -21,14 +22,6 @@ export interface PictureFormValues {
   stock: string;
   imageUrl: string;
 }
-
-type ProductType = {
-  id: string;
-  name: string;
-  displayName: string;
-  description?: string;
-  isActive?: boolean;
-};
 
 interface Props {
   initialValues: PictureFormValues;
@@ -52,26 +45,15 @@ export function PictureForm({
   previewExtra,
 }: Props) {
   const [formData, setFormData] = useState<PictureFormValues>(initialValues);
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+  const { data: productTypes = [], isError: productTypesError } =
+    useProductTypes();
 
   useEffect(() => {
-    const fetchProductTypes = async () => {
-      try {
-        const response = await fetch("/api/admin/product-types");
-        if (!response.ok) {
-          throw new Error("Failed to fetch product types");
-        }
-        const data = await response.json();
-        setProductTypes(data.productTypes);
-      } catch (error) {
-        console.error("Error fetching product types:", error);
-        toast.error("Error al cargar los tipos de producto");
-      }
-    };
-
-    fetchProductTypes();
-  }, []);
+    if (productTypesError) {
+      toast.error("Error al cargar los tipos de producto");
+    }
+  }, [productTypesError]);
 
   const handleTitleChange = (title: string) => {
     setFormData((prev) => ({
