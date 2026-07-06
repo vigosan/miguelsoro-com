@@ -14,6 +14,15 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@heroicons/react'],
   },
+  async redirects() {
+    return [
+      {
+        source: '/products/:slug',
+        destination: '/pictures/:slug',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
