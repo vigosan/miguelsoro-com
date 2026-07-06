@@ -3,6 +3,8 @@ import {
   calculateOrderTotal,
   generateOrderNumber,
   orderReference,
+  orderStatusMeta,
+  OrderStatus,
 } from "@/domain/order";
 import type { OrderItem } from "@/domain/order";
 
@@ -90,5 +92,23 @@ describe("orderReference", () => {
         id: "5b9f930f-a0ee-49d1-a271-afb177447382",
       }),
     ).toBe("#77447382");
+  });
+});
+
+describe("orderStatusMeta", () => {
+  it("defines a label and badge style for every order status", () => {
+    // Three admin pages kept their own diverging copies: SHIPPED was purple
+    // in the list but blue in the detail view. One source of truth.
+    for (const status of Object.values(OrderStatus)) {
+      const meta = orderStatusMeta(status);
+      expect(meta.label).toBeTruthy();
+      expect(meta.badgeClasses).toMatch(/bg-.+text-/);
+    }
+  });
+
+  it("falls back gracefully for unknown statuses instead of crashing the page", () => {
+    const meta = orderStatusMeta("SOMETHING_NEW");
+    expect(meta.label).toBe("SOMETHING_NEW");
+    expect(meta.badgeClasses).toContain("bg-gray-100");
   });
 });
