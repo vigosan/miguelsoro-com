@@ -51,4 +51,28 @@ describe("generateInvoicePdf", () => {
     expect(text).toContain("B12345678");
     expect(text).toContain("Test Artwork");
   });
+
+  it("embeds the signature logo as an image", async () => {
+    const pdf = await generateInvoicePdf({
+      order: mockOrder,
+      seller,
+      invoiceNumber: 7,
+      invoicedAt: new Date("2026-07-06T10:00:00Z"),
+    });
+
+    expect(pdf.toString("latin1")).toContain("/Image");
+  });
+
+  it("shows the short order reference instead of the raw database id", async () => {
+    const pdf = await generateInvoicePdf({
+      order: { ...mockOrder, id: "14a87447-1836-431a-a623-491676546b6e" },
+      seller,
+      invoiceNumber: 7,
+      invoicedAt: new Date("2026-07-06T10:00:00Z"),
+    });
+
+    const text = extractDrawnText(pdf);
+    expect(text).toContain("76546B6E");
+    expect(text).not.toContain("14a87447-1836-431a-a623-491676546b6e");
+  });
 });

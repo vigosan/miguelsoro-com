@@ -1,6 +1,7 @@
 import { PDFDocument, PDFFont, StandardFonts, rgb } from "pdf-lib";
 import { OrderWithDetails } from "@/infra/OrderRepository";
 import { formatInvoiceNumber } from "@/domain/order";
+import { INVOICE_LOGO_PNG_BASE64 } from "@/lib/invoiceLogo";
 
 export { formatInvoiceNumber };
 
@@ -11,14 +12,16 @@ export interface InvoiceSeller {
 }
 
 const A4 = { width: 595.28, height: 841.89 };
-const MARGIN = 50;
-const GRAY = rgb(0.45, 0.45, 0.45);
-const BLACK = rgb(0.1, 0.1, 0.1);
+const MARGIN = 56;
+const GRAY = rgb(0.52, 0.52, 0.52);
+const LIGHT_GRAY = rgb(0.93, 0.93, 0.93);
+const RULE_GRAY = rgb(0.8, 0.8, 0.8);
+const BLACK = rgb(0.12, 0.12, 0.12);
 
 // WinAnsi (the encoding of the standard PDF fonts) has no narrow spaces,
 // which Intl uses between amount and currency symbol in some ICU versions.
 function pdfSafe(text: string): string {
-  return text.replace(/[  ]/g, " ");
+  return text.replace(/[  ]/g, " ");
 }
 
 function money(amountInCents: number): string {
@@ -30,6 +33,10 @@ function money(amountInCents: number): string {
   );
 }
 
+function orderReference(orderId: string): string {
+  return `#${orderId.slice(-8).toUpperCase()}`;
+}
+
 export async function generateInvoicePdf(params: {
   order: OrderWithDetails;
   seller: InvoiceSeller;
@@ -37,11 +44,14 @@ export async function generateInvoicePdf(params: {
   invoicedAt: Date;
 }): Promise<Buffer> {
   const { order, seller, invoiceNumber, invoicedAt } = params;
+  const formattedNumber = formatInvoiceNumber(invoiceNumber);
 
   const doc = await PDFDocument.create();
+  doc.setTitle(`Factura ${formattedNumber}`);
   const page = doc.addPage([A4.width, A4.height]);
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const logo = await doc.embedPng(Buffer.from(INVOICE_LOGO_PNG_BASE64, "base64"));
 
   const drawText = (
     text: string,
@@ -70,21 +80,57 @@ export async function generateInvoicePdf(params: {
     drawText(text, rightEdge - width, y, options);
   };
 
-  let y = A4.height - MARGIN - 20;
+  const drawRule = (y: number, color = RULE_GRAY, thickness = 0.75) => {
+    page.drawLine({
+      start: { x: MARGIN, y },
+      end: { x: A4.width - MARGIN, y },
+      thickness,
+      color,
+    });
+  };
 
-  drawText("FACTURA", MARGIN, y, { font: bold, size: 22 });
-  drawRightAligned(formatInvoiceNumber(invoiceNumber), A4.width - MARGIN, y, {
-    font: bold,
-    size: 14,
+  let y = A4.height - MARGIN;
+
+  const logoWidth = 130;
+  const logoHeight = (logo.height / logo.width) * logoWidth;
+  page.drawImage(logo, {
+    x: MARGIN,
+    y: y - logoHeight,
+    width: logoWidth,
+    height: logoHeight,
   });
-  y -= 18;
-  drawRightAligned(
-    `Fecha: ${invoicedAt.toLocaleDateString("es-ES")}`,
-    A4.width - MARGIN,
+
+  drawRightAligned("FACTURA", A4.width - MARGIN, y - 14, {
+    font: bold,
+    size: 20,
+  });
+  drawRightAligned(formattedNumber, A4.width - MARGIN, y - 32, {
+    font: bold,
+    size: 12,
+  });
+  y -= logoHeight + 28;
+
+  drawText("Fecha", MARGIN, y, { font: bold, size: 9, color: GRAY });
+  drawRightAligned("Pedido", A4.width - MARGIN - 100, y, {
+    font: bold,
+    size: 9,
+    color: GRAY,
+  });
+  y -= 14;
+  drawText(
+    invoicedAt.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }),
+    MARGIN,
     y,
   );
+  drawRightAligned(orderReference(order.id), A4.width - MARGIN - 100, y);
+  y -= 24;
+  drawRule(y);
+  y -= 28;
 
-  y -= 50;
   drawText("Emisor", MARGIN, y, { font: bold, size: 9, color: GRAY });
   drawText("Facturar a", A4.width / 2 + 20, y, {
     font: bold,
@@ -103,26 +149,26 @@ export async function generateInvoicePdf(params: {
   const blockHeight = Math.max(sellerLines.length, customerLines.length) * 14;
   sellerLines.forEach((line, i) => drawText(line, MARGIN, y - i * 14));
   customerLines.forEach((line, i) => drawText(line, A4.width / 2 + 20, y - i * 14));
-  y -= blockHeight + 40;
+  y -= blockHeight + 44;
 
   const columns = {
-    concept: MARGIN,
-    quantity: 380,
-    price: 460,
-    total: A4.width - MARGIN,
+    concept: MARGIN + 10,
+    quantity: 390,
+    price: 465,
+    total: A4.width - MARGIN - 10,
   };
-  drawText("Concepto", columns.concept, y, { font: bold, size: 9, color: GRAY });
-  drawRightAligned("Cantidad", columns.quantity, y, { font: bold, size: 9, color: GRAY });
-  drawRightAligned("Precio", columns.price, y, { font: bold, size: 9, color: GRAY });
-  drawRightAligned("Total", columns.total, y, { font: bold, size: 9, color: GRAY });
-  y -= 6;
-  page.drawLine({
-    start: { x: MARGIN, y },
-    end: { x: A4.width - MARGIN, y },
-    thickness: 0.5,
-    color: GRAY,
+  page.drawRectangle({
+    x: MARGIN,
+    y: y - 7,
+    width: A4.width - 2 * MARGIN,
+    height: 22,
+    color: LIGHT_GRAY,
   });
-  y -= 16;
+  drawText("Concepto", columns.concept, y, { font: bold, size: 9 });
+  drawRightAligned("Cantidad", columns.quantity, y, { font: bold, size: 9 });
+  drawRightAligned("Precio", columns.price, y, { font: bold, size: 9 });
+  drawRightAligned("Total", columns.total, y, { font: bold, size: 9 });
+  y -= 28;
 
   for (const item of order.items) {
     const productType = item.variant.product.productType?.displayName;
@@ -133,37 +179,50 @@ export async function generateInvoicePdf(params: {
     drawRightAligned(String(item.quantity), columns.quantity, y);
     drawRightAligned(money(item.price), columns.price, y);
     drawRightAligned(money(item.total), columns.total, y);
-    y -= 18;
+    y -= 8;
+    drawRule(y, LIGHT_GRAY, 0.5);
+    y -= 16;
   }
 
-  y -= 10;
-  page.drawLine({
-    start: { x: MARGIN, y },
-    end: { x: A4.width - MARGIN, y },
-    thickness: 0.5,
-    color: GRAY,
-  });
-  y -= 20;
+  y -= 12;
 
   const ivaRate =
     order.subtotal > 0 && order.tax > 0
       ? ` (${Math.round((order.tax / order.subtotal) * 100)} %)`
       : "";
-  const totals: Array<[string, string, PDFFont]> = [
-    ["Base imponible", money(order.subtotal), font],
-    [`IVA${ivaRate}`, money(order.tax), font],
+  const totalRows: Array<[string, string]> = [
+    ["Base imponible", money(order.subtotal)],
+    [`IVA${ivaRate}`, money(order.tax)],
     ...(order.shipping > 0
-      ? ([["Envío", money(order.shipping), font]] as Array<[string, string, PDFFont]>)
+      ? ([["Envío", money(order.shipping)]] as Array<[string, string]>)
       : []),
-    ["TOTAL", money(order.total), bold],
   ];
-  for (const [label, amount, rowFont] of totals) {
-    drawRightAligned(label, columns.price, y, { font: rowFont });
-    drawRightAligned(amount, columns.total, y, { font: rowFont });
+  for (const [label, amount] of totalRows) {
+    drawRightAligned(label, columns.price, y, { color: GRAY });
+    drawRightAligned(amount, columns.total, y);
     y -= 18;
   }
+  y -= 4;
+  page.drawLine({
+    start: { x: columns.price - 110, y: y + 12 },
+    end: { x: A4.width - MARGIN, y: y + 12 },
+    thickness: 0.75,
+    color: BLACK,
+  });
+  drawRightAligned("TOTAL", columns.price, y - 4, { font: bold, size: 12 });
+  drawRightAligned(money(order.total), columns.total, y - 4, {
+    font: bold,
+    size: 12,
+  });
 
-  drawText(`Pedido: ${order.id}`, MARGIN, MARGIN, { size: 8, color: GRAY });
+  const footer = pdfSafe(
+    `${seller.name} · NIF ${seller.nif} · ${seller.address.split("\n").join(", ")}`,
+  );
+  const footerWidth = font.widthOfTextAtSize(footer, 8);
+  drawText(footer, (A4.width - footerWidth) / 2, MARGIN - 10, {
+    size: 8,
+    color: GRAY,
+  });
 
   const bytes = await doc.save();
   return Buffer.from(bytes);
