@@ -67,9 +67,6 @@ const statusEmailContent = {
       </ul>
 
       <p>Te avisaremos de nuevo cuando tu pedido haya sido enviado.</p>
-
-      <p>Saludos,<br>
-      El equipo de Miguel Soro</p>
     `,
   },
   SHIPPED: {
@@ -84,28 +81,49 @@ const statusEmailContent = {
         <li><strong>Número de pedido:</strong> ${orderId}</li>
         <li><strong>Obra:</strong> ${pictureTitle}</li>
       </ul>
-
-      <p>¡Gracias por apoyar el arte de Miguel Soro!</p>
-
-      <p>Saludos,<br>
-      El equipo de Miguel Soro</p>
     `,
   },
 };
 
 export type OrderStatusWithEmail = keyof typeof statusEmailContent;
 
+export interface InvoiceAttachment {
+  formattedNumber: string;
+  pdf: Buffer;
+}
+
+const emailClosing = `
+      <p>¡Gracias por apoyar el arte de Miguel Soro!</p>
+
+      <p>Saludos,<br>
+      El equipo de Miguel Soro</p>
+    `;
+
 export async function sendOrderStatusEmail(
   data: OrderEmailData,
   status: OrderStatusWithEmail,
+  invoice?: InvoiceAttachment,
 ) {
   const content = statusEmailContent[status];
+  const invoiceNote = invoice
+    ? `<p>Adjuntamos la factura ${invoice.formattedNumber} de tu compra.</p>`
+    : "";
 
   await resend.emails.send({
     from: `Miguel Soro Art <${fromAddress}>`,
     to: data.customerEmail,
     subject: content.subject(data.orderId),
-    html: content.body(data),
+    html: content.body(data) + invoiceNote + emailClosing,
+    ...(invoice
+      ? {
+          attachments: [
+            {
+              filename: `factura-${invoice.formattedNumber}.pdf`,
+              content: invoice.pdf,
+            },
+          ],
+        }
+      : {}),
   });
 }
 

@@ -95,7 +95,18 @@ function OrderDetails() {
         throw new Error(data.error || "No se pudo actualizar el estado");
       }
       setOrder((prev) => (prev ? { ...prev, status: newStatus } : prev));
-      toast.success("Estado actualizado");
+      if (data.warning) {
+        toast.error(data.warning, { duration: 8000 });
+      } else {
+        toast.success("Estado actualizado");
+      }
+      if (newStatus === "SHIPPED") {
+        const refreshed = await fetch(`/api/admin/orders/${order.id}`);
+        if (refreshed.ok) {
+          const refreshedData = await refreshed.json();
+          setOrder(refreshedData.order);
+        }
+      }
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Error al actualizar el estado",
@@ -330,7 +341,7 @@ function OrderDetails() {
             <p className="text-sm text-gray-600 mb-4">
               {order.invoiceNumber
                 ? `Factura ${formatInvoiceNumber(order.invoiceNumber)} emitida el ${formatDate(order.invoicedAt!)}`
-                : "Al ver o enviar la factura se le asignará el siguiente número correlativo."}
+                : "Se adjunta automáticamente al email al marcar el pedido como Enviado. Al emitirla se le asigna el siguiente número correlativo."}
             </p>
             <div className="flex flex-wrap gap-3">
               <a

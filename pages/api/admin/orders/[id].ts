@@ -2,9 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import {
   findOrderByIdForAdmin,
   updateOrderStatus,
+  getOrderInvoice,
 } from "../../../../infra/dependencies";
 import { requireAuth } from "@/lib/auth";
-import { sendOrderStatusEmail } from "@/lib/email";
+import { sendOrderStatusEmail, InvoiceAttachment } from "@/lib/email";
+import { getGeneralSettings } from "@/services/databaseGeneralSettings";
+import { generateInvoicePdf, formatInvoiceNumber } from "@/lib/invoice";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
@@ -81,7 +84,45 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         status,
       );
 
+      let warning: string | undefined;
+
       if (status === "PROCESSING" || status === "SHIPPED") {
+        let invoice: InvoiceAttachment | undefined;
+
+        if (status === "SHIPPED") {
+          try {
+            const settings = await getGeneralSettings();
+            if (
+              !settings?.businessName ||
+              !settings?.businessNif ||
+              !settings?.businessAddress
+            ) {
+              warning =
+                "Pedido actualizado, pero el email salió sin factura: faltan los datos fiscales en Ajustes → General.";
+            } else {
+              const invoiceData = await getOrderInvoice.execute(id as string);
+              const pdf = await generateInvoicePdf({
+                order: invoiceData.order,
+                seller: {
+                  name: settings.businessName,
+                  nif: settings.businessNif,
+                  address: settings.businessAddress,
+                },
+                invoiceNumber: invoiceData.invoiceNumber,
+                invoicedAt: invoiceData.invoicedAt,
+              });
+              invoice = {
+                formattedNumber: formatInvoiceNumber(invoiceData.invoiceNumber),
+                pdf,
+              };
+            }
+          } catch (invoiceError) {
+            console.error("Error generating invoice for email:", invoiceError);
+            warning =
+              "Pedido actualizado, pero el email salió sin factura: no se pudo generar. Envíala manualmente.";
+          }
+        }
+
         try {
           const firstItem = updatedOrder.items[0];
           await sendOrderStatusEmail(
@@ -94,13 +135,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               paypalOrderId: updatedOrder.paypalOrderId || undefined,
             },
             status,
+            invoice,
           );
         } catch (emailError) {
           console.error("Error sending status email:", emailError);
         }
       }
 
-      return res.status(200).json({ order: updatedOrder });
+      return res
+        .status(200)
+        .json({ order: updatedOrder, ...(warning ? { warning } : {}) });
     } catch (error) {
       console.error("Error updating order:", error);
 
