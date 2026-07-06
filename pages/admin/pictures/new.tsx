@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { slugify } from "@/utils/slug";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { ArrowLeftIcon, PhotoIcon } from "@heroicons/react/24/outline";
@@ -334,7 +334,6 @@ export default function NewPicture() {
           </div>
         </div>
 
-        <Toaster position="top-right" />
       </div>
     </>
   );

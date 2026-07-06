@@ -9,7 +9,7 @@ import {
   getNewsTypeInfo,
   formatNewsDate,
 } from "@/domain/news";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import {
   PencilIcon,
   TrashIcon,
@@ -465,7 +465,6 @@ export default function AdminNews() {
         confirmation={confirmation}
         onClose={() => setConfirmation(null)}
       />
-      <Toaster position="top-right" />
     </>
   );
 }

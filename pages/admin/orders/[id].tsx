@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { ReactElement } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
 import { OrderWithDetails } from "../../../infra/OrderRepository";
 import { formatInvoiceNumber, orderReference } from "../../../domain/order";
@@ -518,7 +518,6 @@ function OrderDetails() {
         confirmation={confirmation}
         onClose={() => setConfirmation(null)}
       />
-      <Toaster position="top-right" />
     </>
   );
 }

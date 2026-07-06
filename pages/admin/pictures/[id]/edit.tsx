@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { getPictureStatus } from "@/domain/picture";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { usePicture, useUpdatePicture } from "@/hooks/usePictures";
@@ -450,7 +450,6 @@ export default function EditPicture() {
           confirmation={confirmation}
           onClose={() => setConfirmation(null)}
         />
-        <Toaster position="top-right" />
       </div>
     </>
   );

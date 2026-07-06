@@ -14,6 +14,7 @@ import {
   NewspaperIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/cn";
+import { Toaster } from "react-hot-toast";
 
 type Props = {
   children?: ReactNode;
@@ -302,6 +303,7 @@ export function AdminLayout({
           <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
         </div>
       </div>
+      <Toaster position="top-right" />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { usePictures, useDeletePicture } from "@/hooks/usePictures";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { PictureStatus, getPictureStatus } from "@/domain/picture";
 import { formatEuros } from "@/domain/order";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import {
   PlusIcon,
   PencilIcon,
@@ -277,7 +277,6 @@ export default function AdminPictures() {
           </div>
         )}
 
-        <Toaster position="top-right" />
       </div>
       <ConfirmDialog
         confirmation={confirmation}

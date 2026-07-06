@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -327,7 +327,6 @@ export default function ProductTypesAdmin() {
           confirmation={confirmation}
           onClose={() => setConfirmation(null)}
         />
-        <Toaster position="top-right" />
       </div>
     </>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { ReactElement } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 
@@ -159,7 +159,6 @@ export default function GeneralSettings() {
         </div>
       </div>
 
-      <Toaster position="top-right" />
     </>
   );
 }
