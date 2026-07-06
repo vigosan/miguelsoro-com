@@ -27,6 +27,7 @@ interface Order {
 
 interface Props {
   orders: Order[];
+  loadError?: boolean;
 }
 
 const statusColors = {
@@ -51,7 +52,7 @@ const statusLabels = {
 
 const PAGE_SIZE = 20;
 
-export default function AdminOrdersPage({ orders }: Props) {
+export default function AdminOrdersPage({ orders, loadError }: Props) {
   const [filter, setFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
@@ -86,6 +87,29 @@ export default function AdminOrdersPage({ orders }: Props) {
     },
     {} as Record<string, number>,
   );
+
+  if (loadError) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Pedidos"
+          description="Gestiona todos los pedidos de la tienda"
+        />
+        <div
+          className="rounded-md border border-red-200 bg-red-50 p-6"
+          data-testid="orders-load-error"
+        >
+          <h3 className="text-sm font-semibold text-red-800">
+            No se pudieron cargar los pedidos
+          </h3>
+          <p className="mt-1 text-sm text-red-700">
+            Ha fallado la consulta a la base de datos. Los pedidos siguen ahí:
+            revisa los logs del servidor y recarga la página.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -337,6 +361,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       props: {
         orders: [],
+        loadError: true,
       },
     };
   }
