@@ -156,7 +156,7 @@ export async function sendOrderStatusEmail(
           attachments: [
             {
               filename: `factura-${invoice.formattedNumber}.pdf`,
-              content: invoice.pdf,
+              content: invoice.pdf.toString("base64"),
             },
           ],
         }
@@ -190,7 +190,7 @@ export async function sendInvoiceEmail(
     attachments: [
       {
         filename: `factura-${formattedInvoiceNumber}.pdf`,
-        content: pdf,
+        content: pdf.toString("base64"),
       },
     ],
   });

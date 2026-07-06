@@ -84,7 +84,7 @@ describe("sendOrderStatusEmail", () => {
     const email = mockSend.mock.calls[0][0];
     expect(email.html).toContain("MS-0007");
     expect(email.attachments).toEqual([
-      { filename: "factura-MS-0007.pdf", content: pdf },
+      { filename: "factura-MS-0007.pdf", content: pdf.toString("base64") },
     ]);
   });
 });
@@ -105,7 +105,7 @@ describe("sendInvoiceEmail", () => {
     expect(email.subject).toContain("MS-0007");
     expect(email.html).toContain("John Doe");
     expect(email.attachments).toEqual([
-      { filename: "factura-MS-0007.pdf", content: pdf },
+      { filename: "factura-MS-0007.pdf", content: pdf.toString("base64") },
     ]);
   });
 });
