@@ -1,10 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { ReactElement } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
-import { OrderWithDetails } from "../../../infra/OrderRepository";
+import {
+  useOrder,
+  useUpdateOrderStatus,
+  orderKeys,
+  OrderStatus,
+} from "../../../hooks/useOrders";
 import {
   formatInvoiceNumber,
   orderReference,
@@ -19,22 +25,26 @@ import {
 
 const STATUS_FLOW = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] as const;
 
-interface OrderDetailsProps {
-  order: OrderWithDetails | null;
-  loading: boolean;
-  error: string | null;
-}
-
 function OrderDetails() {
   const router = useRouter();
   const { id } = router.query;
-  const [order, setOrder] = useState<OrderWithDetails | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const orderId = typeof id === "string" ? id : "";
+  const queryClient = useQueryClient();
+  const {
+    data: order,
+    isLoading: loading,
+    error: queryError,
+  } = useOrder(orderId);
+  const updateStatusMutation = useUpdateOrderStatus();
   const [refunding, setRefunding] = useState(false);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
   const [sendingInvoice, setSendingInvoice] = useState(false);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+
+  const error = queryError instanceof Error ? queryError.message : null;
+  const updatingStatus = updateStatusMutation.isPending;
+
+  const refreshOrder = () =>
+    queryClient.invalidateQueries({ queryKey: orderKeys.detail(orderId) });
 
   const handleSendInvoice = async () => {
     if (!order) return;
@@ -49,11 +59,7 @@ function OrderDetails() {
         throw new Error(data.error || "No se pudo enviar la factura");
       }
       toast.success(`Factura ${data.invoiceNumber} enviada a ${data.sentTo}`);
-      const refreshed = await fetch(`/api/admin/orders/${order.id}`);
-      if (refreshed.ok) {
-        const refreshedData = await refreshed.json();
-        setOrder(refreshedData.order);
-      }
+      await refreshOrder();
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Error al enviar la factura",
@@ -74,8 +80,8 @@ function OrderDetails() {
       if (!response.ok) {
         throw new Error(data.error || "No se pudo reembolsar");
       }
-      setOrder((prev) => (prev ? { ...prev, status: "REFUNDED" } : prev));
       toast.success("Reembolso completado correctamente");
+      await refreshOrder();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al reembolsar");
     } finally {
@@ -85,62 +91,22 @@ function OrderDetails() {
 
   const handleStatusChange = async (newStatus: string) => {
     if (!order) return;
-    setUpdatingStatus(true);
     try {
-      const response = await fetch(`/api/admin/orders/${order.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+      const data = await updateStatusMutation.mutateAsync({
+        id: order.id,
+        status: newStatus as OrderStatus,
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo actualizar el estado");
-      }
-      setOrder((prev) => (prev ? { ...prev, status: newStatus } : prev));
       if (data.warning) {
         toast.error(data.warning, { duration: 8000 });
       } else {
         toast.success("Estado actualizado");
       }
-      if (newStatus === "SHIPPED") {
-        const refreshed = await fetch(`/api/admin/orders/${order.id}`);
-        if (refreshed.ok) {
-          const refreshedData = await refreshed.json();
-          setOrder(refreshedData.order);
-        }
-      }
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Error al actualizar el estado",
       );
-    } finally {
-      setUpdatingStatus(false);
     }
   };
-
-  useEffect(() => {
-    if (!id || typeof id !== "string") return;
-
-    const fetchOrder = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/admin/orders/${id}`);
-
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        setOrder(data.order);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Error desconocido");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrder();
-  }, [id]);
 
   if (loading) {
     return (
