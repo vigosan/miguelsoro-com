@@ -202,6 +202,40 @@ describe("DatabaseOrderRepository.updateManyByPayPalId", () => {
   });
 });
 
+describe("DatabaseOrderRepository.getStats", () => {
+  let repository: DatabaseOrderRepository;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    supabaseMock.state.responses = [];
+    repository = new DatabaseOrderRepository();
+  });
+
+  it("aggregates every stat from a single query (the dashboard ran four in series)", async () => {
+    queueResponses({
+      data: [
+        { status: "PENDING", total: 1000 },
+        { status: "PAID", total: 2000 },
+        { status: "PROCESSING", total: 3000 },
+        { status: "SHIPPED", total: 4000 },
+        { status: "DELIVERED", total: 5000 },
+        { status: "CANCELLED", total: 9999 },
+      ],
+      error: null,
+    });
+
+    const stats = await repository.getStats();
+
+    expect(stats).toEqual({
+      totalOrders: 6,
+      completedOrders: 1, // DELIVERED
+      pendingOrders: 2, // PAID + PROCESSING
+      totalRevenue: 14000, // paid-through statuses only; PENDING/CANCELLED excluded
+    });
+    expect(supabaseMock.builder.select).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("DatabaseProductVariantRepository stock updates", () => {
   let repository: DatabaseProductVariantRepository;
 

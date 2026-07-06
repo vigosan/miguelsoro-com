@@ -174,60 +174,36 @@ export class DatabaseOrderRepository implements OrderRepository {
   async getStats(): Promise<OrderStats> {
     const supabase = this.getClient();
 
-    // Get total orders count
-    const { count: totalOrders, error: totalError } = await supabase
+    const { data: orders, error } = await supabase
       .from("orders")
-      .select("*", { count: "exact", head: true });
+      .select("status, total");
 
-    if (totalError) {
-      console.error("Error getting total orders:", totalError);
-      throw new Error(`Failed to get stats: ${totalError.message}`);
+    if (error) {
+      console.error("Error getting order stats:", error);
+      throw new Error(`Failed to get stats: ${error.message}`);
     }
 
-    // Get completed orders count
-    const { count: completedOrders, error: completedError } = await supabase
-      .from("orders")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "DELIVERED");
+    const PAID_THROUGH = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"];
 
-    if (completedError) {
-      console.error("Error getting completed orders:", completedError);
-      throw new Error(`Failed to get stats: ${completedError.message}`);
-    }
-
-    // Get pending orders count (paid but not yet shipped)
-    const { count: pendingOrders, error: pendingError } = await supabase
-      .from("orders")
-      .select("*", { count: "exact", head: true })
-      .in("status", ["PAID", "PROCESSING"]);
-
-    if (pendingError) {
-      console.error("Error getting pending orders:", pendingError);
-      throw new Error(`Failed to get stats: ${pendingError.message}`);
-    }
-
-    // Get total revenue from every order whose payment went through
-    const { data: revenueData, error: revenueError } = await supabase
-      .from("orders")
-      .select("total")
-      .in("status", ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"]);
-
-    if (revenueError) {
-      console.error("Error getting revenue:", revenueError);
-      throw new Error(`Failed to get stats: ${revenueError.message}`);
-    }
-
-    const totalRevenue = (revenueData || []).reduce(
-      (sum, order) => sum + (order.total || 0),
-      0,
+    return (orders || []).reduce(
+      (stats, order) => {
+        stats.totalOrders += 1;
+        if (order.status === "DELIVERED") stats.completedOrders += 1;
+        if (order.status === "PAID" || order.status === "PROCESSING") {
+          stats.pendingOrders += 1;
+        }
+        if (PAID_THROUGH.includes(order.status)) {
+          stats.totalRevenue += order.total || 0;
+        }
+        return stats;
+      },
+      {
+        totalOrders: 0,
+        completedOrders: 0,
+        pendingOrders: 0,
+        totalRevenue: 0,
+      },
     );
-
-    return {
-      totalOrders: totalOrders || 0,
-      completedOrders: completedOrders || 0,
-      pendingOrders: pendingOrders || 0,
-      totalRevenue,
-    };
   }
 
   async create(data: CreateOrderData): Promise<OrderWithDetails> {
