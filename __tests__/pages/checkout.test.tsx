@@ -97,7 +97,7 @@ describe("CheckoutPage capture flow", () => {
       throw new Error(`Unexpected fetch: ${url}`);
     });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<CheckoutPage />);
     await fillRequiredFields(user);
 
@@ -119,7 +119,7 @@ describe("CheckoutPage capture flow", () => {
       throw new Error(`Unexpected fetch: ${url}`);
     });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<CheckoutPage />);
     await fillRequiredFields(user);
 
