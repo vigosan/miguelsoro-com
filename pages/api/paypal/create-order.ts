@@ -75,7 +75,9 @@ export default async function handler(
 
     const outOfStock = items.find((item) => {
       const variant = variants.find((v) => v.id === item.variantId);
-      return variant && item.quantity > variant.stock;
+      return (
+        variant && variant.stock !== undefined && item.quantity > variant.stock
+      );
     });
     if (outOfStock) {
       console.log(
