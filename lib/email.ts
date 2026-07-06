@@ -52,6 +52,63 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
   });
 }
 
+const statusEmailContent = {
+  PROCESSING: {
+    subject: (orderId: string) => `Tu pedido #${orderId} está en marcha`,
+    body: ({ customerName, pictureTitle, orderId }: OrderEmailData) => `
+      <h2>¡Tu pedido está en marcha!</h2>
+      <p>Hola ${customerName},</p>
+      <p>Ya estamos preparando tu pedido para que llegue a tus manos lo antes posible.</p>
+
+      <h3>Detalles del pedido:</h3>
+      <ul>
+        <li><strong>Número de pedido:</strong> ${orderId}</li>
+        <li><strong>Obra:</strong> ${pictureTitle}</li>
+      </ul>
+
+      <p>Te avisaremos de nuevo cuando tu pedido haya sido enviado.</p>
+
+      <p>Saludos,<br>
+      El equipo de Miguel Soro</p>
+    `,
+  },
+  SHIPPED: {
+    subject: (orderId: string) => `Tu pedido #${orderId} ha sido enviado`,
+    body: ({ customerName, pictureTitle, orderId }: OrderEmailData) => `
+      <h2>¡Tu pedido está en camino!</h2>
+      <p>Hola ${customerName},</p>
+      <p>Tu pedido ha sido enviado y llegará pronto a la dirección indicada.</p>
+
+      <h3>Detalles del pedido:</h3>
+      <ul>
+        <li><strong>Número de pedido:</strong> ${orderId}</li>
+        <li><strong>Obra:</strong> ${pictureTitle}</li>
+      </ul>
+
+      <p>¡Gracias por apoyar el arte de Miguel Soro!</p>
+
+      <p>Saludos,<br>
+      El equipo de Miguel Soro</p>
+    `,
+  },
+};
+
+export type OrderStatusWithEmail = keyof typeof statusEmailContent;
+
+export async function sendOrderStatusEmail(
+  data: OrderEmailData,
+  status: OrderStatusWithEmail,
+) {
+  const content = statusEmailContent[status];
+
+  await resend.emails.send({
+    from: `Miguel Soro Art <${fromAddress}>`,
+    to: data.customerEmail,
+    subject: content.subject(data.orderId),
+    html: content.body(data),
+  });
+}
+
 export async function sendAdminNotificationEmail(
   data: OrderEmailData,
   toEmail?: string,

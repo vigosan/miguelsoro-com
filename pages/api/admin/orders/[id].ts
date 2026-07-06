@@ -4,6 +4,7 @@ import {
   updateOrderStatus,
 } from "../../../../infra/dependencies";
 import { requireAuth } from "@/lib/auth";
+import { sendOrderStatusEmail } from "@/lib/email";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
@@ -77,6 +78,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         id as string,
         status,
       );
+
+      if (status === "PROCESSING" || status === "SHIPPED") {
+        try {
+          const firstItem = updatedOrder.items[0];
+          await sendOrderStatusEmail(
+            {
+              customerName: updatedOrder.customerName,
+              customerEmail: updatedOrder.customerEmail,
+              pictureTitle: firstItem?.variant?.product?.title || "Obra de arte",
+              picturePrice: updatedOrder.total,
+              orderId: updatedOrder.id,
+              paypalOrderId: updatedOrder.paypalOrderId || undefined,
+            },
+            status,
+          );
+        } catch (emailError) {
+          console.error("Error sending status email:", emailError);
+        }
+      }
 
       return res.status(200).json({ order: updatedOrder });
     } catch (error) {
