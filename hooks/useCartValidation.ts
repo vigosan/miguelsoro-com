@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useCart, CartItem } from "../contexts/CartContext";
 
 interface ShippingSettings {
@@ -35,8 +35,9 @@ export function useCartValidation() {
       isLoading: false,
       lastChecked: null,
     });
-  const [lastShippingSettings, setLastShippingSettings] =
-    useState<ShippingSettings | null>(null);
+  // Ref, not state: validateCart is memoized on cart items only, so state
+  // would be captured stale and the baseline would never advance.
+  const lastShippingSettings = useRef<ShippingSettings | null>(null);
 
   const validateCart = useCallback(async () => {
     if (state.items.length === 0) {
@@ -70,24 +71,23 @@ export function useCartValidation() {
       const issues: CartValidationIssue[] = [];
 
       // Check for shipping settings changes
-      if (lastShippingSettings) {
+      const previousShipping = lastShippingSettings.current;
+      if (previousShipping) {
         const currentShipping = data.shippingSettings;
         if (
-          currentShipping.standardRate !== lastShippingSettings.standardRate ||
+          currentShipping.standardRate !== previousShipping.standardRate ||
           currentShipping.freeShippingThreshold !==
-            lastShippingSettings.freeShippingThreshold
+            previousShipping.freeShippingThreshold
         ) {
           let message = "Los costes de envío han cambiado. ";
-          if (
-            currentShipping.standardRate !== lastShippingSettings.standardRate
-          ) {
-            message += `Coste: €${(lastShippingSettings.standardRate / 100).toFixed(2)} → €${(currentShipping.standardRate / 100).toFixed(2)}. `;
+          if (currentShipping.standardRate !== previousShipping.standardRate) {
+            message += `Coste: €${(previousShipping.standardRate / 100).toFixed(2)} → €${(currentShipping.standardRate / 100).toFixed(2)}. `;
           }
           if (
             currentShipping.freeShippingThreshold !==
-            lastShippingSettings.freeShippingThreshold
+            previousShipping.freeShippingThreshold
           ) {
-            message += `Envío gratis desde: €${(lastShippingSettings.freeShippingThreshold / 100).toFixed(2)} → €${(currentShipping.freeShippingThreshold / 100).toFixed(2)}`;
+            message += `Envío gratis desde: €${(previousShipping.freeShippingThreshold / 100).toFixed(2)} → €${(currentShipping.freeShippingThreshold / 100).toFixed(2)}`;
           }
 
           issues.push({
@@ -99,7 +99,7 @@ export function useCartValidation() {
       }
 
       // Store current shipping settings for next comparison
-      setLastShippingSettings(data.shippingSettings);
+      lastShippingSettings.current = data.shippingSettings;
 
       // Check each cart item against current database state
       state.items.forEach((cartItem) => {
