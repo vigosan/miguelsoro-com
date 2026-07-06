@@ -1,10 +1,8 @@
 import React from "react";
-import { expect, afterEach, vi } from "vitest";
+import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
-import * as matchers from "@testing-library/jest-dom/matchers";
-
-// extends Vitest's expect method with methods from react-testing-library
-expect.extend(matchers);
+// Registers the jest-dom matchers AND their vitest types project-wide
+import "@testing-library/jest-dom/vitest";
 
 // Provide a stable secret so admin auth (JWT) works in tests.
 process.env.AUTH_SECRET =

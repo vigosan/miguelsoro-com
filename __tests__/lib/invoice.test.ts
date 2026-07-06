@@ -6,7 +6,7 @@ import { mockOrder } from "../api/simple-helpers";
 
 const extractDrawnText = (pdf: Buffer): string => {
   const raw = pdf.toString("latin1");
-  const streams = [...raw.matchAll(/stream\r?\n([\s\S]*?)endstream/g)]
+  const streams = Array.from(raw.matchAll(/stream\r?\n([\s\S]*?)endstream/g))
     .map((match) => {
       try {
         return inflateSync(Buffer.from(match[1], "latin1")).toString("latin1");
@@ -15,7 +15,7 @@ const extractDrawnText = (pdf: Buffer): string => {
       }
     })
     .join("\n");
-  return [...streams.matchAll(/<([0-9A-Fa-f]+)>\s*Tj/g)]
+  return Array.from(streams.matchAll(/<([0-9A-Fa-f]+)>\s*Tj/g))
     .map((match) => Buffer.from(match[1], "hex").toString("latin1"))
     .join("\n");
 };

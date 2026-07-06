@@ -8,11 +8,10 @@ const mockPicture: Picture = {
   id: "1",
   title: "Test Picture",
   description: "A test picture description",
-  price: 100000, // 1000 EUR in cents
+  price: 1000, // euros
   size: "120x90",
   slug: "test-picture",
   imageUrl: "/pictures/1.webp",
-  status: "AVAILABLE",
   productTypeId: "cuadros",
   productTypeName: "Cuadros Originales",
   stock: 1,

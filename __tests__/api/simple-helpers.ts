@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 // Mock data structures
 export const mockOrder = {
@@ -72,12 +73,13 @@ export const createMockRequest = (
   body?: any,
   query?: any,
   headers?: Record<string, string>,
-) => ({
-  method,
-  body,
-  query: query || {},
-  headers: headers || {},
-});
+): NextApiRequest =>
+  ({
+    method,
+    body,
+    query: query || {},
+    headers: headers || {},
+  }) as unknown as NextApiRequest;
 
 // Build a request carrying a valid admin session cookie for protected endpoints.
 export const createAuthedRequest = async (
@@ -92,7 +94,11 @@ export const createAuthedRequest = async (
   });
 };
 
-export const createMockResponse = () => {
+export const createMockResponse = (): NextApiResponse & {
+  status: ReturnType<typeof vi.fn>;
+  json: ReturnType<typeof vi.fn>;
+  end: ReturnType<typeof vi.fn>;
+} => {
   const res: any = {};
   res.status = vi.fn().mockReturnValue(res);
   res.json = vi.fn().mockReturnValue(res);
