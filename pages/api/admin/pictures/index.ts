@@ -68,8 +68,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (req.method === "POST") {
     try {
-      const { title, description, price, slug, stock, productTypeId, imageUrl } =
-        req.body ?? {};
+      const {
+        title,
+        description,
+        price,
+        slug,
+        stock,
+        productTypeId,
+        imageUrl,
+      } = req.body ?? {};
 
       if (typeof title !== "string" || !title.trim()) {
         return res.status(400).json({ error: "El título es obligatorio" });
@@ -103,6 +110,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         productTypeId,
         imageUrl,
       } as any);
+
+      try {
+        await res.revalidate("/");
+        await res.revalidate("/obra");
+      } catch (err) {
+        console.warn("Failed to revalidate pages:", err);
+      }
 
       return res.status(201).json({ picture: created });
     } catch (error) {

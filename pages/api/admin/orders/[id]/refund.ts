@@ -48,14 +48,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       captureId: order.captureId,
     });
 
-    const refund =
-      typeof body === "string" ? JSON.parse(body) : body;
+    const refund = typeof body === "string" ? JSON.parse(body) : body;
 
     if (refund?.status !== "COMPLETED" && refund?.status !== "PENDING") {
       console.error("PayPal refund not completed:", refund);
-      return res
-        .status(502)
-        .json({ error: "PayPal no confirmó el reembolso", status: refund?.status });
+      return res.status(502).json({
+        error: "PayPal no confirmó el reembolso",
+        status: refund?.status,
+      });
     }
 
     // Only after PayPal confirms: mark refunded and restore stock.
@@ -78,7 +78,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         {
           customerName: order.customerName,
           customerEmail: order.customerEmail,
-          pictureTitle: order.items[0]?.variant?.product?.title || "Obra de arte",
+          pictureTitle:
+            order.items[0]?.variant?.product?.title || "Obra de arte",
           picturePrice: order.total,
           orderId: orderReference(order),
           paypalOrderId: order.paypalOrderId || undefined,
@@ -98,9 +99,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   } catch (error) {
     console.error("Error refunding order:", error);
-    return res
-      .status(500)
-      .json({ error: "No se pudo procesar el reembolso" });
+    return res.status(500).json({ error: "No se pudo procesar el reembolso" });
   }
 };
 

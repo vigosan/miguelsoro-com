@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { Layout } from "@/components/Layout";
 import { List } from "@/components/List";
 import { Reveal } from "@/components/Reveal";
@@ -80,9 +80,9 @@ export default function ObraPage({
   );
 }
 
-export const getServerSideProps: GetServerSideProps<
-  ObraPageProps
-> = async () => {
+// ISR like the homepage and picture pages: the catalog changes rarely and
+// the admin can trigger /api/revalidate for immediate updates.
+export const getStaticProps: GetStaticProps<ObraPageProps> = async () => {
   try {
     const pictureRepository = new DatabasePictureRepository();
     const productTypeRepository = new DatabaseProductTypeRepository();
@@ -98,16 +98,18 @@ export const getServerSideProps: GetServerSideProps<
         initialPictures: pictures,
         availableTypes: productTypes,
       },
+      revalidate: 3600,
     };
   } catch (error) {
     console.error("Error fetching data for obra page:", error);
 
-    // Return empty arrays as fallback
+    // Return empty arrays as fallback, retrying sooner
     return {
       props: {
         initialPictures: [],
         availableTypes: [],
       },
+      revalidate: 300,
     };
   }
 };
