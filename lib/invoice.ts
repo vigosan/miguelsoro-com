@@ -104,29 +104,28 @@ export async function generateInvoicePdf(params: {
     font: bold,
     size: 20,
   });
-  drawRightAligned(formattedNumber, A4.width - MARGIN, y - 32, {
-    font: bold,
-    size: 12,
-  });
   y -= logoHeight + 28;
 
-  drawText("Fecha", MARGIN, y, { font: bold, size: 9, color: GRAY });
-  drawRightAligned("Pedido", A4.width - MARGIN - 100, y, {
+  const metaCenter = 300;
+  drawText("Nº de factura", MARGIN, y, { font: bold, size: 9, color: GRAY });
+  drawText("Fecha", metaCenter, y, { font: bold, size: 9, color: GRAY });
+  drawRightAligned("Pedido", A4.width - MARGIN, y, {
     font: bold,
     size: 9,
     color: GRAY,
   });
   y -= 14;
+  drawText(formattedNumber, MARGIN, y, { font: bold });
   drawText(
     invoicedAt.toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     }),
-    MARGIN,
+    metaCenter,
     y,
   );
-  drawRightAligned(orderReference(order.id), A4.width - MARGIN - 100, y);
+  drawRightAligned(orderReference(order.id), A4.width - MARGIN, y);
   y -= 24;
   drawRule(y);
   y -= 28;
