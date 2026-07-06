@@ -13,19 +13,16 @@ export default async function handler(
   try {
     const { variantIds } = req.body;
 
-    if (!variantIds || !Array.isArray(variantIds)) {
+    if (!variantIds || !Array.isArray(variantIds) || variantIds.length > 100) {
       return res.status(400).json({ error: "Invalid variant IDs" });
     }
 
-    // Get current state of all variants in the cart
-    const variants =
-      await productVariantRepository.findAvailableByIds(variantIds);
-
-    // Also get unavailable variants to detect products that are no longer available
-    const allVariants = await productVariantRepository.findByIds(variantIds);
-
-    // Get current shipping settings
-    const shippingSettings = await getShippingSettings();
+    // Full list (including unavailable variants, so removed products are
+    // detected) plus current shipping settings, fetched in parallel
+    const [allVariants, shippingSettings] = await Promise.all([
+      productVariantRepository.findByIds(variantIds),
+      getShippingSettings(),
+    ]);
 
     res.status(200).json({
       variants: allVariants.map((variant) => ({
