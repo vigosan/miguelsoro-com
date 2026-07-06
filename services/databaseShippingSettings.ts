@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/utils/supabase/server";
+import { createSettingsCache } from "@/services/settingsCache";
 
 export interface ShippingSettings {
   id: string;
@@ -9,41 +10,41 @@ export interface ShippingSettings {
   updatedAt: string;
 }
 
-export async function getShippingSettings(): Promise<ShippingSettings | null> {
-  try {
-    const supabase = createAdminClient();
+async function fetchShippingSettings(): Promise<ShippingSettings | null> {
+  const supabase = createAdminClient();
 
-    const { data: settings, error } = await supabase
-      .from("shipping_settings")
-      .select("*")
-      .eq("isActive", true)
-      .order("createdAt", { ascending: false })
-      .limit(1)
-      .single();
+  const { data: settings, error } = await supabase
+    .from("shipping_settings")
+    .select("*")
+    .eq("isActive", true)
+    .order("createdAt", { ascending: false })
+    .limit(1)
+    .single();
 
-    if (error) {
-      if (error.code === "PGRST116") {
-        // No rows returned
-        return null;
-      }
-      console.error("Error fetching shipping settings:", error);
+  if (error) {
+    if (error.code === "PGRST116") {
+      // No rows returned
       return null;
     }
-
-    return settings
-      ? {
-          id: settings.id,
-          standardRate: settings.standardRate,
-          freeShippingThreshold: settings.freeShippingThreshold,
-          isActive: settings.isActive,
-          createdAt: settings.createdAt,
-          updatedAt: settings.updatedAt,
-        }
-      : null;
-  } catch (error) {
-    console.error("Error fetching shipping settings:", error);
-    return null;
+    throw new Error(`Failed to fetch shipping settings: ${error.message}`);
   }
+
+  return settings
+    ? {
+        id: settings.id,
+        standardRate: settings.standardRate,
+        freeShippingThreshold: settings.freeShippingThreshold,
+        isActive: settings.isActive,
+        createdAt: settings.createdAt,
+        updatedAt: settings.updatedAt,
+      }
+    : null;
+}
+
+const shippingSettingsCache = createSettingsCache(fetchShippingSettings);
+
+export async function getShippingSettings(): Promise<ShippingSettings | null> {
+  return shippingSettingsCache.get();
 }
 
 export async function createShippingSettings(data: {
@@ -68,6 +69,9 @@ export async function createShippingSettings(data: {
     })
     .select()
     .single();
+
+  // The deactivate + insert pair may have changed rows even on failure
+  shippingSettingsCache.invalidate();
 
   if (error) {
     console.error("Error creating shipping settings:", error);
@@ -100,6 +104,8 @@ export async function updateShippingSettings(
       .eq("id", id)
       .select()
       .single();
+
+    shippingSettingsCache.invalidate();
 
     if (error) {
       console.error("Error updating shipping settings:", error);

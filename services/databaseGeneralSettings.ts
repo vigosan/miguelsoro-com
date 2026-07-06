@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/utils/supabase/server";
+import { createSettingsCache } from "@/services/settingsCache";
 
 export interface GeneralSettings {
   id: string;
@@ -13,45 +14,45 @@ export interface GeneralSettings {
   updatedAt: string;
 }
 
-export async function getGeneralSettings(): Promise<GeneralSettings | null> {
-  try {
-    const supabase = createAdminClient();
+async function fetchGeneralSettings(): Promise<GeneralSettings | null> {
+  const supabase = createAdminClient();
 
-    const { data: settings, error } = await supabase
-      .from("general_settings")
-      .select("*")
-      .eq("isActive", true)
-      .order("createdAt", { ascending: false })
-      .limit(1)
-      .single();
+  const { data: settings, error } = await supabase
+    .from("general_settings")
+    .select("*")
+    .eq("isActive", true)
+    .order("createdAt", { ascending: false })
+    .limit(1)
+    .single();
 
-    if (error) {
-      if (error.code === "PGRST116") {
-        // No rows returned
-        return null;
-      }
-      console.error("Error fetching general settings:", error);
+  if (error) {
+    if (error.code === "PGRST116") {
+      // No rows returned
       return null;
     }
-
-    return settings
-      ? {
-          id: settings.id,
-          siteName: settings.siteName,
-          siteDescription: settings.siteDescription,
-          contactEmail: settings.contactEmail,
-          businessName: settings.businessName,
-          businessNif: settings.businessNif,
-          businessAddress: settings.businessAddress,
-          isActive: settings.isActive,
-          createdAt: settings.createdAt,
-          updatedAt: settings.updatedAt,
-        }
-      : null;
-  } catch (error) {
-    console.error("Error fetching general settings:", error);
-    return null;
+    throw new Error(`Failed to fetch general settings: ${error.message}`);
   }
+
+  return settings
+    ? {
+        id: settings.id,
+        siteName: settings.siteName,
+        siteDescription: settings.siteDescription,
+        contactEmail: settings.contactEmail,
+        businessName: settings.businessName,
+        businessNif: settings.businessNif,
+        businessAddress: settings.businessAddress,
+        isActive: settings.isActive,
+        createdAt: settings.createdAt,
+        updatedAt: settings.updatedAt,
+      }
+    : null;
+}
+
+const generalSettingsCache = createSettingsCache(fetchGeneralSettings);
+
+export async function getGeneralSettings(): Promise<GeneralSettings | null> {
+  return generalSettingsCache.get();
 }
 
 export async function saveGeneralSettings(data: {
@@ -83,6 +84,9 @@ export async function saveGeneralSettings(data: {
     })
     .select()
     .single();
+
+  // The deactivate + insert pair may have changed rows even on failure
+  generalSettingsCache.invalidate();
 
   if (error) {
     console.error("Error saving general settings:", error);
