@@ -19,6 +19,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ListSkeleton } from "@/components/ui/Skeleton";
+import { ConfirmDialog, Confirmation } from "@/components/ui/ConfirmDialog";
 
 type NewsFormData = CreateNewsData;
 
@@ -31,6 +32,7 @@ export default function AdminNews() {
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [editingNews, setEditingNews] = useState<News | null>(null);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [formData, setFormData] = useState<NewsFormData>({
     title: "",
     description: "",
@@ -86,17 +88,11 @@ export default function AdminNews() {
   };
 
   const handleDelete = async (newsItem: News) => {
-    if (
-      window.confirm(
-        `¿Estás seguro de que quieres eliminar "${newsItem.title}"?`,
-      )
-    ) {
-      const success = await deleteNews(newsItem.id);
-      if (success) {
-        toast.success("Noticia eliminada correctamente");
-      } else {
-        toast.error("Error al eliminar la noticia");
-      }
+    const success = await deleteNews(newsItem.id);
+    if (success) {
+      toast.success("Noticia eliminada correctamente");
+    } else {
+      toast.error("Error al eliminar la noticia");
     }
   };
 
@@ -383,7 +379,14 @@ export default function AdminNews() {
                         <PencilIcon className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(newsItem)}
+                        onClick={() =>
+                          setConfirmation({
+                            title: "Eliminar noticia",
+                            description: `Se eliminará "${newsItem.title}". Esta acción no se puede deshacer.`,
+                            confirmLabel: "Eliminar",
+                            action: () => handleDelete(newsItem),
+                          })
+                        }
                         className="p-2 text-gray-400 hover:text-red-600 rounded-md hover:bg-gray-100"
                         title="Eliminar"
                       >
@@ -458,6 +461,10 @@ export default function AdminNews() {
         )}
       </div>
 
+      <ConfirmDialog
+        confirmation={confirmation}
+        onClose={() => setConfirmation(null)}
+      />
       <Toaster position="top-right" />
     </>
   );

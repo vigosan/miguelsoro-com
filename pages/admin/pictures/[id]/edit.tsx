@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { ConfirmDialog, Confirmation } from "@/components/ui/ConfirmDialog";
 
 type AdminPicture = {
   id: string;
@@ -58,6 +59,7 @@ export default function EditPicture() {
     stock: "",
     imageUrl: "",
   });
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   // Use React Query hooks
   const {
@@ -137,14 +139,6 @@ export default function EditPicture() {
   const handleDelete = async () => {
     if (!picture) return;
 
-    if (
-      !confirm(
-        `¿Estás seguro de que quieres eliminar "${picture.title}"? Esta acción no se puede deshacer.`,
-      )
-    ) {
-      return;
-    }
-
     try {
       const response = await fetch(`/api/admin/pictures/${picture.id}`, {
         method: "DELETE",
@@ -223,8 +217,15 @@ export default function EditPicture() {
             <h1 className="text-3xl font-bold text-gray-900">Editar Cuadro</h1>
           </div>
           <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+            onClick={() =>
+              setConfirmation({
+                title: "Eliminar cuadro",
+                description: `Se eliminará "${picture.title}". Esta acción no se puede deshacer.`,
+                confirmLabel: "Eliminar",
+                action: handleDelete,
+              })
+            }
+            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors cursor-pointer"
           >
             Eliminar Cuadro
           </button>
@@ -445,6 +446,10 @@ export default function EditPicture() {
           </div>
         </div>
 
+        <ConfirmDialog
+          confirmation={confirmation}
+          onClose={() => setConfirmation(null)}
+        />
         <Toaster position="top-right" />
       </div>
     </>

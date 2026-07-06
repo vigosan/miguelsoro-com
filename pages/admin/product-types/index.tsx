@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ListSkeleton } from "@/components/ui/Skeleton";
+import { ConfirmDialog, Confirmation } from "@/components/ui/ConfirmDialog";
 
 type ProductType = {
   id: string;
@@ -26,6 +27,7 @@ export default function ProductTypesAdmin() {
     displayName: "",
     description: "",
   });
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   const fetchProductTypes = async () => {
     try {
@@ -107,14 +109,6 @@ export default function ProductTypesAdmin() {
   };
 
   const handleDelete = async (productType: ProductType) => {
-    if (
-      !confirm(
-        `¿Estás seguro de que quieres eliminar el tipo "${productType.displayName}"?`,
-      )
-    ) {
-      return;
-    }
-
     try {
       const response = await fetch(
         `/api/admin/product-types/${productType.id}`,
@@ -276,7 +270,14 @@ export default function ProductTypesAdmin() {
                       <PencilIcon className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(type)}
+                      onClick={() =>
+                        setConfirmation({
+                          title: "Eliminar tipo de producto",
+                          description: `Se eliminará el tipo "${type.displayName}". Esta acción no se puede deshacer.`,
+                          confirmLabel: "Eliminar",
+                          action: () => handleDelete(type),
+                        })
+                      }
                       className="p-2 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
                       title="Eliminar"
                       aria-label={`Eliminar "${type.displayName}"`}
@@ -310,6 +311,10 @@ export default function ProductTypesAdmin() {
           )}
         </div>
 
+        <ConfirmDialog
+          confirmation={confirmation}
+          onClose={() => setConfirmation(null)}
+        />
         <Toaster position="top-right" />
       </div>
     </>

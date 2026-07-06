@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ListSkeleton } from "@/components/ui/Skeleton";
+import { ConfirmDialog, Confirmation } from "@/components/ui/ConfirmDialog";
 
 const statusColors = {
   AVAILABLE: "bg-green-100 text-green-800",
@@ -39,6 +40,7 @@ export default function AdminPictures() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState(1);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
@@ -60,14 +62,12 @@ export default function AdminPictures() {
   const totalPages = data?.totalPages ?? 1;
   const deletePictureMutation = useDeletePicture();
 
-  const handleDelete = async (id: string, title: string) => {
-    if (confirm(`¿Estás seguro de que quieres eliminar "${title}"?`)) {
-      try {
-        await deletePictureMutation.mutateAsync(id);
-        toast.success("Cuadro eliminado correctamente");
-      } catch (err) {
-        toast.error("Error al eliminar el cuadro");
-      }
+  const handleDelete = async (id: string) => {
+    try {
+      await deletePictureMutation.mutateAsync(id);
+      toast.success("Cuadro eliminado correctamente");
+    } catch (err) {
+      toast.error("Error al eliminar el cuadro");
     }
   };
 
@@ -199,7 +199,14 @@ export default function AdminPictures() {
                   </Link>
                   <button
                     type="button"
-                    onClick={() => handleDelete(picture.id, picture.title)}
+                    onClick={() =>
+                      setConfirmation({
+                        title: "Eliminar cuadro",
+                        description: `Se eliminará "${picture.title}". Esta acción no se puede deshacer.`,
+                        confirmLabel: "Eliminar",
+                        action: () => handleDelete(picture.id),
+                      })
+                    }
                     disabled={deletePictureMutation.isPending}
                     className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                     title="Eliminar"
@@ -272,6 +279,10 @@ export default function AdminPictures() {
 
         <Toaster position="top-right" />
       </div>
+      <ConfirmDialog
+        confirmation={confirmation}
+        onClose={() => setConfirmation(null)}
+      />
     </>
   );
 }

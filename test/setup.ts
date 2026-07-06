@@ -50,6 +50,15 @@ if (typeof window !== "undefined") {
   });
 }
 
+// Mock ResizeObserver (required by Headless UI Dialog)
+class MockResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+global.ResizeObserver =
+  MockResizeObserver as unknown as typeof ResizeObserver;
+
 // Mock IntersectionObserver
 class MockIntersectionObserver {
   observe = vi.fn();

@@ -8,6 +8,10 @@ import { OrderWithDetails } from "../../../infra/OrderRepository";
 import { formatInvoiceNumber } from "../../../domain/order";
 import { Skeleton } from "../../../components/ui/Skeleton";
 import { PageHeader } from "../../../components/admin/PageHeader";
+import {
+  ConfirmDialog,
+  Confirmation,
+} from "../../../components/ui/ConfirmDialog";
 
 const STATUS_FLOW = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] as const;
 
@@ -26,14 +30,10 @@ function OrderDetails() {
   const [refunding, setRefunding] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [sendingInvoice, setSendingInvoice] = useState(false);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   const handleSendInvoice = async () => {
     if (!order) return;
-    const confirmed = window.confirm(
-      `¿Enviar la factura por email a ${order.customerEmail}?`,
-    );
-    if (!confirmed) return;
-
     setSendingInvoice(true);
     try {
       const response = await fetch(
@@ -61,11 +61,6 @@ function OrderDetails() {
 
   const handleRefund = async () => {
     if (!order) return;
-    const confirmed = window.confirm(
-      `¿Reembolsar ${(order.total / 100).toFixed(2)} € al cliente vía PayPal? Esta acción no se puede deshacer.`,
-    );
-    if (!confirmed) return;
-
     setRefunding(true);
     try {
       const response = await fetch(`/api/admin/orders/${order.id}/refund`, {
@@ -278,7 +273,14 @@ function OrderDetails() {
             </div>
             {order.status === "PAID" && (
               <button
-                onClick={handleRefund}
+                onClick={() =>
+                  setConfirmation({
+                    title: "Reembolsar pedido",
+                    description: `Se reembolsarán ${(order.total / 100).toFixed(2)} € al cliente vía PayPal. Esta acción no se puede deshacer.`,
+                    confirmLabel: "Reembolsar",
+                    action: handleRefund,
+                  })
+                }
                 disabled={refunding}
                 className="rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="refund-button"
@@ -314,15 +316,15 @@ function OrderDetails() {
                 )}
                 {canCancel && (
                   <button
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          "¿Cancelar este pedido? El cliente no será reembolsado automáticamente.",
-                        )
-                      ) {
-                        handleStatusChange("CANCELLED");
-                      }
-                    }}
+                    onClick={() =>
+                      setConfirmation({
+                        title: "Cancelar pedido",
+                        description:
+                          "El pedido quedará cancelado y el cliente no será reembolsado automáticamente.",
+                        confirmLabel: "Cancelar pedido",
+                        action: () => handleStatusChange("CANCELLED"),
+                      })
+                    }
                     disabled={updatingStatus}
                     className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -357,7 +359,15 @@ function OrderDetails() {
                 Ver factura
               </a>
               <button
-                onClick={handleSendInvoice}
+                onClick={() =>
+                  setConfirmation({
+                    title: "Enviar factura",
+                    description: `Se enviará la factura en PDF por email a ${order.customerEmail}.`,
+                    confirmLabel: "Enviar factura",
+                    variant: "primary",
+                    action: handleSendInvoice,
+                  })
+                }
                 disabled={sendingInvoice}
                 className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="send-invoice-button"
@@ -506,6 +516,10 @@ function OrderDetails() {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        confirmation={confirmation}
+        onClose={() => setConfirmation(null)}
+      />
       <Toaster position="top-right" />
     </>
   );
