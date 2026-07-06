@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { SupabaseNewsRepository } from "@/infra/SupabaseNewsRepository";
 import { CreateNewsData } from "@/domain/news";
+import { isAuthenticated } from "@/lib/auth";
 
 const repository = new SupabaseNewsRepository();
 
@@ -13,12 +14,18 @@ export default async function handler(
       case "GET":
         // Get all news or only published based on query param
         const showAll = req.query.all === "true";
+        if (showAll && !(await isAuthenticated(req))) {
+          return res.status(401).json({ error: "Authentication required" });
+        }
         const news = showAll
           ? await repository.findAll()
           : await repository.findPublished();
         return res.status(200).json(news);
 
       case "POST":
+        if (!(await isAuthenticated(req))) {
+          return res.status(401).json({ error: "Authentication required" });
+        }
         // Create new news item
         const createData: CreateNewsData = req.body;
         const newNews = await repository.create(createData);

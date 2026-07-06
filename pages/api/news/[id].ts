@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { SupabaseNewsRepository } from "@/infra/SupabaseNewsRepository";
 import { UpdateNewsData } from "@/domain/news";
+import { isAuthenticated } from "@/lib/auth";
 
 const repository = new SupabaseNewsRepository();
 
@@ -26,9 +27,9 @@ export default async function handler(
 
       case "PUT":
       case "PATCH":
-        // Update news item
-        console.log("Update request body:", req.body);
-        console.log("Update ID:", id);
+        if (!(await isAuthenticated(req))) {
+          return res.status(401).json({ error: "Authentication required" });
+        }
 
         const updateData: UpdateNewsData = req.body;
 
@@ -55,7 +56,10 @@ export default async function handler(
         return res.status(200).json(updatedNews);
 
       case "DELETE":
-        // Delete news item
+        if (!(await isAuthenticated(req))) {
+          return res.status(401).json({ error: "Authentication required" });
+        }
+
         const deleted = await repository.delete(id);
         if (!deleted) {
           return res.status(404).json({ error: "News not found" });
