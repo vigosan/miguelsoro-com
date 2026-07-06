@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-export function useParallax<T extends HTMLElement = HTMLDivElement>(
-  speed = 0.3,
-) {
+// Writes the offset to a CSS variable on the target element instead of React
+// state: a state update per scroll frame re-rendered the whole page tree.
+export function useParallax<
+  T extends HTMLElement = HTMLDivElement,
+  E extends HTMLElement = HTMLElement,
+>(speed = 0.3) {
   const ref = useRef<T>(null);
-  const [offset, setOffset] = useState(0);
+  const targetRef = useRef<E>(null);
 
   useEffect(() => {
     const node = ref.current;
@@ -21,7 +24,10 @@ export function useParallax<T extends HTMLElement = HTMLDivElement>(
       const viewportH = window.innerHeight;
       if (rect.bottom < 0 || rect.top > viewportH) return;
       const progress = (rect.top + rect.height / 2 - viewportH / 2) / viewportH;
-      setOffset(-progress * speed * 100);
+      targetRef.current?.style.setProperty(
+        "--parallax-y",
+        `${-progress * speed * 100}px`,
+      );
     };
 
     const onScroll = () => {
@@ -39,5 +45,5 @@ export function useParallax<T extends HTMLElement = HTMLDivElement>(
     };
   }, [speed]);
 
-  return { ref, offset };
+  return { ref, targetRef };
 }

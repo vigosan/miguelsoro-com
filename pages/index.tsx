@@ -24,7 +24,10 @@ export default function IndexPage({
   totalPictures,
   litografiaPrice,
 }: IndexPageProps) {
-  const { ref: heroRef, offset: heroOffset } = useParallax<HTMLDivElement>(0.35);
+  const { ref: heroRef, targetRef: heroTargetRef } = useParallax<
+    HTMLDivElement,
+    HTMLDivElement
+  >(0.35);
 
   return (
     <>
@@ -42,8 +45,12 @@ export default function IndexPage({
         >
           <div className="relative min-h-[80vh] lg:min-h-[92vh]">
             <div
+              ref={heroTargetRef}
               className="absolute inset-0 will-change-transform"
-              style={{ transform: `translate3d(0, ${heroOffset}px, 0) scale(1.15)` }}
+              style={{
+                transform:
+                  "translate3d(0, var(--parallax-y, 0px), 0) scale(1.15)",
+              }}
             >
               <Image
                 src="/estudio.webp"
