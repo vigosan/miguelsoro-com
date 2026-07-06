@@ -290,36 +290,43 @@ export class DatabaseOrderRepository implements OrderRepository {
   }> {
     const supabase = this.getClient();
 
-    const { data: existing, error: findError } = await supabase
+    // The guarded update is the single source of truth: only the caller whose
+    // update touches the row transitions the order to PAID (alreadyPaid=false)
+    // and may decrement stock. A concurrent capture/webhook sees zero affected
+    // rows and must not decrement again.
+    const { data: updated, error } = await supabase
       .from("orders")
-      .select("id, status")
+      .update({
+        status: "PAID",
+        updatedAt: new Date().toISOString(),
+      })
       .eq("paypalOrderId", paypalOrderId)
-      .single();
+      .neq("status", "PAID")
+      .select("id");
 
-    if (findError) {
-      console.error("Error finding order by PayPal ID:", findError);
-      throw new Error(`Failed to find order: ${findError.message}`);
+    if (error) {
+      console.error("Error marking order as paid:", error);
+      throw new Error(`Failed to mark order as paid: ${error.message}`);
     }
 
-    const alreadyPaid = existing.status === "PAID";
+    const alreadyPaid = !updated || updated.length === 0;
 
-    if (!alreadyPaid) {
-      const { error } = await supabase
+    let orderId = updated?.[0]?.id;
+    if (!orderId) {
+      const { data: existing, error: findError } = await supabase
         .from("orders")
-        .update({
-          status: "PAID",
-          updatedAt: new Date().toISOString(),
-        })
+        .select("id")
         .eq("paypalOrderId", paypalOrderId)
-        .neq("status", "PAID");
+        .single();
 
-      if (error) {
-        console.error("Error marking order as paid:", error);
-        throw new Error(`Failed to mark order as paid: ${error.message}`);
+      if (findError) {
+        console.error("Error finding order by PayPal ID:", findError);
+        throw new Error(`Failed to find order: ${findError.message}`);
       }
+      orderId = existing.id;
     }
 
-    const order = await this.findById(existing.id);
+    const order = await this.findById(orderId);
     if (!order) {
       throw new Error("Order not found after marking as paid");
     }
@@ -543,61 +550,61 @@ export class DatabaseProductVariantRepository
   }
 
   async decrementStock(id: string, quantity: number): Promise<void> {
-    const supabase = this.getClient();
-
-    // Get current stock first
-    const { data: variant, error: getError } = await supabase
-      .from("product_variants")
-      .select("stock")
-      .eq("id", id)
-      .single();
-
-    if (getError) {
-      console.error("Error getting variant stock:", getError);
-      throw new Error(`Failed to get variant: ${getError.message}`);
-    }
-
-    const newStock = variant.stock - quantity;
-
-    const { error } = await supabase
-      .from("product_variants")
-      .update({ stock: newStock })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error decrementing stock:", error);
-      throw new Error(`Failed to update stock: ${error.message}`);
-    }
+    await this.adjustStock(id, (stock) => ({ stock: stock - quantity }));
   }
 
   async incrementStock(id: string, quantity: number): Promise<void> {
-    const supabase = this.getClient();
-
-    const { data: variant, error: getError } = await supabase
-      .from("product_variants")
-      .select("stock")
-      .eq("id", id)
-      .single();
-
-    if (getError) {
-      console.error("Error getting variant stock:", getError);
-      throw new Error(`Failed to get variant: ${getError.message}`);
-    }
-
-    const newStock = variant.stock + quantity;
-
-    const { error } = await supabase
-      .from("product_variants")
-      .update({
+    await this.adjustStock(id, (stock) => {
+      const newStock = stock + quantity;
+      return {
         stock: newStock,
         ...(newStock > 0 ? { status: "AVAILABLE" } : {}),
-      })
-      .eq("id", id);
+      };
+    });
+  }
 
-    if (error) {
-      console.error("Error incrementing stock:", error);
-      throw new Error(`Failed to update stock: ${error.message}`);
+  // Compare-and-swap: the update only applies while the stock still holds the
+  // value we read, so two concurrent payments can never overwrite each other's
+  // decrement. On conflict we re-read and retry with the fresh value.
+  private async adjustStock(
+    id: string,
+    buildUpdate: (currentStock: number) => { stock: number; status?: string },
+  ): Promise<void> {
+    const supabase = this.getClient();
+    const MAX_ATTEMPTS = 3;
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const { data: variant, error: getError } = await supabase
+        .from("product_variants")
+        .select("stock")
+        .eq("id", id)
+        .single();
+
+      if (getError) {
+        console.error("Error getting variant stock:", getError);
+        throw new Error(`Failed to get variant: ${getError.message}`);
+      }
+
+      const { data: updated, error } = await supabase
+        .from("product_variants")
+        .update(buildUpdate(variant.stock))
+        .eq("id", id)
+        .eq("stock", variant.stock)
+        .select("id");
+
+      if (error) {
+        console.error("Error updating stock:", error);
+        throw new Error(`Failed to update stock: ${error.message}`);
+      }
+
+      if (updated && updated.length > 0) {
+        return;
+      }
     }
+
+    throw new Error(
+      `Failed to update stock for variant ${id} after ${MAX_ATTEMPTS} concurrent modifications`,
+    );
   }
 
   async markOutOfStockIfNeeded(id: string): Promise<void> {
