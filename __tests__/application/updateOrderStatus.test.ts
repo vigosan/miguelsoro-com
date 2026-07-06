@@ -31,10 +31,7 @@ describe("UpdateOrderStatus", () => {
     async (status) => {
       await useCase.execute("order-123", status);
 
-      expect(repository.updateStatus).toHaveBeenCalledWith(
-        "order-123",
-        status,
-      );
+      expect(repository.updateStatus).toHaveBeenCalledWith("order-123", status);
     },
   );
 

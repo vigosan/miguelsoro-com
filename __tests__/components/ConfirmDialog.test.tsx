@@ -18,9 +18,9 @@ describe("ConfirmDialog", () => {
     expect(
       screen.getByText("Se reembolsarán 151,25 € al cliente."),
     ).toBeInTheDocument();
-    expect(
-      screen.getByTestId("confirm-dialog-confirm"),
-    ).toHaveTextContent("Reembolsar");
+    expect(screen.getByTestId("confirm-dialog-confirm")).toHaveTextContent(
+      "Reembolsar",
+    );
   });
 
   it("runs the action and closes on confirm", async () => {

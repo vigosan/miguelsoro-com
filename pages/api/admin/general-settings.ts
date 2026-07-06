@@ -47,7 +47,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           .status(400)
           .json({ error: "El nombre del sitio es obligatorio" });
       }
-      if (typeof contactEmail !== "string" || !/^\S+@\S+\.\S+$/.test(contactEmail)) {
+      if (
+        typeof contactEmail !== "string" ||
+        !/^\S+@\S+\.\S+$/.test(contactEmail)
+      ) {
         return res
           .status(400)
           .json({ error: "El email de contacto no es válido" });

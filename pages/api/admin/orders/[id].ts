@@ -139,7 +139,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             {
               customerName: updatedOrder.customerName,
               customerEmail: updatedOrder.customerEmail,
-              pictureTitle: firstItem?.variant?.product?.title || "Obra de arte",
+              pictureTitle:
+                firstItem?.variant?.product?.title || "Obra de arte",
               picturePrice: updatedOrder.total,
               orderId: orderReference(updatedOrder),
               paypalOrderId: updatedOrder.paypalOrderId || undefined,

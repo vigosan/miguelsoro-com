@@ -76,7 +76,10 @@ export default function IndurainPage({ picture }: IndurainPageProps) {
           </p>
         </Reveal>
 
-        <Reveal clip className="relative overflow-hidden rounded-lg bg-gray-100">
+        <Reveal
+          clip
+          className="relative overflow-hidden rounded-lg bg-gray-100"
+        >
           <Image
             src="/reproducciones/indurain-firmada.webp"
             alt="Litografía de Miguel Indurain firmada por Miguel Soro"
@@ -122,9 +125,7 @@ export default function IndurainPage({ picture }: IndurainPageProps) {
               </button>
             ) : (
               <div className="rounded-sm bg-gray-100 py-4 text-center text-sm font-medium text-gray-600">
-                {picture
-                  ? "Edición agotada"
-                  : "Disponible próximamente"}
+                {picture ? "Edición agotada" : "Disponible próximamente"}
               </div>
             )}
           </div>
@@ -272,7 +273,9 @@ export default function IndurainPage({ picture }: IndurainPageProps) {
                 disabled={isAdding}
                 className="mt-6 rounded-sm bg-accent px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-black transition-colors hover:bg-accent-ink active:scale-[0.99] disabled:opacity-50"
               >
-                {isAdding ? "Añadiendo…" : `Añadir al carrito — ${formatEuros(picture.price)}`}
+                {isAdding
+                  ? "Añadiendo…"
+                  : `Añadir al carrito — ${formatEuros(picture.price)}`}
               </button>
             )}
           </Reveal>

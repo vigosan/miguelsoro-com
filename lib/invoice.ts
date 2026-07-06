@@ -47,13 +47,19 @@ export async function generateInvoicePdf(params: {
   const page = doc.addPage([A4.width, A4.height]);
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
-  const logo = await doc.embedPng(Buffer.from(INVOICE_LOGO_PNG_BASE64, "base64"));
+  const logo = await doc.embedPng(
+    Buffer.from(INVOICE_LOGO_PNG_BASE64, "base64"),
+  );
 
   const drawText = (
     text: string,
     x: number,
     y: number,
-    options: { font?: PDFFont; size?: number; color?: ReturnType<typeof rgb> } = {},
+    options: {
+      font?: PDFFont;
+      size?: number;
+      color?: ReturnType<typeof rgb>;
+    } = {},
   ) => {
     page.drawText(pdfSafe(text), {
       x,
@@ -68,7 +74,11 @@ export async function generateInvoicePdf(params: {
     text: string,
     rightEdge: number,
     y: number,
-    options: { font?: PDFFont; size?: number; color?: ReturnType<typeof rgb> } = {},
+    options: {
+      font?: PDFFont;
+      size?: number;
+      color?: ReturnType<typeof rgb>;
+    } = {},
   ) => {
     const usedFont = options.font ?? font;
     const size = options.size ?? 10;
@@ -134,7 +144,11 @@ export async function generateInvoicePdf(params: {
   });
   y -= 16;
 
-  const sellerLines = [seller.name, `NIF: ${seller.nif}`, ...seller.address.split("\n")];
+  const sellerLines = [
+    seller.name,
+    `NIF: ${seller.nif}`,
+    ...seller.address.split("\n"),
+  ];
   const customerLines = [
     order.customerName,
     ...(order.shippingAddress ? order.shippingAddress.split("\n") : []),
@@ -143,7 +157,9 @@ export async function generateInvoicePdf(params: {
   ];
   const blockHeight = Math.max(sellerLines.length, customerLines.length) * 14;
   sellerLines.forEach((line, i) => drawText(line, MARGIN, y - i * 14));
-  customerLines.forEach((line, i) => drawText(line, A4.width / 2 + 20, y - i * 14));
+  customerLines.forEach((line, i) =>
+    drawText(line, A4.width / 2 + 20, y - i * 14),
+  );
   y -= blockHeight + 44;
 
   const columns = {

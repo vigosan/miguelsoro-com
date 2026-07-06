@@ -136,86 +136,86 @@ export default function AdminPictures() {
             {pictures.map((picture) => {
               const status = getPictureStatus(picture);
               return (
-              <div
-                key={picture.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 transition-colors gap-3 sm:gap-0"
-              >
-                {/* Left side - Image and info */}
-                <div className="flex items-start space-x-4 min-w-0 flex-1">
-                  {/* Image */}
-                  <div className="flex-shrink-0">
-                    <Image
-                      src={picture.imageUrl || `/pictures/${picture.id}.webp`}
-                      alt={picture.title}
-                      width={64}
-                      height={48}
-                      className="w-16 h-12 rounded-md object-cover border"
-                    />
-                  </div>
+                <div
+                  key={picture.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 transition-colors gap-3 sm:gap-0"
+                >
+                  {/* Left side - Image and info */}
+                  <div className="flex items-start space-x-4 min-w-0 flex-1">
+                    {/* Image */}
+                    <div className="flex-shrink-0">
+                      <Image
+                        src={picture.imageUrl || `/pictures/${picture.id}.webp`}
+                        alt={picture.title}
+                        width={64}
+                        height={48}
+                        className="w-16 h-12 rounded-md object-cover border"
+                      />
+                    </div>
 
-                  {/* Title, size, status, stock, price */}
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-medium text-gray-900 truncate">
-                      {picture.title}
-                    </h3>
-                    <div className="flex items-center space-x-2 mt-1 text-xs text-gray-500">
-                      <span>{picture.size}</span>
-                      <span>·</span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {formatEuros(picture.price)}
-                      </span>
-                      <span>·</span>
-                      <span
-                        className={cn(
-                          "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                          statusColors[status],
-                        )}
-                      >
-                        {statusLabels[status]}
-                      </span>
-                      <span>·</span>
-                      <span>Stock: {picture.stock || 0}</span>
+                    {/* Title, size, status, stock, price */}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-medium text-gray-900 truncate">
+                        {picture.title}
+                      </h3>
+                      <div className="flex items-center space-x-2 mt-1 text-xs text-gray-500">
+                        <span>{picture.size}</span>
+                        <span>·</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {formatEuros(picture.price)}
+                        </span>
+                        <span>·</span>
+                        <span
+                          className={cn(
+                            "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
+                            statusColors[status],
+                          )}
+                        >
+                          {statusLabels[status]}
+                        </span>
+                        <span>·</span>
+                        <span>Stock: {picture.stock || 0}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right side - Actions only */}
-                <div className="flex items-center space-x-1 flex-shrink-0 self-start sm:self-center">
-                  <Link
-                    href={`/pictures/${picture.slug}`}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
-                    title="Ver en el sitio"
-                    aria-label={`Ver "${picture.title}" en el sitio`}
-                  >
-                    <EyeIcon className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                  <Link
-                    href={`/admin/pictures/${picture.id}/edit`}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
-                    title="Editar"
-                    aria-label={`Editar "${picture.title}"`}
-                  >
-                    <PencilIcon className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setConfirmation({
-                        title: "Eliminar cuadro",
-                        description: `Se eliminará "${picture.title}". Esta acción no se puede deshacer.`,
-                        confirmLabel: "Eliminar",
-                        action: () => handleDelete(picture.id),
-                      })
-                    }
-                    disabled={deletePictureMutation.isPending}
-                    className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                    title="Eliminar"
-                    aria-label={`Eliminar "${picture.title}"`}
-                  >
-                    <TrashIcon className="h-4 w-4" aria-hidden="true" />
-                  </button>
+                  {/* Right side - Actions only */}
+                  <div className="flex items-center space-x-1 flex-shrink-0 self-start sm:self-center">
+                    <Link
+                      href={`/pictures/${picture.slug}`}
+                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
+                      title="Ver en el sitio"
+                      aria-label={`Ver "${picture.title}" en el sitio`}
+                    >
+                      <EyeIcon className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                    <Link
+                      href={`/admin/pictures/${picture.id}/edit`}
+                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-100"
+                      title="Editar"
+                      aria-label={`Editar "${picture.title}"`}
+                    >
+                      <PencilIcon className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setConfirmation({
+                          title: "Eliminar cuadro",
+                          description: `Se eliminará "${picture.title}". Esta acción no se puede deshacer.`,
+                          confirmLabel: "Eliminar",
+                          action: () => handleDelete(picture.id),
+                        })
+                      }
+                      disabled={deletePictureMutation.isPending}
+                      className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      title="Eliminar"
+                      aria-label={`Eliminar "${picture.title}"`}
+                    >
+                      <TrashIcon className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
-              </div>
               );
             })}
           </div>

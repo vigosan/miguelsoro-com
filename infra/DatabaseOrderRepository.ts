@@ -383,10 +383,7 @@ export class DatabaseOrderRepository implements OrderRepository {
     }
   }
 
-  async setCaptureId(
-    paypalOrderId: string,
-    captureId: string,
-  ): Promise<void> {
+  async setCaptureId(paypalOrderId: string, captureId: string): Promise<void> {
     const supabase = this.getClient();
 
     const { error } = await supabase

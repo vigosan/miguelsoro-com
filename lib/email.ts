@@ -100,8 +100,7 @@ const statusEmailContent = {
     `,
   },
   REFUNDED: {
-    subject: (orderId: string) =>
-      `Hemos reembolsado tu pedido #${orderId}`,
+    subject: (orderId: string) => `Hemos reembolsado tu pedido #${orderId}`,
     body: ({
       customerName,
       pictureTitle,

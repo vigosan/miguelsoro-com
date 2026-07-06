@@ -190,9 +190,7 @@ describe("DatabaseOrderRepository.updateManyByPayPalId", () => {
       "PENDING",
     ]);
 
-    expect(supabaseMock.builder.in).toHaveBeenCalledWith("status", [
-      "PENDING",
-    ]);
+    expect(supabaseMock.builder.in).toHaveBeenCalledWith("status", ["PENDING"]);
   });
 
   it("updates unconditionally when no source statuses are given", async () => {

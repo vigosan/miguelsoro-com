@@ -239,10 +239,11 @@ export class HandleWebhookPaymentDenied {
   constructor(private orderRepository: OrderRepository) {}
 
   async execute(paypalOrderId: string) {
-    await this.orderRepository.updateManyByPayPalId(paypalOrderId, "CANCELLED", [
-      "PENDING",
-      "PROCESSING",
-    ]);
+    await this.orderRepository.updateManyByPayPalId(
+      paypalOrderId,
+      "CANCELLED",
+      ["PENDING", "PROCESSING"],
+    );
   }
 }
 
@@ -270,7 +271,10 @@ export class HandleWebhookPaymentRefunded {
           item.quantity,
         );
       } catch (stockError) {
-        console.error("Error restoring stock after refund webhook:", stockError);
+        console.error(
+          "Error restoring stock after refund webhook:",
+          stockError,
+        );
       }
     }
   }

@@ -41,9 +41,7 @@ export function Header({ transparent = false }: HeaderProps) {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 pt-4 pb-4 transition-colors duration-300 ${
-        overlay
-          ? "bg-transparent"
-          : "bg-white/95 backdrop-blur-sm shadow-sm"
+        overlay ? "bg-transparent" : "bg-white/95 backdrop-blur-sm shadow-sm"
       }`}
       data-testid="main-header"
     >

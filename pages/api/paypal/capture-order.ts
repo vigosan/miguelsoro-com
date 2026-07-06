@@ -1,7 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ordersController } from "../../../lib/paypal";
 import { Order } from "@paypal/paypal-server-sdk";
-import { capturePayPalOrder, orderRepository } from "../../../infra/dependencies";
+import {
+  capturePayPalOrder,
+  orderRepository,
+} from "../../../infra/dependencies";
 import {
   sendOrderConfirmationEmail,
   sendAdminNotificationEmail,

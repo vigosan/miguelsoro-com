@@ -121,7 +121,10 @@ export default function IndexPage({
         <section className="py-24 lg:py-32 bg-white [content-visibility:auto] [contain-intrinsic-size:auto_700px]">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-              <Reveal clip className="order-1 overflow-hidden rounded-lg bg-gray-100 lg:order-2">
+              <Reveal
+                clip
+                className="order-1 overflow-hidden rounded-lg bg-gray-100 lg:order-2"
+              >
                 <Image
                   src="/reproducciones/indurain-firmada.webp"
                   alt="Litografía de Miguel Indurain firmada por Miguel Soro"
@@ -320,7 +323,6 @@ export default function IndexPage({
             </Reveal>
           </div>
         </section>
-
       </Layout>
     </>
   );

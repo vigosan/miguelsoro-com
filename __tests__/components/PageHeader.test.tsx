@@ -25,7 +25,9 @@ describe("PageHeader", () => {
   it("omits the description block when not provided", () => {
     render(<PageHeader title="Dashboard" />);
 
-    expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Dashboard" }),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/Gestiona/)).not.toBeInTheDocument();
   });
 });

@@ -119,9 +119,7 @@ export default function AdminDashboard() {
     },
     {
       name: "Cuadros Disponibles",
-      value: loading
-        ? null
-        : (pictureStats?.availablePictures || 0).toString(),
+      value: loading ? null : (pictureStats?.availablePictures || 0).toString(),
       icon: EyeIcon,
       href: "/admin/pictures?status=available",
       color: "bg-green-500",
@@ -138,134 +136,132 @@ export default function AdminDashboard() {
   ];
   return (
     <div className="space-y-8">
-        <PageHeader
-          title="Dashboard"
-          description="Resumen de la galería Miguel Soro"
-        />
+      <PageHeader
+        title="Dashboard"
+        description="Resumen de la galería Miguel Soro"
+      />
 
-        {/* Sales stats */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {salesStats.map((stat) => (
-            <StatCard key={stat.name} stat={stat} />
-          ))}
+      {/* Sales stats */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {salesStats.map((stat) => (
+          <StatCard key={stat.name} stat={stat} />
+        ))}
+      </div>
+
+      {/* Recent orders */}
+      <div className="rounded-lg bg-white shadow">
+        <div className="flex items-center justify-between p-4 sm:p-6 pb-0 sm:pb-0">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+            Últimos Pedidos
+          </h2>
+          <Link
+            href="/admin/orders"
+            className="text-sm font-medium text-gray-600 hover:text-gray-900"
+          >
+            Ver todos →
+          </Link>
         </div>
+        <div className="p-4 sm:p-6">
+          {ordersLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : recentOrders.length === 0 ? (
+            <p className="text-sm text-gray-500">Aún no hay pedidos.</p>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {recentOrders.map((order) => {
+                const status = orderStatusStyles[order.status] ?? {
+                  label: order.status,
+                  classes: "bg-gray-100 text-gray-800",
+                };
+                return (
+                  <Link
+                    key={order.id}
+                    href={`/admin/orders/${order.id}`}
+                    className="flex items-center justify-between gap-3 py-3 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {order.customerName}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(order.createdAt).toLocaleDateString("es-ES")}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status.classes}`}
+                      >
+                        {status.label}
+                      </span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {formatCurrency(order.totalAmount)}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
 
-        {/* Recent orders */}
-        <div className="rounded-lg bg-white shadow">
-          <div className="flex items-center justify-between p-4 sm:p-6 pb-0 sm:pb-0">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-              Últimos Pedidos
-            </h2>
+      {/* Catalog stats */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {catalogStats.map((stat) => (
+          <StatCard key={stat.name} stat={stat} />
+        ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
+        <div className="rounded-lg bg-white p-4 sm:p-6 shadow">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
+            Acciones Rápidas
+          </h2>
+          <div className="space-y-2 sm:space-y-3">
+            <Link
+              href="/admin/pictures/new"
+              className="flex items-center justify-between rounded-lg border border-gray-200 p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center min-w-0">
+                <PhotoIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mr-2 sm:mr-3 flex-shrink-0" />
+                <span className="text-sm font-medium text-gray-900 truncate">
+                  Añadir Nuevo Cuadro
+                </span>
+              </div>
+              <span className="text-gray-400 ml-2">→</span>
+            </Link>
+            <Link
+              href="/admin/pictures"
+              className="flex items-center justify-between rounded-lg border border-gray-200 p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center min-w-0">
+                <EyeIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mr-2 sm:mr-3 flex-shrink-0" />
+                <span className="text-sm font-medium text-gray-900 truncate">
+                  Ver Todos los Cuadros
+                </span>
+              </div>
+              <span className="text-gray-400 ml-2">→</span>
+            </Link>
             <Link
               href="/admin/orders"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
+              className="flex items-center justify-between rounded-lg border border-gray-200 p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer"
             >
-              Ver todos →
+              <div className="flex items-center min-w-0">
+                <ShoppingBagIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mr-2 sm:mr-3 flex-shrink-0" />
+                <span className="text-sm font-medium text-gray-900 truncate">
+                  Gestionar Pedidos
+                </span>
+              </div>
+              <span className="text-gray-400 ml-2">→</span>
             </Link>
           </div>
-          <div className="p-4 sm:p-6">
-            {ordersLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            ) : recentOrders.length === 0 ? (
-              <p className="text-sm text-gray-500">Aún no hay pedidos.</p>
-            ) : (
-              <div className="divide-y divide-gray-100">
-                {recentOrders.map((order) => {
-                  const status = orderStatusStyles[order.status] ?? {
-                    label: order.status,
-                    classes: "bg-gray-100 text-gray-800",
-                  };
-                  return (
-                    <Link
-                      key={order.id}
-                      href={`/admin/orders/${order.id}`}
-                      className="flex items-center justify-between gap-3 py-3 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {order.customerName}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(order.createdAt).toLocaleDateString(
-                            "es-ES",
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3 flex-shrink-0">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status.classes}`}
-                        >
-                          {status.label}
-                        </span>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {formatCurrency(order.totalAmount)}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
-
-        {/* Catalog stats */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {catalogStats.map((stat) => (
-            <StatCard key={stat.name} stat={stat} />
-          ))}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 gap-4 sm:gap-6">
-          <div className="rounded-lg bg-white p-4 sm:p-6 shadow">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
-              Acciones Rápidas
-            </h2>
-            <div className="space-y-2 sm:space-y-3">
-              <Link
-                href="/admin/pictures/new"
-                className="flex items-center justify-between rounded-lg border border-gray-200 p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center min-w-0">
-                  <PhotoIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mr-2 sm:mr-3 flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-900 truncate">
-                    Añadir Nuevo Cuadro
-                  </span>
-                </div>
-                <span className="text-gray-400 ml-2">→</span>
-              </Link>
-              <Link
-                href="/admin/pictures"
-                className="flex items-center justify-between rounded-lg border border-gray-200 p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center min-w-0">
-                  <EyeIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mr-2 sm:mr-3 flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-900 truncate">
-                    Ver Todos los Cuadros
-                  </span>
-                </div>
-                <span className="text-gray-400 ml-2">→</span>
-              </Link>
-              <Link
-                href="/admin/orders"
-                className="flex items-center justify-between rounded-lg border border-gray-200 p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center min-w-0">
-                  <ShoppingBagIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mr-2 sm:mr-3 flex-shrink-0" />
-                  <span className="text-sm font-medium text-gray-900 truncate">
-                    Gestionar Pedidos
-                  </span>
-                </div>
-                <span className="text-gray-400 ml-2">→</span>
-              </Link>
-            </div>
-          </div>
-        </div>
+      </div>
     </div>
   );
 }

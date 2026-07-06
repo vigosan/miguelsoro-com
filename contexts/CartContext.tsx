@@ -274,9 +274,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [state],
   );
 
-  return (
-    <CartContext.Provider value={value}>{children}</CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {

@@ -25,10 +25,16 @@ export function SectionLabel({
     >
       {paren ? (
         <>
-          (<span className={onDark ? "text-accent" : "text-accent-ink"}>{prefix}</span>){" "}
+          (
+          <span className={onDark ? "text-accent" : "text-accent-ink"}>
+            {prefix}
+          </span>
+          ){" "}
         </>
       ) : (
-        <span className={onDark ? "text-accent" : "text-accent-ink"}>{prefix}</span>
+        <span className={onDark ? "text-accent" : "text-accent-ink"}>
+          {prefix}
+        </span>
       )}
       {" — "}
       {children}
