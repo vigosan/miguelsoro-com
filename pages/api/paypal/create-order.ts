@@ -10,6 +10,7 @@ import {
   createOrder,
 } from "../../../infra/dependencies";
 import { CreateOrderRequest, calculateOrderTotal } from "../../../domain/order";
+import { getShippingSettings } from "../../../services/databaseShippingSettings";
 
 export default async function handler(
   req: NextApiRequest,
@@ -78,6 +79,8 @@ export default async function handler(
       };
     });
 
+    const shippingSettings = await getShippingSettings();
+
     const { subtotal, tax, shipping, total } = calculateOrderTotal(
       orderItems.map((item) => ({
         id: "",
@@ -88,6 +91,8 @@ export default async function handler(
         total: item.total,
         createdAt: new Date(),
       })),
+      shippingSettings?.standardRate,
+      shippingSettings?.freeShippingThreshold,
     );
 
     console.log("PayPal create-order: Order totals calculated:", {
