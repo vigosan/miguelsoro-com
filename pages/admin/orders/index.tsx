@@ -8,6 +8,7 @@ import { orderRepository } from "../../../infra/dependencies";
 import Link from "next/link";
 import { Input } from "../../../components/ui/Input";
 import { Select } from "../../../components/ui/Select";
+import { PageHeader } from "../../../components/admin/PageHeader";
 
 interface Order {
   id: string;
@@ -88,17 +89,10 @@ export default function AdminOrdersPage({ orders }: Props) {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Pedidos
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-gray-600">
-              Gestiona todos los pedidos de la tienda
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          title="Pedidos"
+          description="Gestiona todos los pedidos de la tienda"
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

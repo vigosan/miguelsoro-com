@@ -5,6 +5,8 @@ import { Toaster, toast } from "react-hot-toast";
 import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { ListSkeleton } from "@/components/ui/Skeleton";
 
 type ProductType = {
   id: string;
@@ -135,36 +137,32 @@ export default function ProductTypesAdmin() {
 
   if (loading) {
     return (
-      <>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-        </div>
-      </>
+      <div className="space-y-6">
+        <PageHeader
+          title="Tipos de Producto"
+          description="Gestiona las categorías de productos (Cuadros, Reproducciones, Camisetas, etc.)"
+        />
+        <ListSkeleton />
+      </div>
     );
   }
 
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Tipos de Producto
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-gray-600">
-              Gestiona las categorías de productos (Cuadros, Reproducciones,
-              Camisetas, etc.)
-            </p>
-          </div>
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-900 transition-colors w-full sm:w-auto cursor-pointer"
-          >
-            <PlusIcon className="h-4 w-4 mr-2" />
-            Nuevo Tipo
-          </button>
-        </div>
+        <PageHeader
+          title="Tipos de Producto"
+          description="Gestiona las categorías de productos (Cuadros, Reproducciones, Camisetas, etc.)"
+          action={
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors w-full sm:w-auto cursor-pointer"
+            >
+              <PlusIcon className="h-4 w-4 mr-2" />
+              Nuevo Tipo
+            </button>
+          }
+        />
 
         {/* Create/Edit Form */}
         {showCreateForm && (

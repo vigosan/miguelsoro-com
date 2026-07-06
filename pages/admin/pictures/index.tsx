@@ -20,6 +20,8 @@ import {
 import { cn } from "@/utils/cn";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { ListSkeleton } from "@/components/ui/Skeleton";
 
 const statusColors = {
   AVAILABLE: "bg-green-100 text-green-800",
@@ -71,11 +73,13 @@ export default function AdminPictures() {
 
   if (loading) {
     return (
-      <>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-        </div>
-      </>
+      <div className="space-y-6">
+        <PageHeader
+          title="Cuadros"
+          description="Gestiona todos los cuadros de la galería"
+        />
+        <ListSkeleton />
+      </div>
     );
   }
 
@@ -92,24 +96,19 @@ export default function AdminPictures() {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Cuadros
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-gray-600">
-              Gestiona todos los cuadros de la galería
-            </p>
-          </div>
-          <Link
-            href="/admin/pictures/new"
-            className="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors w-full sm:w-auto cursor-pointer"
-          >
-            <PlusIcon className="h-4 w-4 mr-2" />
-            Añadir Cuadro
-          </Link>
-        </div>
+        <PageHeader
+          title="Cuadros"
+          description="Gestiona todos los cuadros de la galería"
+          action={
+            <Link
+              href="/admin/pictures/new"
+              className="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors w-full sm:w-auto cursor-pointer"
+            >
+              <PlusIcon className="h-4 w-4 mr-2" />
+              Añadir Cuadro
+            </Link>
+          }
+        />
 
         {/* Filters */}
         <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">

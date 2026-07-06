@@ -17,6 +17,8 @@ import {
   EyeIcon,
   EyeSlashIcon,
 } from "@heroicons/react/24/outline";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { ListSkeleton } from "@/components/ui/Skeleton";
 
 type NewsFormData = CreateNewsData;
 
@@ -126,11 +128,13 @@ export default function AdminNews() {
 
   if (loading) {
     return (
-      <>
-        <div className="flex justify-center items-center py-12">
-          <div className="text-gray-500">Cargando noticias...</div>
-        </div>
-      </>
+      <div className="space-y-6">
+        <PageHeader
+          title="Noticias"
+          description="Gestiona las noticias del sitio web"
+        />
+        <ListSkeleton />
+      </div>
     );
   }
 
@@ -149,20 +153,19 @@ export default function AdminNews() {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Noticias</h1>
-          <p className="text-gray-600">Gestiona las noticias del sitio web</p>
-        </div>
-
-        {/* Add Button */}
-        <button
-          onClick={() => setShowForm(true)}
-          className="w-full flex items-center justify-center px-4 py-3 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors"
-        >
-          <PlusIcon className="h-4 w-4 mr-2" />
-          Nueva Noticia
-        </button>
+        <PageHeader
+          title="Noticias"
+          description="Gestiona las noticias del sitio web"
+          action={
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors w-full sm:w-auto cursor-pointer"
+            >
+              <PlusIcon className="h-4 w-4 mr-2" />
+              Nueva Noticia
+            </button>
+          }
+        />
 
         {/* Form Modal */}
         {showForm && (

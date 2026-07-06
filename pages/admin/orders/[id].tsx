@@ -6,6 +6,8 @@ import { Toaster, toast } from "react-hot-toast";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
 import { OrderWithDetails } from "../../../infra/OrderRepository";
 import { formatInvoiceNumber } from "../../../domain/order";
+import { Skeleton } from "../../../components/ui/Skeleton";
+import { PageHeader } from "../../../components/admin/PageHeader";
 
 const STATUS_FLOW = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] as const;
 
@@ -143,11 +145,15 @@ function OrderDetails() {
 
   if (loading) {
     return (
-      <>
-        <div className="flex justify-center items-center h-64">
-          <div className="text-lg">Cargando detalles del pedido...</div>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-48" />
         </div>
-      </>
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
     );
   }
 
@@ -244,23 +250,18 @@ function OrderDetails() {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Pedido #{order.id ? order.id.slice(-8).toUpperCase() : "N/A"}
-            </h1>
-            <p className="text-gray-600">
-              Creado el {formatDate(order.createdAt)}
-            </p>
-          </div>
-          <button
-            onClick={() => router.back()}
-            className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
-          >
-            ← Volver
-          </button>
-        </div>
+        <PageHeader
+          title={`Pedido #${order.id ? order.id.slice(-8).toUpperCase() : "N/A"}`}
+          description={`Creado el ${formatDate(order.createdAt)}`}
+          action={
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 transition-colors w-full sm:w-auto cursor-pointer"
+            >
+              ← Volver
+            </button>
+          }
+        />
 
         {/* Status */}
         <div className="bg-white shadow rounded-lg p-6">
@@ -293,8 +294,9 @@ function OrderDetails() {
               currentIndex >= 0 && currentIndex < STATUS_FLOW.length - 1
                 ? STATUS_FLOW[currentIndex + 1]
                 : null;
-            const canCancel =
-              order.status === "PAID" || order.status === "PROCESSING";
+            const canCancel = ["PENDING", "PAID", "PROCESSING"].includes(
+              order.status,
+            );
             if (!nextStatus && !canCancel) return null;
             return (
               <div className="mt-6 flex flex-wrap gap-3 border-t border-gray-100 pt-4">

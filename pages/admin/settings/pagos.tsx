@@ -4,6 +4,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { SettingsLayout } from "@/components/admin/SettingsLayout";
 import { Toaster, toast } from "react-hot-toast";
 import { Input } from "@/components/ui/Input";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type PaymentSettings = {
   shippingCost: number;
@@ -73,11 +74,12 @@ export default function PaymentSettings() {
 
   if (loading) {
     return (
-      <>
-        <div className="p-4 sm:p-6 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        </div>
-      </>
+      <div className="p-4 sm:p-6 space-y-4">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
     );
   }
 
