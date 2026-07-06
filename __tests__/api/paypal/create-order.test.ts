@@ -65,6 +65,67 @@ describe("/api/paypal/create-order", () => {
     } as any);
   });
 
+  describe("stock validation", () => {
+    beforeEach(() => {
+      mockGetShippingSettings.mockResolvedValue(null);
+    });
+
+    it("rejects orders for more units than are in stock (unique artwork cannot oversell)", async () => {
+      mockFindAvailableByIds.mockResolvedValue([
+        { ...mockVariant, stock: 1 },
+      ] as any);
+
+      const req = createMockRequest("POST", {
+        ...requestBody,
+        items: [{ variantId: "variant-1", quantity: 2 }],
+      });
+      const res = createMockResponse();
+
+      await handler(req as any, res);
+
+      expect(res.status).toHaveBeenCalledWith(409);
+      expect(mockPayPalCreateOrder).not.toHaveBeenCalled();
+      expect(mockCreateOrderUseCase).not.toHaveBeenCalled();
+    });
+
+    it("allows buying exactly the remaining stock", async () => {
+      mockFindAvailableByIds.mockResolvedValue([
+        { ...mockVariant, stock: 2 },
+      ] as any);
+
+      const req = createMockRequest("POST", {
+        ...requestBody,
+        items: [{ variantId: "variant-1", quantity: 2 }],
+      });
+      const res = createMockResponse();
+
+      await handler(req as any, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it.each([0, -1, 1.5, "2", null])(
+      "rejects invalid quantity %j before charging anything",
+      async (quantity) => {
+        mockFindAvailableByIds.mockResolvedValue([
+          { ...mockVariant, stock: 5 },
+        ] as any);
+
+        const req = createMockRequest("POST", {
+          ...requestBody,
+          items: [{ variantId: "variant-1", quantity }],
+        });
+        const res = createMockResponse();
+
+        await handler(req as any, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(mockPayPalCreateOrder).not.toHaveBeenCalled();
+        expect(mockCreateOrderUseCase).not.toHaveBeenCalled();
+      },
+    );
+  });
+
   describe("shipping", () => {
     it("charges the customer the same shipping the checkout displays", async () => {
       // Subtotal 2000 is below the 10000 threshold, so the configured

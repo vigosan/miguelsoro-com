@@ -50,6 +50,7 @@ export const mockOrder = {
 export const mockVariant = {
   id: "variant-1",
   price: 2000,
+  stock: 5,
   status: "AVAILABLE",
   product: {
     id: "product-1",

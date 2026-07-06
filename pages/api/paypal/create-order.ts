@@ -42,6 +42,14 @@ export default async function handler(
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    const hasInvalidQuantity = items.some(
+      (item) => !Number.isInteger(item.quantity) || item.quantity < 1,
+    );
+    if (hasInvalidQuantity) {
+      console.log("PayPal create-order: Invalid item quantity");
+      return res.status(400).json({ error: "Invalid item quantity" });
+    }
+
     // Fetch product variants to calculate pricing
     const variantIds = items.map((item) => item.variantId);
     console.log("PayPal create-order: Fetching variants for IDs:", variantIds);
@@ -63,6 +71,20 @@ export default async function handler(
         variants.length,
       );
       return res.status(400).json({ error: "Some products are not available" });
+    }
+
+    const outOfStock = items.find((item) => {
+      const variant = variants.find((v) => v.id === item.variantId);
+      return variant && item.quantity > variant.stock;
+    });
+    if (outOfStock) {
+      console.log(
+        "PayPal create-order: Requested quantity exceeds stock for variant:",
+        outOfStock.variantId,
+      );
+      return res
+        .status(409)
+        .json({ error: "Not enough stock for some products" });
     }
 
     // Calculate order totals
