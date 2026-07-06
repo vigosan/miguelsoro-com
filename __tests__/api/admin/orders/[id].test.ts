@@ -213,26 +213,46 @@ describe("/api/admin/orders/[id] PUT", () => {
     );
   });
 
-  it.each(["DELIVERED", "CANCELLED"])(
-    "does not email the customer for %s",
-    async (status) => {
-      mockUpdateOrderStatus.execute.mockResolvedValue({
-        ...mockOrder,
-        status,
-      });
-      const req = await createAuthedRequest(
-        "PUT",
-        { status },
-        { id: "order-123" },
-      );
-      const res = createMockResponse();
+  it("notifies the customer by email when the order is CANCELLED", async () => {
+    mockUpdateOrderStatus.execute.mockResolvedValue({
+      ...mockOrder,
+      status: "CANCELLED",
+    });
+    const req = await createAuthedRequest(
+      "PUT",
+      { status: "CANCELLED" },
+      { id: "order-123" },
+    );
+    const res = createMockResponse();
 
-      await handler(req, res);
+    await handler(req, res);
 
-      expect(mockSendOrderStatusEmail).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(200);
-    },
-  );
+    expect(mockGetOrderInvoice.execute).not.toHaveBeenCalled();
+    expect(mockSendOrderStatusEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ customerEmail: "john@example.com" }),
+      "CANCELLED",
+      undefined,
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it("does not email the customer for DELIVERED", async () => {
+    mockUpdateOrderStatus.execute.mockResolvedValue({
+      ...mockOrder,
+      status: "DELIVERED",
+    });
+    const req = await createAuthedRequest(
+      "PUT",
+      { status: "DELIVERED" },
+      { id: "order-123" },
+    );
+    const res = createMockResponse();
+
+    await handler(req, res);
+
+    expect(mockSendOrderStatusEmail).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
 
   it("still updates the order when the email fails, so a mail outage never blocks fulfilment", async () => {
     mockSendOrderStatusEmail.mockRejectedValue(new Error("Resend down"));

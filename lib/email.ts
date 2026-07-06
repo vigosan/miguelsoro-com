@@ -83,6 +83,43 @@ const statusEmailContent = {
       </ul>
     `,
   },
+  CANCELLED: {
+    subject: (orderId: string) => `Tu pedido #${orderId} ha sido cancelado`,
+    body: ({ customerName, pictureTitle, orderId }: OrderEmailData) => `
+      <h2>Tu pedido ha sido cancelado</h2>
+      <p>Hola ${customerName},</p>
+      <p>Tu pedido ha sido cancelado y no se enviará.</p>
+
+      <h3>Detalles del pedido:</h3>
+      <ul>
+        <li><strong>Número de pedido:</strong> ${orderId}</li>
+        <li><strong>Obra:</strong> ${pictureTitle}</li>
+      </ul>
+
+      <p>Si tienes cualquier duda o crees que se trata de un error, escríbenos respondiendo a este email.</p>
+    `,
+  },
+  REFUNDED: {
+    subject: (orderId: string) =>
+      `Hemos reembolsado tu pedido #${orderId}`,
+    body: ({
+      customerName,
+      pictureTitle,
+      orderId,
+      picturePrice,
+    }: OrderEmailData) => `
+      <h2>Reembolso realizado</h2>
+      <p>Hola ${customerName},</p>
+      <p>Hemos reembolsado el importe de tu pedido a través de PayPal. Puede tardar unos días en reflejarse en tu cuenta.</p>
+
+      <h3>Detalles del reembolso:</h3>
+      <ul>
+        <li><strong>Número de pedido:</strong> ${orderId}</li>
+        <li><strong>Obra:</strong> ${pictureTitle}</li>
+        <li><strong>Importe reembolsado:</strong> €${(picturePrice / 100).toFixed(2)}</li>
+      </ul>
+    `,
+  },
 };
 
 export type OrderStatusWithEmail = keyof typeof statusEmailContent;

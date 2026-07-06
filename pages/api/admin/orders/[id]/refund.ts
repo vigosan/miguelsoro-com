@@ -5,6 +5,7 @@ import {
   orderRepository,
   productVariantRepository,
 } from "@/infra/dependencies";
+import { sendOrderStatusEmail } from "@/lib/email";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
@@ -69,6 +70,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         // Stock restore is best-effort; the money is already refunded.
         console.error("Error restoring stock after refund:", stockError);
       }
+    }
+
+    try {
+      await sendOrderStatusEmail(
+        {
+          customerName: order.customerName,
+          customerEmail: order.customerEmail,
+          pictureTitle: order.items[0]?.variant?.product?.title || "Obra de arte",
+          picturePrice: order.total,
+          orderId: order.id,
+          paypalOrderId: order.paypalOrderId || undefined,
+        },
+        "REFUNDED",
+      );
+    } catch (emailError) {
+      // Notification is best-effort; the money is already refunded.
+      console.error("Error sending refund email:", emailError);
     }
 
     return res.status(200).json({

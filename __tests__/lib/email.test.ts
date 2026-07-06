@@ -49,6 +49,29 @@ describe("sendOrderStatusEmail", () => {
     expect(email.attachments).toBeUndefined();
   });
 
+  it("tells the customer their order was cancelled without promising an automatic refund", async () => {
+    await sendOrderStatusEmail(emailData, "CANCELLED");
+
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    const email = mockSend.mock.calls[0][0];
+    expect(email.to).toBe("john@example.com");
+    expect(email.subject).toContain("cancelado");
+    expect(email.subject).toContain("order-123");
+    expect(email.html).toContain("cancelado");
+    expect(email.html).not.toContain("reembols");
+  });
+
+  it("tells the customer the refunded amount when the order is refunded", async () => {
+    await sendOrderStatusEmail(emailData, "REFUNDED");
+
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    const email = mockSend.mock.calls[0][0];
+    expect(email.to).toBe("john@example.com");
+    expect(email.subject).toContain("order-123");
+    expect(email.html).toContain("reembolsado");
+    expect(email.html).toContain("€20.00");
+  });
+
   it("attaches the invoice to the SHIPPED email when one is provided", async () => {
     const pdf = Buffer.from("%PDF-fake");
 

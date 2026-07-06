@@ -86,7 +86,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       let warning: string | undefined;
 
-      if (status === "PROCESSING" || status === "SHIPPED") {
+      if (
+        status === "PROCESSING" ||
+        status === "SHIPPED" ||
+        status === "CANCELLED"
+      ) {
         let invoice: InvoiceAttachment | undefined;
 
         if (status === "SHIPPED") {
