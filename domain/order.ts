@@ -111,8 +111,8 @@ export function calculateOrderTotal(
 
   // Use provided shipping settings or fallback to 0
   const standardRate = shippingRate ?? 0; // Default 0 (no shipping)
-  const threshold = freeShippingThreshold ?? 0; // Default 0 (no free shipping)
-  const shipping = standardRate > 0 && subtotal >= threshold ? 0 : standardRate;
+  const threshold = freeShippingThreshold ?? 0; // 0 disables free shipping
+  const shipping = threshold > 0 && subtotal >= threshold ? 0 : standardRate;
 
   const total = subtotal + tax + shipping;
 

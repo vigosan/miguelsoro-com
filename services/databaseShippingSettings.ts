@@ -128,7 +128,8 @@ export function calculateShipping(
     return 0;
   }
 
-  return subtotalCents >= settings.freeShippingThreshold
+  return settings.freeShippingThreshold > 0 &&
+    subtotalCents >= settings.freeShippingThreshold
     ? 0
     : settings.standardRate;
 }
