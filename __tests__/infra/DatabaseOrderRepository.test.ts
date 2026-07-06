@@ -99,6 +99,81 @@ describe("DatabaseOrderRepository.markPaidByPayPalId", () => {
   });
 });
 
+describe("DatabaseOrderRepository.create order number", () => {
+  let repository: DatabaseOrderRepository;
+
+  const createData = {
+    customerEmail: "ana@example.com",
+    customerName: "Ana García",
+    paypalOrderId: "paypal-123",
+    status: "PENDING",
+    subtotal: 2000,
+    tax: 420,
+    shipping: 0,
+    total: 2420,
+    items: [{ variantId: "variant-1", quantity: 1, price: 2000, total: 2000 }],
+  } as any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    supabaseMock.state.responses = [];
+    repository = new DatabaseOrderRepository();
+    vi.spyOn(repository, "findById").mockResolvedValue({
+      id: "order-1",
+      orderNumber: "MS-ABCDEF",
+    } as any);
+  });
+
+  it("assigns every new order a short customer-facing reference", async () => {
+    queueResponses(
+      { data: { id: "order-1" }, error: null }, // order insert
+      { data: null, error: null }, // items insert
+    );
+
+    await repository.create(createData);
+
+    const inserted = supabaseMock.builder.insert.mock.calls[0][0];
+    expect(inserted.orderNumber).toMatch(/^MS-[2-9A-HJKMNP-Z]{6}$/);
+  });
+
+  it("retries with a fresh reference when the generated one collides", async () => {
+    queueResponses(
+      {
+        data: null,
+        error: {
+          code: "23505",
+          message:
+            'duplicate key value violates unique constraint "orders_orderNumber_key"',
+        },
+      },
+      { data: { id: "order-1" }, error: null },
+      { data: null, error: null },
+    );
+
+    await repository.create(createData);
+
+    const firstTry = supabaseMock.builder.insert.mock.calls[0][0];
+    const secondTry = supabaseMock.builder.insert.mock.calls[1][0];
+    expect(secondTry.orderNumber).toMatch(/^MS-[2-9A-HJKMNP-Z]{6}$/);
+    expect(secondTry.orderNumber).not.toBe(firstTry.orderNumber);
+  });
+
+  it("does not mask other unique violations as collisions", async () => {
+    queueResponses({
+      data: null,
+      error: {
+        code: "23505",
+        message:
+          'duplicate key value violates unique constraint "orders_paypalOrderId_key"',
+      },
+    });
+
+    await expect(repository.create(createData)).rejects.toThrow(
+      "Failed to create order",
+    );
+  });
+});
+
 describe("DatabaseOrderRepository.updateManyByPayPalId", () => {
   let repository: DatabaseOrderRepository;
 

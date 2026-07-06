@@ -3,6 +3,7 @@ import { vi } from "vitest";
 // Mock data structures
 export const mockOrder = {
   id: "order-123",
+  orderNumber: "MS-ABC234",
   customerName: "John Doe",
   customerEmail: "john@example.com",
   customerPhone: "123456789",

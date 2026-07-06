@@ -1,6 +1,6 @@
 import { PDFDocument, PDFFont, StandardFonts, rgb } from "pdf-lib";
 import { OrderWithDetails } from "@/infra/OrderRepository";
-import { formatInvoiceNumber } from "@/domain/order";
+import { formatInvoiceNumber, orderReference } from "@/domain/order";
 import { INVOICE_LOGO_PNG_BASE64 } from "@/lib/invoiceLogo";
 
 export { formatInvoiceNumber };
@@ -31,10 +31,6 @@ function money(amountInCents: number): string {
       currency: "EUR",
     }),
   );
-}
-
-function orderReference(orderId: string): string {
-  return `#${orderId.slice(-8).toUpperCase()}`;
 }
 
 export async function generateInvoicePdf(params: {
@@ -125,7 +121,7 @@ export async function generateInvoicePdf(params: {
     metaCenter,
     y,
   );
-  drawRightAligned(orderReference(order.id), A4.width - MARGIN, y);
+  drawRightAligned(orderReference(order), A4.width - MARGIN, y);
   y -= 24;
   drawRule(y);
   y -= 28;

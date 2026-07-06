@@ -2,6 +2,7 @@
 
 export interface OrderWithDetails {
   id: string;
+  orderNumber?: string | null;
   customerName: string;
   customerEmail: string;
   customerPhone?: string | null;
@@ -47,6 +48,7 @@ export interface OrderWithDetails {
 
 export interface OrderSummary {
   id: string;
+  orderNumber?: string | null;
   customerName: string;
   customerEmail: string;
   totalAmount: number;

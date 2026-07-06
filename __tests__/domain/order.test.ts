@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { calculateOrderTotal } from "@/domain/order";
+import {
+  calculateOrderTotal,
+  generateOrderNumber,
+  orderReference,
+} from "@/domain/order";
 import type { OrderItem } from "@/domain/order";
 
 const item = (total: number): OrderItem => ({
@@ -55,5 +59,36 @@ describe("calculateOrderTotal", () => {
 
     expect(result.shipping).toBe(0);
     expect(result.total).toBe(12100);
+  });
+});
+
+describe("generateOrderNumber", () => {
+  it("produces short references a customer can read over the phone", () => {
+    for (let i = 0; i < 200; i++) {
+      expect(generateOrderNumber()).toMatch(/^MS-[2-9A-HJKMNP-Z]{6}$/);
+    }
+  });
+
+  it("never uses characters that are easy to confuse when dictated (0/O, 1/I/L)", () => {
+    for (let i = 0; i < 200; i++) {
+      expect(generateOrderNumber()).not.toMatch(/[01OIL]/);
+    }
+  });
+});
+
+describe("orderReference", () => {
+  it("prefers the short order number when the order has one", () => {
+    expect(
+      orderReference({ orderNumber: "MS-7KQ2M4", id: "5b9f930f-a0ee" }),
+    ).toBe("MS-7KQ2M4");
+  });
+
+  it("falls back to a short tail of the UUID for orders created before the migration", () => {
+    expect(
+      orderReference({
+        orderNumber: null,
+        id: "5b9f930f-a0ee-49d1-a271-afb177447382",
+      }),
+    ).toBe("#77447382");
   });
 });

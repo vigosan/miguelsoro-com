@@ -9,6 +9,7 @@ import {
   ProductVariant,
 } from "./OrderRepository";
 import { v4 as uuidv4 } from "uuid";
+import { generateOrderNumber } from "../domain/order";
 
 export class DatabaseOrderRepository implements OrderRepository {
   private getClient() {
@@ -73,6 +74,7 @@ export class DatabaseOrderRepository implements OrderRepository {
       .select(
         `
         id,
+        orderNumber,
         customerName,
         customerEmail,
         total,
@@ -102,6 +104,7 @@ export class DatabaseOrderRepository implements OrderRepository {
 
     return (orders || []).map((order) => ({
       id: order.id,
+      orderNumber: order.orderNumber ?? null,
       customerName: order.customerName,
       customerEmail: order.customerEmail,
       totalAmount: order.total,
@@ -230,32 +233,51 @@ export class DatabaseOrderRepository implements OrderRepository {
   async create(data: CreateOrderData): Promise<OrderWithDetails> {
     const supabase = this.getClient();
 
-    // Create order
+    // Create order. The short customer-facing reference is random, so retry
+    // with a fresh one on the (rare) unique-constraint collision.
     const orderId = uuidv4();
     const now = new Date().toISOString();
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        id: orderId,
-        customerEmail: data.customerEmail,
-        customerName: data.customerName,
-        customerPhone: data.customerPhone,
-        shippingAddress: data.shippingAddress,
-        paypalOrderId: data.paypalOrderId,
-        status: data.status,
-        subtotal: data.subtotal,
-        tax: data.tax,
-        shipping: data.shipping,
-        total: data.total,
-        createdAt: now,
-        updatedAt: now,
-      })
-      .select()
-      .single();
+    const MAX_ATTEMPTS = 3;
+    let order: { id: string } | null = null;
 
-    if (orderError) {
-      console.error("Error creating order:", orderError);
-      throw new Error(`Failed to create order: ${orderError.message}`);
+    for (let attempt = 0; attempt < MAX_ATTEMPTS && !order; attempt++) {
+      const { data: inserted, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          id: orderId,
+          orderNumber: generateOrderNumber(),
+          customerEmail: data.customerEmail,
+          customerName: data.customerName,
+          customerPhone: data.customerPhone,
+          shippingAddress: data.shippingAddress,
+          paypalOrderId: data.paypalOrderId,
+          status: data.status,
+          subtotal: data.subtotal,
+          tax: data.tax,
+          shipping: data.shipping,
+          total: data.total,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        const isOrderNumberCollision =
+          orderError.code === "23505" &&
+          orderError.message.includes("orderNumber");
+        if (isOrderNumberCollision && attempt < MAX_ATTEMPTS - 1) {
+          continue;
+        }
+        console.error("Error creating order:", orderError);
+        throw new Error(`Failed to create order: ${orderError.message}`);
+      }
+
+      order = inserted;
+    }
+
+    if (!order) {
+      throw new Error("Failed to create order: could not assign order number");
     }
 
     // Create order items
@@ -404,6 +426,7 @@ export class DatabaseOrderRepository implements OrderRepository {
   private mapToOrderWithDetails(dbOrder: any): OrderWithDetails {
     return {
       id: dbOrder.id,
+      orderNumber: dbOrder.orderNumber ?? null,
       customerName: dbOrder.customerName,
       customerEmail: dbOrder.customerEmail,
       customerPhone: dbOrder.customerPhone,

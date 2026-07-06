@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { orderReference } from "@/domain/order";
 import { requireAuth } from "@/lib/auth";
 import { paymentsController } from "@/lib/paypal";
 import {
@@ -79,7 +80,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           customerEmail: order.customerEmail,
           pictureTitle: order.items[0]?.variant?.product?.title || "Obra de arte",
           picturePrice: order.total,
-          orderId: order.id,
+          orderId: orderReference(order),
           paypalOrderId: order.paypalOrderId || undefined,
         },
         "REFUNDED",

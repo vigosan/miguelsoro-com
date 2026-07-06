@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Toaster, toast } from "react-hot-toast";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
 import { OrderWithDetails } from "../../../infra/OrderRepository";
-import { formatInvoiceNumber } from "../../../domain/order";
+import { formatInvoiceNumber, orderReference } from "../../../domain/order";
 import { Skeleton } from "../../../components/ui/Skeleton";
 import { PageHeader } from "../../../components/admin/PageHeader";
 import {
@@ -246,7 +246,7 @@ function OrderDetails() {
     <>
       <div className="space-y-6">
         <PageHeader
-          title={`Pedido #${order.id ? order.id.slice(-8).toUpperCase() : "N/A"}`}
+          title={`Pedido ${orderReference(order)}`}
           description={`Creado el ${formatDate(order.createdAt)}`}
           action={
             <button

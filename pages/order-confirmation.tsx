@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "../components/Layout";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
-import { formatPrice } from "../domain/order";
+import { formatPrice, orderReference } from "../domain/order";
 import Link from "next/link";
 
 interface Order {
   id: string;
+  orderNumber?: string | null;
   customerEmail: string;
   customerName: string;
   status: string;
@@ -121,7 +122,7 @@ export default function OrderConfirmationPage() {
             ¡Gracias por tu pedido!
           </h1>
           <p className="text-lg text-gray-600">
-            Tu pedido #{order.id.slice(-8)} ha sido{" "}
+            Tu pedido {orderReference(order)} ha sido{" "}
             {isPaid ? "procesado" : "recibido"} exitosamente.
           </p>
         </div>
@@ -162,8 +163,8 @@ export default function OrderConfirmationPage() {
               </h2>
               <div className="space-y-2">
                 <p>
-                  <span className="font-medium">Número:</span> #
-                  {order.id.slice(-8)}
+                  <span className="font-medium">Número:</span>{" "}
+                  {orderReference(order)}
                 </p>
                 <p>
                   <span className="font-medium">Fecha:</span>{" "}

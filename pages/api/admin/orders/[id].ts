@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { orderReference } from "@/domain/order";
 import {
   findOrderByIdForAdmin,
   updateOrderStatus,
@@ -19,6 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // Transform order to match expected format
       const transformedOrder = {
         id: order.id,
+        orderNumber: order.orderNumber,
         customerName: order.customerName,
         customerEmail: order.customerEmail,
         customerPhone: order.customerPhone,
@@ -139,7 +141,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               customerEmail: updatedOrder.customerEmail,
               pictureTitle: firstItem?.variant?.product?.title || "Obra de arte",
               picturePrice: updatedOrder.total,
-              orderId: updatedOrder.id,
+              orderId: orderReference(updatedOrder),
               paypalOrderId: updatedOrder.paypalOrderId || undefined,
             },
             status,

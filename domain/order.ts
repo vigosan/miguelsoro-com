@@ -88,6 +88,27 @@ export interface PayPalOrderData {
   }>;
 }
 
+// No 0/O or 1/I/L: customers dictate this over the phone and email
+const ORDER_NUMBER_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+
+export function generateOrderNumber(): string {
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code +=
+      ORDER_NUMBER_ALPHABET[
+        Math.floor(Math.random() * ORDER_NUMBER_ALPHABET.length)
+      ];
+  }
+  return `MS-${code}`;
+}
+
+export function orderReference(order: {
+  orderNumber?: string | null;
+  id: string;
+}): string {
+  return order.orderNumber ?? `#${order.id.slice(-8).toUpperCase()}`;
+}
+
 export function formatPrice(cents: number): string {
   return `€${(cents / 100).toFixed(2)}`;
 }

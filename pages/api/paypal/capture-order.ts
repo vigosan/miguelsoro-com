@@ -7,6 +7,7 @@ import {
   sendAdminNotificationEmail,
 } from "../../../lib/email";
 import { getGeneralSettings } from "../../../services/databaseGeneralSettings";
+import { orderReference } from "../../../domain/order";
 
 export default async function handler(
   req: NextApiRequest,
@@ -88,7 +89,7 @@ export default async function handler(
         customerEmail: order.customerEmail,
         pictureTitle: firstItem?.variant?.product?.title || "Obra de arte",
         picturePrice: order.total,
-        orderId: order.id,
+        orderId: orderReference(order),
         paypalOrderId: order.paypalOrderId || undefined,
       };
 

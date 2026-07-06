@@ -115,7 +115,7 @@ describe("/api/admin/orders/[id] PUT", () => {
         customerName: "John Doe",
         customerEmail: "john@example.com",
         pictureTitle: "Test Artwork",
-        orderId: "order-123",
+        orderId: "MS-ABC234",
       }),
       "PROCESSING",
       undefined,

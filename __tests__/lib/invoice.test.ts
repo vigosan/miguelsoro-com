@@ -63,7 +63,7 @@ describe("generateInvoicePdf", () => {
     expect(pdf.toString("latin1")).toContain("/Image");
   });
 
-  it("shows the short order reference instead of the raw database id", async () => {
+  it("shows the customer-facing order number instead of the raw database id", async () => {
     const pdf = await generateInvoicePdf({
       order: { ...mockOrder, id: "14a87447-1836-431a-a623-491676546b6e" },
       seller,
@@ -72,7 +72,23 @@ describe("generateInvoicePdf", () => {
     });
 
     const text = extractDrawnText(pdf);
-    expect(text).toContain("76546B6E");
+    expect(text).toContain("MS-ABC234");
     expect(text).not.toContain("14a87447-1836-431a-a623-491676546b6e");
+  });
+
+  it("falls back to a short id tail for orders created before order numbers existed", async () => {
+    const pdf = await generateInvoicePdf({
+      order: {
+        ...mockOrder,
+        id: "14a87447-1836-431a-a623-491676546b6e",
+        orderNumber: null,
+      },
+      seller,
+      invoiceNumber: 7,
+      invoicedAt: new Date("2026-07-06T10:00:00Z"),
+    });
+
+    const text = extractDrawnText(pdf);
+    expect(text).toContain("#76546B6E");
   });
 });

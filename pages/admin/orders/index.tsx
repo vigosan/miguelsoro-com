@@ -3,7 +3,7 @@ import type { ReactElement } from "react";
 import { GetServerSideProps } from "next";
 import { isAuthenticated } from "../../../lib/auth";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
-import { formatPrice } from "../../../domain/order";
+import { formatPrice, orderReference } from "../../../domain/order";
 import { orderRepository } from "../../../infra/dependencies";
 import Link from "next/link";
 import { Input } from "../../../components/ui/Input";
@@ -12,6 +12,7 @@ import { PageHeader } from "../../../components/admin/PageHeader";
 
 interface Order {
   id: string;
+  orderNumber?: string | null;
   customerEmail: string;
   customerName: string;
   customerPhone?: string;
@@ -163,7 +164,7 @@ export default function AdminOrdersPage({ orders }: Props) {
                   {/* Order info */}
                   <div className="min-w-0 flex-1">
                     <h3 className="text-sm font-medium text-gray-900 truncate">
-                      #{order.id.slice(-8)} - {order.customerName}
+                      {orderReference(order)} - {order.customerName}
                     </h3>
                     <div className="flex items-center space-x-2 mt-1 text-xs text-gray-500">
                       <span>{order.customerEmail}</span>
@@ -317,6 +318,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         orders: orders.map((order) => ({
           id: order.id,
+          orderNumber: order.orderNumber ?? null,
           customerEmail: order.customerEmail,
           customerName: order.customerName,
           customerPhone: null, // OrderSummary doesn't include phone

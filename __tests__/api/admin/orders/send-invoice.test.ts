@@ -84,7 +84,7 @@ describe("/api/admin/orders/[id]/send-invoice POST", () => {
       expect.objectContaining({
         customerName: "John Doe",
         customerEmail: "john@example.com",
-        orderId: "order-123",
+        orderId: "MS-ABC234",
       }),
       "MS-0007",
       Buffer.from("%PDF-fake"),
