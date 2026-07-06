@@ -33,6 +33,31 @@ vi.mock("next/image", () => ({
   default: (props: any) => React.createElement("img", props),
 }));
 
+// Node >= 22 ships an experimental localStorage global that is disabled
+// without --localstorage-file and shadows jsdom's; replace it with an
+// in-memory implementation so components can persist state in tests.
+if (typeof window !== "undefined" && !window.localStorage?.setItem) {
+  const storage = new Map<string, string>();
+  const localStorageMock = {
+    getItem: (key: string) => storage.get(key) ?? null,
+    setItem: (key: string, value: string) => storage.set(key, String(value)),
+    removeItem: (key: string) => storage.delete(key),
+    clear: () => storage.clear(),
+    key: (index: number) => [...storage.keys()][index] ?? null,
+    get length() {
+      return storage.size;
+    },
+  };
+  Object.defineProperty(window, "localStorage", {
+    writable: true,
+    value: localStorageMock,
+  });
+  Object.defineProperty(globalThis, "localStorage", {
+    writable: true,
+    value: localStorageMock,
+  });
+}
+
 // Set up global test environment (only in a browser-like environment)
 if (typeof window !== "undefined") {
   Object.defineProperty(window, "matchMedia", {

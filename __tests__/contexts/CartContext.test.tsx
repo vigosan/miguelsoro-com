@@ -32,7 +32,7 @@ function Harness() {
 describe("CartContext value identity", () => {
   beforeEach(() => {
     captured.length = 0;
-    localStorage.clear();
+    window.localStorage.clear();
   });
 
   it("keeps the same context value across unrelated parent re-renders", async () => {
