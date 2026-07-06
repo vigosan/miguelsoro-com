@@ -12,6 +12,33 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: "Invalid product type id" });
   }
 
+  if (req.method === "PUT") {
+    try {
+      const { displayName, description } = req.body;
+
+      if (!displayName || !displayName.trim()) {
+        return res.status(400).json({ error: "displayName is required" });
+      }
+
+      const productTypeRepository = new DatabaseProductTypeRepository();
+
+      const existing = await productTypeRepository.findById(id);
+      if (!existing) {
+        return res.status(404).json({ error: "Product type not found" });
+      }
+
+      const productType = await productTypeRepository.update(id, {
+        displayName,
+        description,
+      });
+
+      return res.status(200).json({ productType });
+    } catch (error) {
+      console.error("Error updating product type:", error);
+      return res.status(500).json({ error: "Failed to update product type" });
+    }
+  }
+
   if (req.method === "DELETE") {
     try {
       const productTypeRepository = new DatabaseProductTypeRepository();
@@ -41,7 +68,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }
 
-  res.setHeader("Allow", ["DELETE"]);
+  res.setHeader("Allow", ["PUT", "DELETE"]);
   return res.status(405).json({ error: "Method not allowed" });
 };
 

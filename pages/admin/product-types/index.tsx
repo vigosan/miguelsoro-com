@@ -63,30 +63,40 @@ export default function ProductTypesAdmin() {
 
     setSubmitting(true);
     try {
-      const response = await fetch("/api/admin/product-types", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        editingType
+          ? `/api/admin/product-types/${editingType.id}`
+          : "/api/admin/product-types",
+        {
+          method: editingType ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al crear el tipo de producto");
+        throw new Error(data.error || "Error al guardar el tipo de producto");
       }
 
-      toast.success("Tipo de producto creado correctamente");
+      toast.success(
+        editingType
+          ? "Tipo de producto actualizado correctamente"
+          : "Tipo de producto creado correctamente",
+      );
+      setEditingType(null);
       setFormData({ displayName: "", description: "" });
       setShowCreateForm(false);
       fetchProductTypes();
     } catch (error) {
-      console.error("Error creating product type:", error);
+      console.error("Error saving product type:", error);
       toast.error(
         error instanceof Error
           ? error.message
-          : "Error al crear el tipo de producto",
+          : "Error al guardar el tipo de producto",
       );
     } finally {
       setSubmitting(false);
@@ -179,12 +189,14 @@ export default function ProductTypesAdmin() {
                   placeholder="Ej: Reproducciones de Alta Calidad"
                   required
                 />
-                <p className="text-xs sm:text-sm text-gray-500 mt-1 break-words">
-                  Se generará automáticamente un nombre interno:{" "}
-                  {formData.displayName
-                    ? formData.displayName.toLowerCase().replace(/\s+/g, "-")
-                    : ""}
-                </p>
+                {!editingType && (
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1 break-words">
+                    Se generará automáticamente un nombre interno:{" "}
+                    {formData.displayName
+                      ? formData.displayName.toLowerCase().replace(/\s+/g, "-")
+                      : ""}
+                  </p>
+                )}
               </div>
 
               <Textarea
