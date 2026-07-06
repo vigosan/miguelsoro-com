@@ -8,6 +8,9 @@ type GeneralSettings = {
   siteName: string;
   siteDescription: string;
   contactEmail: string;
+  businessName: string;
+  businessNif: string;
+  businessAddress: string;
 };
 
 const defaultSettings: GeneralSettings = {
@@ -15,6 +18,9 @@ const defaultSettings: GeneralSettings = {
   siteDescription:
     "Obras de arte originales inspiradas en el mundo del ciclismo",
   contactEmail: "info@miguelsoro.com",
+  businessName: "",
+  businessNif: "",
+  businessAddress: "",
 };
 
 export default function GeneralSettings() {
@@ -32,6 +38,9 @@ export default function GeneralSettings() {
             siteDescription:
               data.siteDescription ?? defaultSettings.siteDescription,
             contactEmail: data.contactEmail ?? defaultSettings.contactEmail,
+            businessName: data.businessName ?? "",
+            businessNif: data.businessNif ?? "",
+            businessAddress: data.businessAddress ?? "",
           });
         }
       } catch (error) {
@@ -98,6 +107,40 @@ export default function GeneralSettings() {
             onChange={(e) =>
               setSettings({ ...settings, contactEmail: e.target.value })
             }
+          />
+        </div>
+
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 mt-6 sm:mt-8 mb-2">
+          Datos fiscales
+        </h3>
+        <p className="text-sm text-gray-600 mb-4 sm:mb-6">
+          Aparecen en las facturas enviadas a los clientes. Sin ellos no se
+          pueden emitir facturas.
+        </p>
+        <div className="space-y-4 sm:space-y-6">
+          <Input
+            label="Nombre o razón social"
+            type="text"
+            value={settings.businessName}
+            onChange={(e) =>
+              setSettings({ ...settings, businessName: e.target.value })
+            }
+          />
+          <Input
+            label="NIF"
+            type="text"
+            value={settings.businessNif}
+            onChange={(e) =>
+              setSettings({ ...settings, businessNif: e.target.value })
+            }
+          />
+          <Textarea
+            label="Dirección fiscal"
+            value={settings.businessAddress}
+            onChange={(e) =>
+              setSettings({ ...settings, businessAddress: e.target.value })
+            }
+            rows={2}
           />
         </div>
       </div>

@@ -5,6 +5,9 @@ export interface GeneralSettings {
   siteName: string;
   siteDescription: string;
   contactEmail: string;
+  businessName: string | null;
+  businessNif: string | null;
+  businessAddress: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -37,6 +40,9 @@ export async function getGeneralSettings(): Promise<GeneralSettings | null> {
           siteName: settings.siteName,
           siteDescription: settings.siteDescription,
           contactEmail: settings.contactEmail,
+          businessName: settings.businessName,
+          businessNif: settings.businessNif,
+          businessAddress: settings.businessAddress,
           isActive: settings.isActive,
           createdAt: settings.createdAt,
           updatedAt: settings.updatedAt,
@@ -52,6 +58,9 @@ export async function saveGeneralSettings(data: {
   siteName: string;
   siteDescription: string;
   contactEmail: string;
+  businessName?: string | null;
+  businessNif?: string | null;
+  businessAddress?: string | null;
 }): Promise<GeneralSettings> {
   const supabase = createAdminClient();
 
@@ -67,6 +76,9 @@ export async function saveGeneralSettings(data: {
       siteName: data.siteName,
       siteDescription: data.siteDescription,
       contactEmail: data.contactEmail,
+      businessName: data.businessName ?? null,
+      businessNif: data.businessNif ?? null,
+      businessAddress: data.businessAddress ?? null,
       isActive: true,
     })
     .select()
@@ -82,6 +94,9 @@ export async function saveGeneralSettings(data: {
     siteName: settings.siteName,
     siteDescription: settings.siteDescription,
     contactEmail: settings.contactEmail,
+    businessName: settings.businessName,
+    businessNif: settings.businessNif,
+    businessAddress: settings.businessAddress,
     isActive: settings.isActive,
     createdAt: settings.createdAt,
     updatedAt: settings.updatedAt,

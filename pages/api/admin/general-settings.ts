@@ -23,6 +23,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         siteName: settings.siteName,
         siteDescription: settings.siteDescription,
         contactEmail: settings.contactEmail,
+        businessName: settings.businessName,
+        businessNif: settings.businessNif,
+        businessAddress: settings.businessAddress,
       });
     } catch (error) {
       console.error("Error fetching general settings:", error);
@@ -30,7 +33,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   } else if (req.method === "POST") {
     try {
-      const { siteName, siteDescription, contactEmail } = req.body ?? {};
+      const {
+        siteName,
+        siteDescription,
+        contactEmail,
+        businessName,
+        businessNif,
+        businessAddress,
+      } = req.body ?? {};
 
       if (typeof siteName !== "string" || !siteName.trim()) {
         return res
@@ -48,12 +58,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         siteDescription:
           typeof siteDescription === "string" ? siteDescription : "",
         contactEmail: contactEmail.trim(),
+        businessName:
+          typeof businessName === "string" ? businessName.trim() : null,
+        businessNif:
+          typeof businessNif === "string" ? businessNif.trim() : null,
+        businessAddress:
+          typeof businessAddress === "string" ? businessAddress.trim() : null,
       });
 
       return res.status(200).json({
         siteName: settings.siteName,
         siteDescription: settings.siteDescription,
         contactEmail: settings.contactEmail,
+        businessName: settings.businessName,
+        businessNif: settings.businessNif,
+        businessAddress: settings.businessAddress,
       });
     } catch (error) {
       console.error("Error saving general settings:", error);
