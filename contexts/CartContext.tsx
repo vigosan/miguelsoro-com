@@ -1,4 +1,10 @@
-import { createContext, useContext, useReducer, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useMemo,
+} from "react";
 import { formatEuros } from "../domain/order";
 
 export interface CartItem {
@@ -237,54 +243,39 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("miguelsoroCart", JSON.stringify(state.items));
   }, [state.items]);
 
-  const addItem = (item: Omit<CartItem, "quantity">) => {
-    dispatch({ type: "ADD_ITEM", payload: item });
-  };
-
-  const removeItem = (variantId: string) => {
-    dispatch({ type: "REMOVE_ITEM", payload: { variantId } });
-  };
-
-  const updateQuantity = (variantId: string, quantity: number) => {
-    dispatch({ type: "UPDATE_QUANTITY", payload: { variantId, quantity } });
-  };
-
-  const updatePrice = (variantId: string, price: number) => {
-    dispatch({ type: "UPDATE_PRICE", payload: { variantId, price } });
-  };
-
-  const clearCart = () => {
-    dispatch({ type: "CLEAR_CART" });
-  };
-
-  const toggleCart = () => {
-    dispatch({ type: "TOGGLE_CART" });
-  };
-
-  const setCartOpen = (open: boolean) => {
-    dispatch({ type: "SET_CART_OPEN", payload: open });
-  };
-
-  const getFormattedTotal = () => {
-    return formatEuros(state.total);
-  };
+  // Memoized on state so unrelated provider re-renders (e.g. route changes)
+  // keep the same value identity and don't re-render every consumer.
+  const value = useMemo(
+    () => ({
+      state,
+      addItem: (item: Omit<CartItem, "quantity">) => {
+        dispatch({ type: "ADD_ITEM", payload: item });
+      },
+      removeItem: (variantId: string) => {
+        dispatch({ type: "REMOVE_ITEM", payload: { variantId } });
+      },
+      updateQuantity: (variantId: string, quantity: number) => {
+        dispatch({ type: "UPDATE_QUANTITY", payload: { variantId, quantity } });
+      },
+      updatePrice: (variantId: string, price: number) => {
+        dispatch({ type: "UPDATE_PRICE", payload: { variantId, price } });
+      },
+      clearCart: () => {
+        dispatch({ type: "CLEAR_CART" });
+      },
+      toggleCart: () => {
+        dispatch({ type: "TOGGLE_CART" });
+      },
+      setCartOpen: (open: boolean) => {
+        dispatch({ type: "SET_CART_OPEN", payload: open });
+      },
+      getFormattedTotal: () => formatEuros(state.total),
+    }),
+    [state],
+  );
 
   return (
-    <CartContext.Provider
-      value={{
-        state,
-        addItem,
-        removeItem,
-        updateQuantity,
-        updatePrice,
-        clearCart,
-        toggleCart,
-        setCartOpen,
-        getFormattedTotal,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+    <CartContext.Provider value={value}>{children}</CartContext.Provider>
   );
 }
 
