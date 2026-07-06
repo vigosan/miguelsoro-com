@@ -15,14 +15,18 @@ type Props = {
   hero?: boolean;
 };
 
+const SITE_ORIGIN = "https://www.miguelsoro.com";
+
 export function Layout({
   children,
   title = "Miguel Soro",
   description = "Cycling-inspired artwork by Miguel Soro. Explore contemporary art that captures the beauty and energy of cycling culture.",
   image = "/biography.webp",
-  url = "https://www.miguelsoro.com",
+  url = SITE_ORIGIN,
   hero = false,
 }: Props) {
+  const ogImage = image.startsWith("http") ? image : `${SITE_ORIGIN}${image}`;
+
   return (
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 overflow-x-hidden py-12 px-6 antialiased lg:gap-12 lg:py-16 lg:px-24">
       <Head>
@@ -37,7 +41,7 @@ export function Layout({
         <meta property="og:url" content={url} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content={`${url}${image}`} />
+        <meta property="og:image" content={ogImage} />
         <meta property="og:site_name" content="Miguel Soro" />
         <meta property="og:locale" content="es_ES" />
 
@@ -46,7 +50,7 @@ export function Layout({
         <meta property="twitter:url" content={url} />
         <meta property="twitter:title" content={title} />
         <meta property="twitter:description" content={description} />
-        <meta property="twitter:image" content={`${url}${image}`} />
+        <meta property="twitter:image" content={ogImage} />
 
         {/* Additional SEO */}
         <meta name="author" content="Miguel Soro" />

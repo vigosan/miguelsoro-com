@@ -31,7 +31,11 @@ const news = [
 
 export default function NewsPage() {
   return (
-    <Layout>
+    <Layout
+      title="Noticias - Miguel Soro | Exposiciones y Medios"
+      description="Exposiciones, prensa y novedades de Miguel Soro, ex-ciclista profesional y artista. Archivo de noticias sobre su obra ciclística."
+      url="https://www.miguelsoro.com/noticias"
+    >
       <div className="py-16 lg:py-20">
         <Reveal className="mb-16">
           <SectionLabel prefix="Archivo">Exposiciones y medios</SectionLabel>

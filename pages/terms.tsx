@@ -4,7 +4,11 @@ import { ContactPageLink } from "@/components/navigation/PageLinks";
 
 export default function TermsPage() {
   return (
-    <Layout>
+    <Layout
+      title="Términos y Condiciones - Miguel Soro"
+      description="Condiciones de compra, envío y devoluciones de las obras de Miguel Soro."
+      url="https://www.miguelsoro.com/terms"
+    >
       <div className="flex flex-col gap-4">
         <p>
           Cada obra de Miguel Soro es una interpretación original basada en

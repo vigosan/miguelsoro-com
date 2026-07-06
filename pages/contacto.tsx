@@ -12,7 +12,7 @@ export default function ContactPage() {
       <Layout
         title="Contacto - Miguel Soro Art | Consultas y Adquisiciones"
         description="Contacta con Miguel Soro para consultas sobre adquisición de obras, exposiciones y colaboraciones. Galería de arte ciclístico con presencia internacional. Respuesta en menos de 24 horas."
-        url="https://www.miguelsoro.com/contact"
+        url="https://www.miguelsoro.com/contacto"
       >
         <div className="py-20 lg:py-24">
           <Reveal className="mb-20">

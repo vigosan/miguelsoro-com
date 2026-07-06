@@ -68,7 +68,7 @@ export default function BiographyPage() {
       <Layout
         title="Biografía Miguel Soro - Ex-Ciclista Profesional y Artista | Del Pedal al Pincel"
         description="Conoce la historia de Miguel Soro (Xàtiva, 1976), ex-ciclista profesional convertido en artista reconocido internacionalmente. Exposiciones en España, Italia, Francia, EEUU, Canadá y Australia. Reconocido por Forbes y Giant Bicycles."
-        url="https://www.miguelsoro.com/biography"
+        url="https://www.miguelsoro.com/biografia"
       >
         <div className="py-16 lg:py-20">
           <Reveal className="mb-12">
