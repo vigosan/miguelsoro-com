@@ -72,6 +72,34 @@ const fillRequiredFields = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.type(screen.getByTestId("shipping-address"), "Calle Mayor 1");
 };
 
+describe("CheckoutPage PayPal SDK loading", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.stubGlobal("fetch", fetchMock);
+    fetchMock.mockImplementation(async (url: string) => {
+      if (url === "/api/shipping/settings") {
+        return { ok: true, json: async () => null };
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+  });
+
+  it("starts loading the SDK before the form is complete so the buttons are ready at pay time", () => {
+    render(<CheckoutPage />);
+
+    expect(screen.getByTestId("paypal-provider")).toBeInTheDocument();
+    expect(screen.queryByTestId("paypal-approve")).not.toBeInTheDocument();
+  });
+
+  it("shows the buttons once the form is complete", async () => {
+    const user = userEvent.setup({ delay: null });
+    render(<CheckoutPage />);
+    await fillRequiredFields(user);
+
+    expect(screen.getByTestId("paypal-approve")).toBeInTheDocument();
+  });
+});
+
 describe("CheckoutPage capture flow", () => {
   beforeEach(() => {
     vi.clearAllMocks();

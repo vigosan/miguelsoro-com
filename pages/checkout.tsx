@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useCart } from "../contexts/CartContext";
@@ -33,6 +33,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [shippingSettings, setShippingSettings] =
     useState<ShippingSettings | null>(null);
+  // Stable options identity: a fresh object per render re-initializes the SDK
+  const paypalConfig = useMemo(() => getPayPalClientConfig(), []);
 
   // Fetch shipping settings on mount
   useEffect(() => {
@@ -385,26 +387,26 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {captureFailed ? (
-              <div
-                className="border border-amber-300 bg-amber-50 p-6 text-left"
-                data-testid="capture-failed"
-              >
-                <p className="text-amber-900 font-semibold mb-2">
-                  No hemos podido confirmar tu pago
-                </p>
-                <p className="text-amber-800 text-sm">
-                  Es posible que el cargo se haya realizado correctamente.{" "}
-                  <strong>No vuelvas a intentar pagar</strong>: revisa tu
-                  correo por si has recibido la confirmación del pedido y, si
-                  no llega en unos minutos, contacta con nosotros indicando tu
-                  email. Te confirmaremos el estado del pago antes de cobrar
-                  nada de nuevo.
-                </p>
-              </div>
-            ) : isFormValid() ? (
-              <div>
-                <PayPalScriptProvider options={getPayPalClientConfig()}>
+            <PayPalScriptProvider options={paypalConfig}>
+              {captureFailed ? (
+                <div
+                  className="border border-amber-300 bg-amber-50 p-6 text-left"
+                  data-testid="capture-failed"
+                >
+                  <p className="text-amber-900 font-semibold mb-2">
+                    No hemos podido confirmar tu pago
+                  </p>
+                  <p className="text-amber-800 text-sm">
+                    Es posible que el cargo se haya realizado correctamente.{" "}
+                    <strong>No vuelvas a intentar pagar</strong>: revisa tu
+                    correo por si has recibido la confirmación del pedido y, si
+                    no llega en unos minutos, contacta con nosotros indicando tu
+                    email. Te confirmaremos el estado del pago antes de cobrar
+                    nada de nuevo.
+                  </p>
+                </div>
+              ) : isFormValid() ? (
+                <div>
                   <PayPalButtons
                     disabled={isProcessing}
                     createOrder={createOrder}
@@ -418,30 +420,30 @@ export default function CheckoutPage() {
                       height: 55,
                     }}
                   />
-                </PayPalScriptProvider>
-              </div>
-            ) : (
-              <div className="border-2 border-dashed border-gray-300 p-12 text-center">
-                <div className="text-gray-400 mb-4">
-                  <svg
-                    className="w-12 h-12 mx-auto"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
                 </div>
-                <p className="text-gray-600 font-medium">
-                  Completa la información requerida para continuar con el pago
-                </p>
-              </div>
-            )}
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 p-12 text-center">
+                  <div className="text-gray-400 mb-4">
+                    <svg
+                      className="w-12 h-12 mx-auto"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600 font-medium">
+                    Completa la información requerida para continuar con el pago
+                  </p>
+                </div>
+              )}
+            </PayPalScriptProvider>
 
             {isProcessing && (
               <div
