@@ -5,7 +5,11 @@ import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
 import { OrderWithDetails } from "../../../infra/OrderRepository";
-import { formatInvoiceNumber, orderReference } from "../../../domain/order";
+import {
+  formatInvoiceNumber,
+  orderReference,
+  orderStatusMeta,
+} from "../../../domain/order";
 import { Skeleton } from "../../../components/ui/Skeleton";
 import { PageHeader } from "../../../components/admin/PageHeader";
 import {
@@ -200,48 +204,6 @@ function OrderDetails() {
     return new Date(date).toLocaleString("es-ES");
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PAID":
-        return "bg-green-100 text-green-800";
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800";
-      case "PROCESSING":
-        return "bg-blue-100 text-blue-800";
-      case "SHIPPED":
-        return "bg-blue-100 text-blue-800";
-      case "DELIVERED":
-        return "bg-purple-100 text-purple-800";
-      case "CANCELLED":
-        return "bg-red-100 text-red-800";
-      case "REFUNDED":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "PAID":
-        return "Pagado";
-      case "PENDING":
-        return "Pendiente";
-      case "PROCESSING":
-        return "Procesando";
-      case "SHIPPED":
-        return "Enviado";
-      case "DELIVERED":
-        return "Entregado";
-      case "CANCELLED":
-        return "Cancelado";
-      case "REFUNDED":
-        return "Reembolsado";
-      default:
-        return status;
-    }
-  };
-
   return (
     <>
       <div className="space-y-6">
@@ -266,9 +228,9 @@ function OrderDetails() {
                 Estado del Pedido
               </h2>
               <span
-                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}
+                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${orderStatusMeta(order.status).badgeClasses}`}
               >
-                {getStatusText(order.status)}
+                {orderStatusMeta(order.status).label}
               </span>
             </div>
             {order.status === "PAID" && (
@@ -311,7 +273,7 @@ function OrderDetails() {
                   >
                     {updatingStatus
                       ? "Actualizando…"
-                      : `Marcar como ${getStatusText(nextStatus)}`}
+                      : `Marcar como ${orderStatusMeta(nextStatus).label}`}
                   </button>
                 )}
                 {canCancel && (

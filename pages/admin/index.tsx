@@ -10,6 +10,7 @@ import {
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { usePictureStats } from "@/hooks/usePictures";
+import { orderStatusMeta } from "@/domain/order";
 import { useOrderStats, useOrders } from "@/hooks/useOrders";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -51,16 +52,6 @@ function StatCard({ stat }: { stat: StatCardData }) {
     </Link>
   );
 }
-
-const orderStatusStyles: Record<string, { label: string; classes: string }> = {
-  PENDING: { label: "Pendiente", classes: "bg-yellow-100 text-yellow-800" },
-  PAID: { label: "Pagado", classes: "bg-green-100 text-green-800" },
-  PROCESSING: { label: "Procesando", classes: "bg-blue-100 text-blue-800" },
-  SHIPPED: { label: "Enviado", classes: "bg-blue-100 text-blue-800" },
-  DELIVERED: { label: "Entregado", classes: "bg-purple-100 text-purple-800" },
-  CANCELLED: { label: "Cancelado", classes: "bg-red-100 text-red-800" },
-  REFUNDED: { label: "Reembolsado", classes: "bg-red-100 text-red-800" },
-};
 
 export default function AdminDashboard() {
   const { data: pictureStats, isLoading: pictureStatsLoading } =
@@ -173,10 +164,7 @@ export default function AdminDashboard() {
           ) : (
             <div className="divide-y divide-gray-100">
               {recentOrders.map((order) => {
-                const status = orderStatusStyles[order.status] ?? {
-                  label: order.status,
-                  classes: "bg-gray-100 text-gray-800",
-                };
+                const status = orderStatusMeta(order.status);
                 return (
                   <Link
                     key={order.id}
@@ -193,7 +181,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
                       <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status.classes}`}
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status.badgeClasses}`}
                       >
                         {status.label}
                       </span>

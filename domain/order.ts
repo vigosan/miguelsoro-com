@@ -55,6 +55,52 @@ export enum OrderStatus {
   REFUNDED = "REFUNDED",
 }
 
+export const ORDER_STATUS_META: Record<
+  OrderStatus,
+  { label: string; badgeClasses: string }
+> = {
+  [OrderStatus.PENDING]: {
+    label: "Pendiente",
+    badgeClasses: "bg-yellow-100 text-yellow-800",
+  },
+  [OrderStatus.PAID]: {
+    label: "Pagado",
+    badgeClasses: "bg-green-100 text-green-800",
+  },
+  [OrderStatus.PROCESSING]: {
+    label: "Procesando",
+    badgeClasses: "bg-blue-100 text-blue-800",
+  },
+  [OrderStatus.SHIPPED]: {
+    label: "Enviado",
+    badgeClasses: "bg-blue-100 text-blue-800",
+  },
+  [OrderStatus.DELIVERED]: {
+    label: "Entregado",
+    badgeClasses: "bg-purple-100 text-purple-800",
+  },
+  [OrderStatus.CANCELLED]: {
+    label: "Cancelado",
+    badgeClasses: "bg-red-100 text-red-800",
+  },
+  [OrderStatus.REFUNDED]: {
+    label: "Reembolsado",
+    badgeClasses: "bg-red-100 text-red-800",
+  },
+};
+
+export function orderStatusMeta(status: string): {
+  label: string;
+  badgeClasses: string;
+} {
+  return (
+    ORDER_STATUS_META[status as OrderStatus] ?? {
+      label: status,
+      badgeClasses: "bg-gray-100 text-gray-800",
+    }
+  );
+}
+
 export function formatInvoiceNumber(invoiceNumber: number): string {
   return `MS-${String(invoiceNumber).padStart(4, "0")}`;
 }

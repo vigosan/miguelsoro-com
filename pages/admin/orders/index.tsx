@@ -3,7 +3,11 @@ import type { ReactElement } from "react";
 import { GetServerSideProps } from "next";
 import { isAuthenticated } from "../../../lib/auth";
 import { AdminLayout } from "../../../components/admin/AdminLayout";
-import { formatPrice, orderReference } from "../../../domain/order";
+import {
+  formatPrice,
+  orderReference,
+  orderStatusMeta,
+} from "../../../domain/order";
 import { orderRepository } from "../../../infra/dependencies";
 import Link from "next/link";
 import { Input } from "../../../components/ui/Input";
@@ -29,26 +33,6 @@ interface Props {
   orders: Order[];
   loadError?: boolean;
 }
-
-const statusColors = {
-  PENDING: "bg-yellow-100 text-yellow-800",
-  PAID: "bg-green-100 text-green-800",
-  PROCESSING: "bg-blue-100 text-blue-800",
-  SHIPPED: "bg-purple-100 text-purple-800",
-  DELIVERED: "bg-green-100 text-green-800",
-  CANCELLED: "bg-red-100 text-red-800",
-  REFUNDED: "bg-gray-100 text-gray-800",
-};
-
-const statusLabels = {
-  PENDING: "Pendiente",
-  PAID: "Pagado",
-  PROCESSING: "Procesando",
-  SHIPPED: "Enviado",
-  DELIVERED: "Entregado",
-  CANCELLED: "Cancelado",
-  REFUNDED: "Reembolsado",
-};
 
 const PAGE_SIZE = 20;
 
@@ -200,11 +184,9 @@ export default function AdminOrdersPage({ orders, loadError }: Props) {
                       </span>
                       <span>·</span>
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status as keyof typeof statusColors] || "bg-gray-100 text-gray-800"}`}
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${orderStatusMeta(order.status).badgeClasses}`}
                       >
-                        {statusLabels[
-                          order.status as keyof typeof statusLabels
-                        ] || order.status}
+                        {orderStatusMeta(order.status).label}
                       </span>
                       <span>·</span>
                       <span>
