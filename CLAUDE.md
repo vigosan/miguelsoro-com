@@ -4,129 +4,56 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Miguel Soro Art Website - A Next.js-based art portfolio website showcasing cycling-inspired artwork. The site displays art pieces with images, descriptions, and pricing information across multiple pages including biography, news, contact, and individual artwork pages.
+Miguel Soro Art Website — a production e-commerce site (Next.js 14, Pages Router) selling cycling-inspired artwork. Public gallery + cart/checkout paid through PayPal, plus a full admin panel (pictures, orders, news, product types, settings) behind JWT cookie auth. Data lives in Supabase Postgres. **Real money flows through this code**: never break existing checkout/order behavior.
 
-## Development Commands
+## Commands
 
-### Docker & Database
 ```bash
-# Quick setup for new developers
-make setup           # Complete setup (install deps, start DB, migrate, seed)
-
-# Database management
-make up             # Start PostgreSQL database
-make down           # Stop all services
-make restart        # Restart services
-make logs           # Show database logs
-make clean          # Remove containers and volumes (DANGER: deletes all data)
-
-# Database operations
-# Database migrations and seeding handled by Supabase
-# Use Supabase dashboard or CLI for database operations
-
-# Development
-make dev            # Start dev server with database
-make pgadmin        # Start pgAdmin (http://localhost:5050)
-make status         # Check services status
+npm run dev           # Dev server (localhost:3000)
+npm run build         # Production build (also type-checks pages)
+npm run lint          # ESLint
+npm run format        # Prettier (with Tailwind plugin)
+npm test              # Vitest (single run); npm run test:watch for watch mode
+npx tsc --noEmit      # Full type-check including tests (kept at 0 errors)
+make setup / make up  # Docker Postgres for local development
 ```
-
-### Application Commands
-```bash
-# Development
-npm run dev           # Start development server (localhost:3000)
-npm run build         # Build for production
-npm start            # Start production server
-
-# Code Quality
-npm run lint         # Run ESLint
-npm run format       # Format code with Prettier + Tailwind plugin
-```
-
-## Technology Stack
-
-- **Framework**: Next.js 14 with Pages Router (not App Router)
-- **Database**: PostgreSQL with Supabase Client
-- **Authentication**: NextAuth.js with database sessions
-- **Styling**: Tailwind CSS v4 (alpha) with PostCSS
-- **Font**: Geist Sans via `geist` package
-- **Icons**: Heroicons + Headless UI React components
-- **Analytics**: Vercel Analytics
-- **Language**: TypeScript with strict mode
-- **Development**: Docker Compose for local PostgreSQL
 
 ## Architecture
 
-The codebase follows a clean architecture pattern with clear separation of concerns:
-
-### Domain Layer
-- `domain/picture.ts` - Core Picture entity with helper functions for paths
-- Pure business logic with no external dependencies
-
-### Application Layer  
-- `application/` - Use cases like `findAllPictures` and `findPictureBySlug`
-- Orchestrates domain objects and infrastructure
-
-### Infrastructure Layer
-- `infra/PictureRepository.ts` - Repository pattern with interface and in-memory implementation
-- `data/pictures.ts` - Static data source for all artwork information
-
-### Presentation Layer
-- `pages/` - Next.js pages using Pages Router
-- `components/` - Reusable UI components (Layout, Header, Footer, Item, List, Pagination)
-- `hooks/` - Custom React hooks (usePictures, usePicture)
-
-### Key Patterns
-
-**Repository Pattern**: Used for data access with `PictureRepository` interface and `InMemoryPictureRepository` implementation. This enables easy testing and future database integration.
-
-**Custom Hooks**: Data fetching logic abstracted into `usePictures()` and `usePicture(slug)` hooks that internally use the repository pattern.
-
-**Component Composition**: 
-- `Layout` component wraps all pages with consistent header/footer
-- `Item` component handles individual artwork display with Next.js Image optimization
-- `List` component manages grid display of artwork items
-
-**Path Management**: Centralized path generation in `domain/picture.ts` with `getPath()` and `getImgPath()` functions.
-
-## File Structure
-
 ```
-├── pages/                 # Next.js pages (Pages Router)
-│   ├── index.tsx         # Homepage with artwork grid
-│   ├── pictures/[slug].tsx # Dynamic artwork detail pages
-│   ├── biography.tsx     # Artist biography
-│   ├── news.tsx         # News/exhibitions
-│   └── contact.tsx      # Contact information
-├── components/           # Reusable UI components
-├── hooks/               # Custom React hooks for data fetching
-├── application/         # Use cases and business logic
-├── domain/             # Core entities and business rules
-├── infra/              # Infrastructure (repositories, data access)
-├── data/               # Static data (artwork information)
-└── utils/              # Utility functions (slug, cn, formatCurrency)
+domain/        # Entities + pure business logic (Picture, Order, News)
+application/   # Use cases (orderUseCases.ts: CreateOrder, CapturePayPalOrder, webhooks)
+infra/         # Repository interfaces + Supabase implementations
+services/      # DB-backed settings (general/shipping) with a 60s in-memory cache
+lib/           # auth (JWT), paypal client, email (Resend), invoice PDF (pdf-lib)
+hooks/         # TanStack Query hooks (usePictures, useOrders, useAdminSettings, ...)
+contexts/      # CartContext (localStorage-persisted cart)
+pages/         # Pages Router; pages/api/** for API routes; pages/admin/** for the panel
+supabase/migrations/  # SQL migrations — applied to prod MANUALLY, BEFORE deploying code
 ```
 
-## Data Flow
+## Critical invariants
 
-1. Static artwork data in `data/pictures.ts`
-2. `InMemoryPictureRepository` provides data access
-3. Application services (`findAllPictures`, `findPictureBySlug`) orchestrate operations
-4. Custom hooks (`usePictures`, `usePicture`) manage React state
-5. Components consume data through hooks
-6. Images served from `/public/pictures/` directory
+- **Price units**: the DB stores cents. `Picture.price` is **euros** (repositories convert). Order/variant amounts (`subtotal`, `tax`, `total`, `variant.price`) are **cents**. `formatPrice` takes cents, `formatEuros` takes euros. Check which you have before doing math.
+- **Server is the price/stock authority**: checkout sends only `{variantId, quantity}`; `/api/paypal/create-order` recomputes prices from the DB, validates quantity vs stock, and loads shipping settings itself. Never trust client amounts.
+- **Payment concurrency**: `markPaidByPayPalId` derives `alreadyPaid` from the guarded UPDATE's affected rows (capture endpoint and webhook race); stock updates use compare-and-swap with retry. Webhook status transitions are guarded (`fromStatuses`) so late events can't downgrade PAID orders. Don't "simplify" these.
+- **Order references**: customers see `orderNumber` (`MS-XXXXXX`, via `orderReference()` in domain/order.ts); the UUID stays internal and acts as the unguessable token for `/api/orders/[orderId]` and the confirmation page URL.
+- **Free shipping threshold 0 means disabled** (rate always charged), per the admin UI copy.
+- **Migrations before code**: deploying code that references a column before its migration runs breaks prod (it happened). Apply `supabase/migrations/*.sql` in the Supabase dashboard first.
 
-## Key Configuration
+## Conventions
 
-- **TypeScript**: Strict mode enabled with path aliases (`@/*` maps to `./`)
-- **Tailwind**: v4 alpha with custom PostCSS configuration
-- **Next.js**: Transpiles `geist` package, uses Pages Router
-- **Image Optimization**: All artwork images are `.webp` format for performance
+- Pages Router (not App Router). Public pages use ISR (`getStaticProps` + `revalidate: 3600`); admin picture create/update/delete revalidate `/`, `/obra`, and detail pages.
+- Admin data fetching goes through TanStack Query hooks in `hooks/` (query keys + mutations that invalidate). `usePictures.ts` is the reference pattern. No manual `useState`+`useEffect` fetch triads.
+- All `/api/admin/**` routes are wrapped in `requireAuth` (lib/auth.ts). `/api/news` mutations and the `?all=true` draft listing also require auth.
+- Admin UI: shared primitives in `components/ui/` (Input, Select, ConfirmDialog...), `PageHeader`, one `Toaster` mounted in `AdminLayout`, order status labels/colors from `orderStatusMeta()` in domain/order.ts.
+- Settings reads (`getGeneralSettings`/`getShippingSettings`) are cached ~60s via `services/settingsCache.ts`; writers invalidate. Fiscal data feeds invoices — the settings forms must not render editable defaults before data loads.
+- Testing: Vitest + Testing Library, TDD (red first). API tests mock `@/infra/dependencies` and use helpers from `__tests__/api/simple-helpers.ts` (`createAuthedRequest` for protected routes). Tests must encode WHY (e.g. "unique artwork cannot oversell").
+- Images: blob storage (Vercel Blob) with `/pictures/*.webp` as legacy fallback; always set `sizes` on `fill` images.
 
-## Development Notes
+## Gotchas
 
-- Uses Pages Router (not App Router) - maintain this pattern
-- All artwork images should be placed in `/public/pictures/` as `.webp` files
-- Artwork data is statically defined - no external API calls
-- Repository pattern enables easy transition to database if needed
-- Component styling uses Tailwind classes with `cn()` utility for conditional classes
-- Typography follows consistent hierarchy with Geist Sans font
+- `next build` type-checks everything; run it before committing API/type changes — vitest alone won't catch type errors.
+- jsdom tests: Node ≥22 ships a disabled `localStorage` global; `test/setup.ts` polyfills it (plus matchMedia, observers).
+- PayPal webhook signature verification (`lib/paypalWebhook.ts`) is correct — never weaken it.
+- The cart stores prices in euros; `/api/cart/validate` variants return cents (divide by 100 when comparing).
