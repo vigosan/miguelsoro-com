@@ -184,6 +184,7 @@ export function useCartValidation() {
     if (state.items.length === 0) return;
 
     const interval = setInterval(() => {
+      if (document.visibilityState !== "visible") return;
       validateCart();
     }, 30000); // 30 seconds
 

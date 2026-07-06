@@ -3,14 +3,20 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
-  useCartValidation,
   CartValidationIssue,
+  CartValidationResult,
 } from "../../hooks/useCartValidation";
 import { useCart } from "../../contexts/CartContext";
 import { useState } from "react";
 
-export default function CartValidationBanner() {
-  const { isValid, issues, isLoading } = useCartValidation();
+interface Props {
+  // Provided by the owner's single useCartValidation() call: a hook call per
+  // banner meant the same cart ran two or three 30-second polls at once.
+  validation: Pick<CartValidationResult, "isValid" | "issues" | "isLoading">;
+}
+
+export default function CartValidationBanner({ validation }: Props) {
+  const { isValid, issues, isLoading } = validation;
   const { removeItem, updateQuantity, updatePrice } = useCart();
   const [dismissedIssues, setDismissedIssues] = useState<string[]>([]);
 

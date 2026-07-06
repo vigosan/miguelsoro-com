@@ -11,10 +11,14 @@ import { formatEuros } from "../../domain/order";
 import Image from "next/image";
 import Link from "next/link";
 import CartValidationBanner from "./CartValidationBanner";
+import { useCartValidation } from "../../hooks/useCartValidation";
 
 export default function CartDrawer() {
   const { state, removeItem, updateQuantity, setCartOpen, getFormattedTotal } =
     useCart();
+  // One validation for both responsive panels (they are both mounted,
+  // only hidden by CSS) — each used to run its own 30-second poll.
+  const validation = useCartValidation();
 
   return (
     <Transition.Root show={state.isOpen} as={Fragment}>
@@ -69,7 +73,7 @@ export default function CartDrawer() {
                       </div>
 
                       <div className="mt-8">
-                        <CartValidationBanner />
+                        <CartValidationBanner validation={validation} />
                         <div className="flow-root">
                           <ul
                             role="list"
@@ -248,7 +252,7 @@ export default function CartDrawer() {
                       </div>
 
                       <div className="mt-8">
-                        <CartValidationBanner />
+                        <CartValidationBanner validation={validation} />
                         <div className="flow-root">
                           <ul
                             role="list"

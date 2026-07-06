@@ -72,6 +72,43 @@ describe("useCartValidation shipping changes", () => {
     expect(result.current.isValid).toBe(true);
   });
 
+  it("pauses the 30-second poll while the tab is hidden", async () => {
+    // Background tabs with items in the cart kept hitting the API every
+    // 30 seconds indefinitely — wasted serverless invocations.
+    vi.useFakeTimers();
+    try {
+      respondWith({ standardRate: 500, freeShippingThreshold: 0 });
+      renderHook(() => useCartValidation());
+      await act(async () => {});
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        value: "hidden",
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(30000);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        value: "visible",
+      });
+      respondWith({ standardRate: 500, freeShippingThreshold: 0 });
+      await act(async () => {
+        vi.advanceTimersByTime(30000);
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        value: "visible",
+      });
+    }
+  });
+
   it("stays usable when validation itself fails (server-side checks are authoritative)", async () => {
     // Blocking checkout on a validation blip would cost sales; stock and
     // prices are enforced server-side in create-order regardless.

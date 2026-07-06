@@ -21,7 +21,8 @@ interface CheckoutFormData {
 export default function CheckoutPage() {
   const router = useRouter();
   const { state: cartState, clearCart } = useCart();
-  const { isValid: isCartValid, issues: cartIssues } = useCartValidation();
+  const cartValidation = useCartValidation();
+  const { isValid: isCartValid } = cartValidation;
   const [formData, setFormData] = useState<CheckoutFormData>({
     customerEmail: "",
     customerName: "",
@@ -222,7 +223,7 @@ export default function CheckoutPage() {
           </p>
         </div>
 
-        <CartValidationBanner />
+        <CartValidationBanner validation={cartValidation} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Customer Information Form */}
