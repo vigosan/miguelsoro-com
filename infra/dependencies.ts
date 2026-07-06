@@ -7,6 +7,7 @@ import {
   GetAllOrders,
   FindOrderByIdForAdmin,
   UpdateOrderStatus,
+  GetOrderInvoice,
   GetOrderStats,
   CreateOrder,
   CapturePayPalOrder,
@@ -25,6 +26,7 @@ export const findOrderById = new FindOrderById(orderRepository);
 export const getAllOrders = new GetAllOrders(orderRepository);
 export const findOrderByIdForAdmin = new FindOrderByIdForAdmin(orderRepository);
 export const updateOrderStatus = new UpdateOrderStatus(orderRepository);
+export const getOrderInvoice = new GetOrderInvoice(orderRepository);
 export const getOrderStats = new GetOrderStats(orderRepository);
 export const createOrder = new CreateOrder(
   orderRepository,

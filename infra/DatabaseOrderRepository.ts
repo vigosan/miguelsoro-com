@@ -146,6 +146,28 @@ export class DatabaseOrderRepository implements OrderRepository {
     return updatedOrder;
   }
 
+  async assignInvoiceNumber(id: string): Promise<{
+    invoiceNumber: number;
+    invoicedAt: Date;
+  }> {
+    const supabase = this.getClient();
+
+    const { data, error } = await supabase
+      .rpc("assign_invoice_number", { order_id: id })
+      .single();
+
+    if (error || !data) {
+      console.error("Error assigning invoice number:", error);
+      throw new Error("Failed to assign invoice number");
+    }
+
+    const row = data as { invoiceNumber: number; invoicedAt: string };
+    return {
+      invoiceNumber: row.invoiceNumber,
+      invoicedAt: new Date(row.invoicedAt),
+    };
+  }
+
   async getStats(): Promise<OrderStats> {
     const supabase = this.getClient();
 
@@ -379,6 +401,8 @@ export class DatabaseOrderRepository implements OrderRepository {
       total: dbOrder.total,
       paypalOrderId: dbOrder.paypalOrderId,
       captureId: dbOrder.captureId,
+      invoiceNumber: dbOrder.invoiceNumber,
+      invoicedAt: dbOrder.invoicedAt ? new Date(dbOrder.invoicedAt) : null,
       createdAt: new Date(dbOrder.createdAt),
       updatedAt: new Date(dbOrder.updatedAt),
       items: (dbOrder.order_items || []).map((item: any) => ({

@@ -13,6 +13,8 @@ export interface OrderWithDetails {
   total: number;
   paypalOrderId?: string | null;
   captureId?: string | null;
+  invoiceNumber?: number | null;
+  invoicedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
   items: Array<{
@@ -100,6 +102,13 @@ export interface OrderRepository {
 
   // From /api/admin/orders/[id] - PUT update order status
   updateStatus(id: string, status: string): Promise<OrderWithDetails>;
+
+  // From /api/admin/orders/[id]/invoice - assign the next sequential invoice
+  // number on first call; later calls return the already-assigned number.
+  assignInvoiceNumber(id: string): Promise<{
+    invoiceNumber: number;
+    invoicedAt: Date;
+  }>;
 
   // From /api/admin/orders/stats - GET order statistics
   getStats(): Promise<OrderStats>;

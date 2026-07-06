@@ -55,6 +55,10 @@ export enum OrderStatus {
   REFUNDED = "REFUNDED",
 }
 
+export function formatInvoiceNumber(invoiceNumber: number): string {
+  return `MS-${String(invoiceNumber).padStart(4, "0")}`;
+}
+
 export enum VariantStatus {
   AVAILABLE = "AVAILABLE",
   OUT_OF_STOCK = "OUT_OF_STOCK",

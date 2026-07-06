@@ -72,6 +72,35 @@ export class UpdateOrderStatus {
   }
 }
 
+export class GetOrderInvoice {
+  constructor(private orderRepository: OrderRepository) {}
+
+  async execute(orderId: string) {
+    const order = await this.orderRepository.findByIdForAdmin(orderId);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    const invoiceableStatuses = ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"];
+    if (!invoiceableStatuses.includes(order.status) && !order.invoiceNumber) {
+      throw new Error("Order is not invoiceable");
+    }
+
+    if (order.invoiceNumber && order.invoicedAt) {
+      return {
+        order,
+        invoiceNumber: order.invoiceNumber,
+        invoicedAt: order.invoicedAt,
+      };
+    }
+
+    const { invoiceNumber, invoicedAt } =
+      await this.orderRepository.assignInvoiceNumber(orderId);
+
+    return { order, invoiceNumber, invoicedAt };
+  }
+}
+
 export class GetOrderStats {
   constructor(private orderRepository: OrderRepository) {}
 
