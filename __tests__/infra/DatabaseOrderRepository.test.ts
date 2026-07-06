@@ -99,6 +99,36 @@ describe("DatabaseOrderRepository.markPaidByPayPalId", () => {
   });
 });
 
+describe("DatabaseOrderRepository.updateManyByPayPalId", () => {
+  let repository: DatabaseOrderRepository;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    supabaseMock.state.responses = [];
+    repository = new DatabaseOrderRepository();
+  });
+
+  it("restricts the update to the given source statuses", async () => {
+    queueResponses({ data: null, error: null });
+
+    await repository.updateManyByPayPalId("paypal-123", "PROCESSING", [
+      "PENDING",
+    ]);
+
+    expect(supabaseMock.builder.in).toHaveBeenCalledWith("status", [
+      "PENDING",
+    ]);
+  });
+
+  it("updates unconditionally when no source statuses are given", async () => {
+    queueResponses({ data: null, error: null });
+
+    await repository.updateManyByPayPalId("paypal-123", "REFUNDED");
+
+    expect(supabaseMock.builder.in).not.toHaveBeenCalled();
+  });
+});
+
 describe("DatabaseProductVariantRepository stock updates", () => {
   let repository: DatabaseProductVariantRepository;
 

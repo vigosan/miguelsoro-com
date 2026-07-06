@@ -337,16 +337,23 @@ export class DatabaseOrderRepository implements OrderRepository {
   async updateManyByPayPalId(
     paypalOrderId: string,
     status: string,
+    fromStatuses?: string[],
   ): Promise<void> {
     const supabase = this.getClient();
 
-    const { error } = await supabase
+    let query = supabase
       .from("orders")
       .update({
         status,
         updatedAt: new Date().toISOString(),
       })
       .eq("paypalOrderId", paypalOrderId);
+
+    if (fromStatuses && fromStatuses.length > 0) {
+      query = query.in("status", fromStatuses);
+    }
+
+    const { error } = await query;
 
     if (error) {
       console.error("Error updating many orders by PayPal ID:", error);

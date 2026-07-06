@@ -198,9 +198,12 @@ export class HandleWebhookOrderApproved {
   constructor(private orderRepository: OrderRepository) {}
 
   async execute(paypalOrderId: string) {
+    // Webhooks arrive out of order: a late APPROVED must never downgrade an
+    // order that a capture already marked PAID (or any later status).
     await this.orderRepository.updateManyByPayPalId(
       paypalOrderId,
       "PROCESSING",
+      ["PENDING"],
     );
   }
 }
@@ -236,7 +239,10 @@ export class HandleWebhookPaymentDenied {
   constructor(private orderRepository: OrderRepository) {}
 
   async execute(paypalOrderId: string) {
-    await this.orderRepository.updateManyByPayPalId(paypalOrderId, "CANCELLED");
+    await this.orderRepository.updateManyByPayPalId(paypalOrderId, "CANCELLED", [
+      "PENDING",
+      "PROCESSING",
+    ]);
   }
 }
 

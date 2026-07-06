@@ -124,8 +124,13 @@ export interface OrderRepository {
     alreadyPaid: boolean;
   }>;
 
-  // From webhook - UPDATE multiple orders (updateMany)
-  updateManyByPayPalId(paypalOrderId: string, status: string): Promise<void>;
+  // From webhook - UPDATE multiple orders (updateMany). When fromStatuses is
+  // given, only orders currently in one of those statuses are touched.
+  updateManyByPayPalId(
+    paypalOrderId: string,
+    status: string,
+    fromStatuses?: string[],
+  ): Promise<void>;
 
   setCaptureId(paypalOrderId: string, captureId: string): Promise<void>;
 }
